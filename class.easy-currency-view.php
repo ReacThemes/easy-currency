@@ -94,6 +94,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
     public function eccw_render_currency_switcher ( $args = [] ) {
         
         $settings = $this->eccw_get_currency_common_settings();
+
         $eccw_currency_table = $settings['eccw_currency_table'];
         $default_currency    = $settings['default_currency'];
         $flag_visibility     = $settings['flag_visibility'];
@@ -105,6 +106,14 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
 
         $wrapper_class .= ' position-' . esc_attr($position);
 
+        try {
+            $currency_countries_json = json_decode( $currency_countries['body'], true );
+        } catch ( Exception $ex ) {
+            $currency_countries_json = null; 
+        }
+
+      
+
         ob_start();
         
         ?>
@@ -114,8 +123,20 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
                     <input type="hidden" name="easy_currency">
                     <?php 
                         if( $show_toggle == true ) {
+                            $country = $currency_countries_json[$default_currency]['countries'][0];
+                            $symbol = $currency_countries_json[$default_currency]['symbol'];
+                            $flag_url = 'https://flagcdn.com/24x18/' . strtolower($country).'.png';
+                           
                     ?>
-                    <button type="button" class="easy-currency-switcher-toggle"><?php echo esc_attr($default_currency) ?> <span class="dropdown-icon"></span></button>
+                    <button type="button" class="easy-currency-switcher-toggle">
+                        
+                        <div class="easy-currency-elements">
+                            <img src="<?php echo esc_url( $flag_url );?>" alt="flag" class="flag">
+                            <span class="easy-country-code"><?php echo esc_attr($default_currency); ?> </span>
+                            <span class="easy-country-symbol">(<?php echo esc_attr($symbol); ?>)</span>
+                        </div>
+                        <span class="dropdown-icon"></span>
+                    </button>
                     <?php } ?>
                     <ul class="easy-currency-switcher-select list <?php echo $flag_visibility == 'yes' ? 'has-flag' : '' ?>">
                         <?php 
@@ -130,13 +151,17 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
                         if(is_array($eccw_currency_table) && count($eccw_currency_table) > 0){
                             foreach ($eccw_currency_table as $key => $currency) {
 
+                                
                                 $currency_code = $currency['code'];
-                                $country = $currency_countries_json[$currency_code][0];
+                                $country = $currency_countries_json[$currency_code]['countries'][0];
+                                $symbol = $currency_countries_json[$currency_code]['symbol'];
                                 $flag_url = 'https://flagcdn.com/24x18/' . strtolower($country).'.png';
 
                                 ?>
                                     <li data-value="<?php echo esc_attr($currency_code) ?>" class="option <?php echo $default_currency == $currency_code ? 'selected' : ''; ?>">
-                                        <img src="<?php echo esc_url( $flag_url )?>" alt="<?php echo esc_attr($currency_code)?> flag" class="flag" data-value="<?php echo esc_attr($currency_code) ?>"><?php echo esc_html($currency_code); ?>
+                                        <img src="<?php echo esc_url( $flag_url )?>" alt="<?php echo esc_attr($currency_code)?> flag" class="flag" data-value="<?php echo esc_attr($currency_code) ?>">
+                                        <span class="eccw-dropdown-country-code"><?php echo esc_html($currency_code); ?></span>
+                                        <span class="eccw-dropdown-symbol-code"><?php echo esc_html($symbol); ?></span> 
                                     </li>
                                 <?php
                             } 

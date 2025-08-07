@@ -18,22 +18,60 @@
 }
 .easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle {
   cursor: pointer;
-  background: transparent;
   border-top-width: none;
   border-left-width: none;
   border-bottom-width: none;
   border-right-width: none;
+  display: flex;
+  align-items: center;
+  width: 220px;
+  justify-content: space-between;
+  height: 40px;
+  line-height: 14px;
+  background: #ffffff;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
 }
 .easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle:focus {
   outline: none;
   box-shadow: none;
 }
 .easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle .dropdown-icon {
-  height: 2px;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 6px solid currentColor;
-  display: inline-block;
+  position: relative;
+  margin: 0 8px !important;
+  height: 8px;
+  width: 8px;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle .dropdown-icon::before, .easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle .dropdown-icon:after {
+  content: "";
+  position: absolute;
+  bottom: 0px;
+  width: 0.15rem;
+  height: 100%;
+  transition: all 0.2s;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle .dropdown-icon::before {
+  left: -2px;
+  transform: rotate(-45deg);
+  background-color: #ccc;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle .dropdown-icon::after {
+  left: 3px;
+  transform: rotate(45deg);
+  background-color: #ccc;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle .easy-currency-elements {
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+}
+.easy-currency-switcher .easy_currency_switcher_form.open .dropdown-icon::before {
+  left: -2px;
+  transform: rotate(45deg);
+}
+.easy-currency-switcher .easy_currency_switcher_form.open .dropdown-icon::after {
+  left: 3px;
+  transform: rotate(-45deg);
 }
 .easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select {
   position: absolute;

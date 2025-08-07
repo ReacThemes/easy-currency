@@ -18,21 +18,68 @@
     line-height: 0;
     .easy-currency-switcher-toggle {
       cursor: pointer;
-      background: transparent;
       border-top-width: none;
       border-left-width: none;
       border-bottom-width: none;
       border-right-width: none;
+      display: flex;
+      align-items: center;
+      width: 220px;
+      justify-content: space-between;
+      height: 40px;
+      line-height: 14px;
+      background: #ffffff;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
       &:focus {
         outline: none;
         box-shadow: none;
       }
+
       .dropdown-icon {
-        height: 2px;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-top: 6px solid currentColor;
-        display: inline-block;
+          position: relative;
+          margin: 0 8px !important;
+          height: 8px;
+          width: 8px;
+
+          &::before,
+          &:after {
+              content: "";
+              position: absolute;
+              bottom: 0px;
+              width: 0.15rem;
+              height: 100%;
+              transition: all 0.2s;
+          }
+          &::before {
+              left: -2px;
+              transform: rotate(-45deg);
+              background-color: #ccc;
+          }
+          &::after {
+              left: 3px;
+              transform: rotate(45deg);
+              background-color: #ccc;
+          }
+      }
+
+      .easy-currency-elements {
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+      }
+    }
+
+    &.open {
+      .dropdown-icon {
+        &::before {
+            left: -2px;
+            transform: rotate(45deg);
+        }
+        &::after {
+            left: 3px;
+            transform: rotate(-45deg);
+        }
       }
     }
     .easy-currency-switcher-select {

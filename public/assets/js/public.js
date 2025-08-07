@@ -11,6 +11,8 @@
         openDropdown: function (e) { 
             e.stopPropagation(); // Prevent propagation to the document
             $('.easy-currency-switcher-select').toggleClass('open'); // Toggle the dropdown
+            
+           
         },
         closeDropdownOutSideClick: function () {
             // Close dropdown when clicking outside
@@ -30,6 +32,13 @@
     }
 
     ECCWPublic.init();
+
+
+
+
+
+
+    
 
 
 })(jQuery);

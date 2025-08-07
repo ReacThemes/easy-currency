@@ -1035,7 +1035,14 @@ class ECCW_admin_settings {
                 'desc' => '',
                 'id' => 'eccw_switcher_flag_section_title'
             ),
-           
+             'flag_visibility' => array(
+                'name' => __('Show Flag', 'easy-currency'),
+                'type' => 'select',
+                'options' => ['yes' => 'Yes', 'no' => 'No'],
+                'desc' => __('Show flag on the currency switcher.', 'easy-currency'),
+                'id' => 'design[flag_visibility]',
+                    'default' => isset($design['flag_visibility']) ? $design['flag_visibility'] : 'yes',
+            ),
             'switcher_dropdown_option_flag_size' => array(
                 'name' => __('Flag Size (Width)', 'easy-currency'),
                 'type' => 'text',
