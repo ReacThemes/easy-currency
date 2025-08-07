@@ -1,0 +1,108 @@
+@keyframes growOut {
+  0% {
+    transform: scale(0);
+  }
+  80% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.easy-currency-switcher p {
+  margin: 0 !important;
+}
+.easy-currency-switcher .easy_currency_switcher_form {
+  position: relative;
+  line-height: 0;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle {
+  cursor: pointer;
+  background: transparent;
+  border-top-width: none;
+  border-left-width: none;
+  border-bottom-width: none;
+  border-right-width: none;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle:focus {
+  outline: none;
+  box-shadow: none;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle .dropdown-icon {
+  height: 2px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid currentColor;
+  display: inline-block;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select {
+  position: absolute;
+  background: #fff;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+  top: 100%;
+  left: 0;
+  perspective: 1000px;
+  display: none;
+  overflow-x: hidden;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select::after {
+  border-color: currentColor;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select.open {
+  animation: growOut 300ms ease-in-out forwards;
+  transform-origin: top center;
+  align-content: center;
+  line-height: normal;
+  display: block;
+  z-index: 10;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select.open::after {
+  border-color: currentColor;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select li {
+  cursor: pointer;
+  color: #181823;
+  height: 35px;
+  width: 100%;
+  font-family: inter;
+  font-weight: 600;
+  font-size: initial;
+  text-align: center;
+  border-bottom: 1px solid #dfdfdf;
+  background-color: #f6f6f6;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 5px;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select li.selected {
+  background: #e5e5e5;
+}
+.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select li:hover {
+  background: #e5e5e5;
+}
+.easy-currency-switcher.position-left {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000000000000000000;
+  left: 0;
+}
+.easy-currency-switcher.position-right {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000000000000000000;
+  right: 0;
+}
+.easy-currency-switcher.position-right .easy-currency-switcher-select {
+  right: 0;
+  left: unset;
+}
+
+/*# sourceMappingURL=public.css.map */
