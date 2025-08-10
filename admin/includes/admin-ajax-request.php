@@ -143,17 +143,26 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             }
 
             $shortcode_id = isset($_POST['shortcode_id']) ? absint($_POST['shortcode_id']) : 0;
+            $tab_key      = isset($_POST['tab_key']) ? sanitize_text_field($_POST['tab_key']) : 'eccw_general_tab';
 
             ob_start();
-           // global $ECCW_admin_settings;
-
             $admin_settings = ECCW_admin_settings::get_instance();
-            woocommerce_admin_fields($admin_settings->get_eccw_settings_modal_switcher_tab_fields($shortcode_id));
+
+            if ($tab_key === 'eccw_general_tab') {
+                woocommerce_admin_fields(
+                    $admin_settings->get_eccw_settings_modal_switcher_tab_fields($shortcode_id)
+                );
+            } elseif ($tab_key === 'eccw_display_option_tab') {
+                woocommerce_admin_fields(
+                    $admin_settings->get_eccw_settings_modal_switcher_display_option_fields($shortcode_id)
+                );
+            }
 
             $html = ob_get_clean();
-
             wp_send_json_success(['html' => $html]);
         }
+
+
 
 
     }

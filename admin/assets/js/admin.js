@@ -11,6 +11,7 @@
       this.SwitcherModalStyle();
       this.initializeEccwModalFormInputs();
       this.eccwTemplateLayoutDisplayShowHide();
+      this.initializeRangeSlider();
 
       $(document)
         .on(
@@ -473,38 +474,112 @@
 
     EccwShortcodeModal: function () {
       $(document).ready(function ($) {
+        let currentShortcodeId = null;
+
+        // Open modal on Edit button click
+
         $(".eccw-btn-edit")
           .off("click")
           .on("click", function (e) {
             e.preventDefault();
 
-            var id = $(this).data("id");
+            currentShortcodeId = $(this).data("id");
+            $("#eccw-style-modal-switcher-id").val(currentShortcodeId);
 
-            $("#eccw-style-modal-switcher-id").val(id);
-            $("#eccw-style-modal-switcher-form").empty();
+            $(".eccw-style-modal-switcher-form").empty();
+            $(".eccw-tab-btn").removeClass("active");
+            $(".eccw-tab-btn[data-tab='eccw_general_tab']").addClass("active");
 
-            $.post(
-              eccw_vars.ajaxurl,
-              {
-                action: "eccw_load_modal_content",
-                shortcode_id: id,
-                nonce: eccw_vars.nonce,
-              },
-              function (response) {
-                if (response.success) {
-                  $("#eccw-style-modal-switcher-form").html(response.data.html);
-                  ECCWAdmin.initializeEccwModalFormInputs(
-                    $("#eccw-style-modal-switcher-form")
-                  );
-                  ECCWAdmin.eccwTemplateLayoutDisplayShowHide();
-                  $("#eccw-style-modal-switcher").fadeIn();
-                } else {
-                  alert("Failed to load modal content.");
-                }
+            $(".eccw-style-modal-switcher-form").attr(
+              "data-eccwtab",
+              "eccw_general_tab"
+            );
+
+            eccwLoadModalTabContent(
+              currentShortcodeId,
+              "eccw_general_tab",
+              false,
+              function () {
+                $("#eccw-style-modal-switcher").fadeIn();
               }
             );
           });
 
+        // Tab click event
+        $(document).on("click", ".eccw-tab-btn", function (e) {
+          e.preventDefault(); 
+          let tabKey = $(this).data("tab");
+
+          if (!currentShortcodeId) return;
+
+          $(".eccw-tab-btn").removeClass("active");
+          $(this).addClass("active");
+
+          $(".eccw-style-modal-switcher-form").attr("data-eccwtab", tabKey);
+
+          eccwLoadModalTabContent(currentShortcodeId, tabKey, true);
+        });
+
+
+        function eccwLoadModalTabContent(
+          shortcodeId,
+          tabKey,
+          animate,
+          callback
+        ) {
+          let $formWrapper = $(".eccw-style-modal-switcher-form");
+
+          let fixedHeight = $formWrapper.outerHeight();
+          $formWrapper.css("min-height", fixedHeight + "px");
+
+          if (animate) {
+            $formWrapper.addClass("eccw-loading");
+          }
+
+         
+
+          $.post(
+            eccw_vars.ajaxurl,
+            {
+              action: "eccw_load_modal_content",
+              shortcode_id: shortcodeId,
+              tab_key: tabKey,
+              nonce: eccw_vars.nonce,
+            },
+            function (response) {
+              if (response.success) {
+                if (animate) {
+                  $formWrapper.fadeOut(150, function () {
+                    $formWrapper
+                      .html(response.data.html)
+                      .fadeIn(150, function () {
+                        $formWrapper.css("min-height", "");
+                        $formWrapper.removeClass("eccw-loading");
+                        ECCWAdmin.initializeEccwModalFormInputs($formWrapper);
+                        ECCWAdmin.eccwTemplateLayoutDisplayShowHide();
+                        bindSaveButtonEnable();
+                        ECCWAdmin.initializeRangeSlider();
+                        if (callback) callback();
+                      });
+                  });
+                } else {
+                  $formWrapper.html(response.data.html);
+                  ECCWAdmin.initializeEccwModalFormInputs($formWrapper);
+                  ECCWAdmin.eccwTemplateLayoutDisplayShowHide();
+                  $formWrapper.css("min-height", "");
+                  ECCWAdmin.initializeRangeSlider();
+                  if (callback) callback();
+                }
+              } else {
+                alert("Failed to load modal content.");
+                $formWrapper.css("min-height", "");
+                if (callback) callback();
+              }
+            }
+          );
+        }
+
+        // Close modal
         $(".eccw-style-modal-switcher-close")
           .off("click")
           .on("click", function () {
@@ -527,7 +602,7 @@
 
     SwitcherModalStyle: function () {
       function saveStyleAndMaybeClose(shouldClose) {
-        let form = $("#eccw-style-modal-switcher-form");
+        let form = $(".eccw-style-modal-switcher-form");
         let shortcodeId = $("#eccw-style-modal-switcher-id").val();
         let serializedData = form.find(":input").serializeArray();
 
@@ -562,49 +637,60 @@
 
     eccwTemplateLayoutDisplayShowHide: function () {
       function eccwUpdateTemplateVisibility() {
-          const selected = $('select[name="design[switcher_layout_view_option][layout_style]"]').val();
+        const selected = $(
+          'select[name="design[switcher_layout_view_option][layout_style]"]'
+        ).val();
 
-          console.log(selected)
+        $(".eccw-template").hide();
 
-          $('.eccw-template').hide();
-
-          if (selected === 'dropdown') {
-              $('.dropdown-template').show();
-              $('.dropdown-template:first input').prop('checked', true);
-          } else if (selected === 'side') {
-              $('.side-template').show();
-              $('.side-template:first input').prop('checked', true);
-          }
+        if (selected === "dropdown") {
+          $(".dropdown-template").show();
+          $(".dropdown-template:first input").prop("checked", true);
+        } else if (selected === "side") {
+          $(".side-template").show();
+          $(".side-template:first input").prop("checked", true);
+        }
       }
 
       eccwUpdateTemplateVisibility();
 
-      $('select[name="design[switcher_layout_view_option][layout_style]"]').on('change', function () {
+      $('select[name="design[switcher_layout_view_option][layout_style]"]').on(
+        "change",
+        function () {
           eccwUpdateTemplateVisibility();
-      });
+        }
+      );
     },
 
+    initializeRangeSlider: function () {
+        function initializeSliders() {
+          $('.eccw-slider-range').off('input change').on('input change', function() {
+              let sliderId = $(this).attr('id');
+              let escapedId = sliderId.replace(/([\[\]])/g, '\\$1');
+              $('#' + escapedId + '_value').val($(this).val());
+          });
+        }
+
+        initializeSliders();
+    }
   };
 
   ECCWAdmin.init();
 
-  $("#eccw-style-modal-switcher-form").on(
-    "input change",
-    ":input",
-    function () {
-      $(
-        ".eccw-style-modal-switcher-save-btn, .eccw-style-modal-switcher-save-closebtn"
-      ).prop("disabled", false);
-    }
-  );
+  function bindSaveButtonEnable() {
+    $(".eccw-style-modal-switcher-form").on(
+      "input change",
+      ":input",
+      function () {
+        $(
+          ".eccw-style-modal-switcher-save-btn, .eccw-style-modal-switcher-save-closebtn"
+        )
+          .prop("disabled", false)
+          .removeAttr("disabled");
+      }
+    );
+  }
 
-  $(".eccw-style-modal-switcher-save-btn").on("click", function (e) {
-    e.preventDefault();
-    saveStyleAndMaybeClose(false);
-  });
+  bindSaveButtonEnable();
 
-  $(".eccw-style-modal-switcher-save-closebtn").on("click", function (e) {
-    e.preventDefault();
-    saveStyleAndMaybeClose(true);
-  });
 })(jQuery);

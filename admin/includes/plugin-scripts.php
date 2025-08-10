@@ -19,15 +19,18 @@ function eccw_admin_enqueue_scripts (){
     wp_enqueue_script( 'eccw-admin' );
     
     wp_localize_script(
-            'eccw-admin', 
-            'eccw_vars',
-                [
-                    'ajaxurl'          => admin_url( 'admin-ajax.php' ),
-                    'adminURL'         => admin_url(),
-                    'nonce'            => wp_create_nonce('eccw_nonce'),
-                    'version'          => ECCW_VERSION,
-                    'pluginURL'        => ECCW_DIR_URL,
-                ]
-        );
+        'eccw-admin', 
+        'eccw_vars',
+            [
+                'ajaxurl'          => admin_url( 'admin-ajax.php' ),
+                'adminURL'         => admin_url(),
+                'nonce'            => wp_create_nonce('eccw_nonce'),
+                'version'          => ECCW_VERSION,
+                'pluginURL'        => ECCW_DIR_URL,
+            ]
+    );
+
+    wp_enqueue_style( 'woocommerce_admin_styles' );
+    wp_enqueue_script( 'wc-admin' );
 
 }
