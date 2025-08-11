@@ -384,15 +384,6 @@
   display: block;
 }
 
-.eccw-field, .eccw-field-switch {
-  margin-bottom: 12px;
-}
-
-.eccw-field label {
-  display: block;
-  margin-bottom: 4px;
-}
-
 .eccw-loading {
   position: relative;
   opacity: 0.6;

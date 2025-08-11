@@ -373,13 +373,6 @@ $white-color: #ffffff;
     max-width:150px; 
     display:block;
   }
-
-//   .side-template {
-//     display: none !important;
-//   }
-//   .show-important {
-//   display: block !important;
-// }
 }
 
 .eccw-button-wrapper {
@@ -397,7 +390,6 @@ $white-color: #ffffff;
 /*
 * eccw tab style
 */
-
 
 .eccw-tabs-wrapper {
     display: flex;
@@ -425,14 +417,6 @@ $white-color: #ffffff;
 }
 .eccw-tab-content.active {
     display: block;
-}
-
-.eccw-field, .eccw-field-switch {
-    margin-bottom: 12px;
-}
-.eccw-field label {
-    display: block;
-    margin-bottom: 4px;
 }
 
 .eccw-loading {

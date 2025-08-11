@@ -400,22 +400,21 @@
               const code = response.data.shortcode;
 
               const card = `
-                            <div class="eccw-designer-card">
-                                <div class="eccw-designer-info">
-                                    <div class="eccw-shortcode-box">
-                                        <input type="text" readonly="" class="eccw-shortcode-input" value="${code}">
-                                        <button type="button" class="eccw-copy-btn" title="Copy shortcode">
-                                            <img draggable="false" role="img" class="emoji" alt="📋" src="https://s.w.org/images/core/emoji/16.0.1/svg/1f4cb.svg">
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="eccw-designer-actions">
-                                    <button class="eccw-btn-edit" data-id="${id}">Edit</button>
-                                    <button class="eccw-btn-delete" data-id="${id}">Delete</button>
-                                </div>
-                            </div>
-                        `;
+                  <div class="eccw-designer-card">
+                      <div class="eccw-designer-info">
+                          <div class="eccw-shortcode-box">
+                              <input type="text" readonly="" class="eccw-shortcode-input" value="${code}">
+                              <button type="button" class="eccw-copy-btn" title="Copy shortcode">
+                                  <img draggable="false" role="img" class="emoji" alt="📋" src="https://s.w.org/images/core/emoji/16.0.1/svg/1f4cb.svg">
+                              </button>
+                          </div>
+                      </div>
+                      <div class="eccw-designer-actions">
+                          <button class="eccw-btn-edit" data-id="${id}">Edit</button>
+                          <button class="eccw-btn-delete" data-id="${id}">Delete</button>
+                      </div>
+                  </div>
+              `;
               $(".eccw-designer-list").prepend(card);
             }
           }
@@ -459,12 +458,13 @@
 
         try {
           document.execCommand("copy");
-          const original = $(this).html();
-          $(this).html("✅");
 
-          setTimeout(() => {
-            $(this).html(original);
-          }, 1500);
+          $(".eccw-copy-btn").each(function () {
+            $(this).html('<img draggable="false" role="img" class="emoji" alt="📋" src="https://s.w.org/images/core/emoji/16.0.1/svg/1f4cb.svg">');
+          });
+
+          $(this).html('<img draggable="false" role="img" class="emoji" alt="✅" src="https://s.w.org/images/core/emoji/16.0.1/svg/2705.svg">');
+
         } catch (err) {
           alert("Failed to copy");
         }
@@ -719,11 +719,9 @@
       if (selected === "dropdown") {
         $(".dropdown-template").show();
         $(".eccw-dropdown-display").show();
-        $(".dropdown-template:first input").prop("checked", true);
       } else if (selected === "side") {
         $(".side-template").show();
         $(".eccw-position-settings").show();
-        $(".side-template:first input").prop("checked", true);
       }
     },
 

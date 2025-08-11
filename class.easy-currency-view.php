@@ -15,7 +15,6 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         add_action( 'init', [$this, 'eccw_add_currency_nonce'] );
         add_action( 'init', [$this, 'ecccw_update_currency'] );
         add_shortcode( 'eccw_currency_switcher', [$this, 'eccw_get_currency_switcher'] );
-        add_action("wp_footer", [$this, 'eccw_output_currency_switcher_in_footer']);
 
     }
 
@@ -112,8 +111,6 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
             $currency_countries_json = null; 
         }
 
-      
-
         ob_start();
         
         ?>
@@ -147,11 +144,9 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
                                 $currency_countries_json = null; 
                             }
 
-
                         if(is_array($eccw_currency_table) && count($eccw_currency_table) > 0){
                             foreach ($eccw_currency_table as $key => $currency) {
 
-                                
                                 $currency_code = $currency['code'];
                                 $country = $currency_countries_json[$currency_code]['countries'][0];
                                 $symbol = $currency_countries_json[$currency_code]['symbol'];
@@ -190,29 +185,10 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         return $this->eccw_render_currency_switcher([
             'show_toggle'   => $show_toggle,
             'wrapper_class' => $wrapper_class,
-            'eccw_position'      => $position
+            'eccw_position'  => $position
         ]);
 
     }
-
-    public function eccw_output_currency_switcher_in_footer() {
-        // $settings = $this->eccw_get_currency_common_settings();
-
-        // $eccw_currency_table = $settings['eccw_currency_table'];
-        // $default_currency = $settings['default_currency'];
-        // $flag_visibility = $settings['flag_visibility'];
-        // $currency_countries = $settings['currency_countries'];
-
-        // $eccw_options = get_option('eccw_currency_settings');
-        // $design = isset($eccw_options['design']) && !empty($eccw_options['design']) ? $eccw_options['design'] : '';
-        // $switcher_sticky_onoff = isset( $design['switcher_sticky_onoff'] ) ?  $design['switcher_sticky_onoff'] : '';
-
-        // if( $switcher_sticky_onoff == '1') {
-        //     include_once ECCW_PL_PATH . '/public/views/easy-switcher-classic-view.php';
-        // }
-
-    }
-
 }
 
 new ECCW_CURRENCY_VIEW();
