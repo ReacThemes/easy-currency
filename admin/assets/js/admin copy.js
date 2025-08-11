@@ -502,12 +502,10 @@
               false,
               function () {
                 $("#eccw-style-modal-switcher").fadeIn();
-                let savedLayout = localStorage.getItem(
-                  "eccw_selected_layout_style"
-                );
+                let savedLayout = localStorage.getItem("eccw_selected_layout_style");
                 if (savedLayout) {
                   ECCWAdmin.applyLayoutSelection(savedLayout);
-                  updateModalFormClassByLayout(savedLayout);
+                 
                 }
               }
             );
@@ -518,8 +516,6 @@
           e.preventDefault();
           let tabKey = $(this).data("tab");
 
-          console.log(tabKey);
-
           if (!currentShortcodeId) return;
 
           $(".eccw-tab-btn").removeClass("active");
@@ -527,21 +523,13 @@
 
           $(".eccw-style-modal-switcher-form").attr("data-eccwtab", tabKey);
 
-          eccwLoadModalTabContent(
-            currentShortcodeId,
-            tabKey,
-            true,
-            function () {
-              let savedLayout = localStorage.getItem(
-                "eccw_selected_layout_style"
-              );
-              console.log(savedLayout);
-              if (savedLayout) {
-                ECCWAdmin.applyLayoutSelection(savedLayout);
-                updateModalFormClassByLayout(savedLayout);
-              }
+          eccwLoadModalTabContent(currentShortcodeId, tabKey, true, function () {
+            let savedLayout = localStorage.getItem("eccw_selected_layout_style");
+            if (savedLayout) {
+              ECCWAdmin.applyLayoutSelection(savedLayout);
             }
-          );
+          });
+
         });
 
         function eccwLoadModalTabContent(
@@ -580,7 +568,7 @@
                         setTimeout(() => {
                           ECCWAdmin.eccwTemplateLayoutDisplayShowHide();
                         }, 50);
-
+                        
                         bindSaveButtonEnable();
                         ECCWAdmin.initializeRangeSlider();
                         if (callback) callback();
@@ -661,6 +649,64 @@
       });
     },
 
+    // eccwTemplateLayoutDisplayShowHide: function () {
+    //   const storageKey = "eccw_selected_layout_style";
+
+    //   $(document)
+    //     .off(
+    //       "change",
+    //       'select[name="design[switcher_layout_view_option][layout_style]"]'
+    //     )
+    //     .on(
+    //       "change",
+    //       'select[name="design[switcher_layout_view_option][layout_style]"]',
+    //       function () {
+    //         let selected = $(this).val();
+
+    //         localStorage.setItem(storageKey, selected);
+
+    //         applyLayoutSelection(selected);
+    //       }
+    //     );
+
+    //   let savedLayout = localStorage.getItem(storageKey);
+    //   if (savedLayout) {
+    //     applyLayoutSelection(savedLayout);
+    //     $(
+    //       'select[name="design[switcher_layout_view_option][layout_style]"]'
+    //     ).val(savedLayout);
+    //   } else {
+    //     $(
+    //       'select[name="design[switcher_layout_view_option][layout_style]"]'
+    //     ).trigger("change");
+    //   }
+
+    //   $(document).on("eccw_second_tab_loaded", function () {
+    //     let savedLayout = localStorage.getItem(storageKey);
+    //     if (savedLayout) {
+    //       applyLayoutSelection(savedLayout);
+    //       $(
+    //         'select[name="design[switcher_layout_view_option][layout_style]"]'
+    //       ).val(savedLayout);
+    //     }
+    //   });
+
+    //   function applyLayoutSelection(selected) {
+    //     $(
+    //       ".eccw-template, .eccw-dropdown-display, .eccw-position-settings"
+    //     ).hide();
+
+    //     if (selected === "dropdown") {
+    //       $(".dropdown-template").show();
+    //       $(".eccw-dropdown-display").show();
+    //       $(".dropdown-template:first input").prop("checked", true);
+    //     } else if (selected === "side") {
+    //       $(".side-template").show();
+    //       $(".eccw-position-settings").show();
+    //       $(".side-template:first input").prop("checked", true);
+    //     }
+    //   }
+    // },
 
     eccwTemplateLayoutDisplayShowHide: function () {
       const storageKey = "eccw_selected_layout_style";
@@ -676,7 +722,6 @@
           'select[name="design[switcher_layout_view_option][layout_style]"]',
           function () {
             let selected = $(this).val();
-            updateModalFormClassByLayout(selected);
             localStorage.setItem(storageKey, selected);
             ECCWAdmin.applyLayoutSelection(selected);
           }
@@ -688,7 +733,7 @@
         $(
           'select[name="design[switcher_layout_view_option][layout_style]"]'
         ).val(savedLayout);
-
+       
         ECCWAdmin.applyLayoutSelection(savedLayout);
       } else {
         $(
@@ -697,24 +742,21 @@
       }
 
       // Watch for new DOM elements in second tab
-      const targetNode = document.querySelector(".eccw-style-modal-switcher-form"); 
-      console.log(targetNode);
-     
+      const targetNode = document.querySelector("#second-tab-content"); // তোমার second tab content selector
       if (targetNode) {
         const observer = new MutationObserver(() => {
           let savedLayout = localStorage.getItem(storageKey);
           if (savedLayout) {
+           
             ECCWAdmin.applyLayoutSelection(savedLayout);
-            updateModalFormClassByLayout(savedLayout);
           }
         });
         observer.observe(targetNode, { childList: true, subtree: true });
       }
+
     },
     applyLayoutSelection: function (selected) {
-      $(
-        ".eccw-template, .eccw-dropdown-display, .eccw-position-settings"
-      ).hide();
+      $(".eccw-template, .eccw-dropdown-display, .eccw-position-settings").hide();
 
       if (selected === "dropdown") {
         $(".dropdown-template").show();
@@ -759,19 +801,4 @@
   }
 
   bindSaveButtonEnable();
-
-  function updateModalFormClassByLayout(layout) {
-    const $form = $(".eccw-style-modal-switcher-form");
-
-    $form.removeClass("dropdown side");
-
-    if (layout === "dropdown") {
-      $form.addClass("dropdown");
-    } else if (layout === "side") {
-      $form.addClass("side");
-    }
-  }
-
-
-
 })(jQuery);

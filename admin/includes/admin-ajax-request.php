@@ -152,7 +152,7 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
                 woocommerce_admin_fields(
                     $admin_settings->get_eccw_settings_modal_switcher_tab_fields($shortcode_id)
                 );
-            } elseif ($tab_key === 'eccw_display_option_tab') {
+            } elseif ($tab_key === 'eccw_display_option_tab') { 
                 woocommerce_admin_fields(
                     $admin_settings->get_eccw_settings_modal_switcher_display_option_fields($shortcode_id)
                 );

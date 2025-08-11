@@ -20,8 +20,15 @@ class ECCW_admin_settings {
         add_action('woocommerce_admin_field_template_preview', array( $this, 'eccw_template_preview_field'));
         add_action('woocommerce_admin_field_switcher',array( $this, 'eccw_admin_field_switcher_show_hide'));
         add_action('woocommerce_admin_field_slider', array($this, 'eccw_admin_field_custom_slider'));
+        add_action('woocommerce_admin_field_html', array($this, 'eccw_admin_field_switcher_html_start_end'));
 
     }  
+
+    public function eccw_admin_field_switcher_html_start_end( $value ) {
+        if (!empty($value['html'])) {
+            echo $value['html'];
+        }
+    }
 
     public function eccw_admin_field_custom_slider( $field ) {
         $id = esc_attr( $field['id'] );
@@ -35,11 +42,6 @@ class ECCW_admin_settings {
         echo '<tr valign="top">';
         echo '<th scope="row" class="titledesc">';
         echo esc_html( $field['name'] );
-        if ( $desc ) : ?>
-                    <span class="eccw-tooltip">?
-                        <span class="eccw-tooltiptext"><?php echo esc_html( $desc ); ?></span>
-                    </span>
-                <?php endif; 
         echo '</th>';
 
         echo '<td class="forminp">';
@@ -55,6 +57,8 @@ class ECCW_admin_settings {
 
     public function eccw_template_preview_field($field) {
         $value = isset($field['value']) ? $field['value'] : '';
+
+      //  error_log(print_r($value, true));
         $name  = esc_attr($field['id']);
 
         $templates = array(
@@ -72,8 +76,9 @@ class ECCW_admin_settings {
         $count2 = 1;
         $reset_done = false;
         foreach ($templates as $key => $img_url) {
+            error_log(print_r($key, true));
             $dropdown_class = ( $count == '1' || $count == '2')  ? 'dropdown-template' : 'side-template';
-            $checked = $value === $key ? 'checked' : '';
+            $checked = $value == $key ? 'checked' : '';
            
             echo '
             <label  class="eccw-template '.$dropdown_class.'">
@@ -110,11 +115,6 @@ class ECCW_admin_settings {
         <tr valign="top">
             <th scope="row" class="titledesc">
                 <?php echo esc_html( $field['title'] ); ?>
-                <?php if ( $desc ) : ?>
-                    <span class="eccw-tooltip">?
-                        <span class="eccw-tooltiptext"><?php echo esc_html( $desc ); ?></span>
-                    </span>
-                <?php endif; ?>
             </th>
             <td class="forminp forminp-checkbox">
                 <label class="eccw-switch">
@@ -633,9 +633,9 @@ class ECCW_admin_settings {
         // Retrieve saved settings
         $saved_settings = get_option('eccw_switcher_styles');
 
-        //error_log(print_r)
-
         $design = isset($saved_settings[$current_shortcodeId]) ? $saved_settings[$current_shortcodeId] : [];
+
+        error_log(print_r($design, true ));
 
         $layout_style = array(
             'section_title_layout_style' => array(
@@ -652,7 +652,7 @@ class ECCW_admin_settings {
                     'dropdown' => 'Dropdown',
                     'side' => 'Side',
                 ),
-                'default' => isset($design['switcher_dropdown_option']['layout_style']) ? $design['switcher_dropdown_option']['layout_style'] : 'dropdown',
+                'default' => isset($design['switcher_layout_view_option']['layout_style']) ? $design['switcher_layout_view_option']['layout_style'] : 'dropdown',
                 'class' => 'eccw-text-input ', // Add custom class here
             ),
             'switcher_template' => array(
@@ -1135,7 +1135,12 @@ class ECCW_admin_settings {
 
         $design = isset($saved_settings[$current_shortcodeId]) ? $saved_settings[$current_shortcodeId] : [];
 
-
+        $switcher_elements_display_wrapper_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-section eccw-elements-display">'
+            )
+        );
         $switcher_elements_display = array(
             'eccw_elements_style_title' => array(
                 'name' => __('Switcher Elements Settings', 'easy-currency'),
@@ -1179,6 +1184,20 @@ class ECCW_admin_settings {
             )
         );
 
+        $switcher_elements_display_wrapper_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+        $switcher_dropdown_display_wrapper_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-section eccw-dropdown-display">'
+            )
+        );
+
         $switcher_dropdown_display = array(
             'eccw_switcher_dropdown_style_title' => array(
                 'name' => __('Switcher Dropdown Elements Settings', 'easy-currency'),
@@ -1219,6 +1238,20 @@ class ECCW_admin_settings {
             'eccw_switcher_dropdown_selements_tab_section_end' => array(
                 'type' => 'sectionend',
                 'id' => 'eccw_switcher_dropdown_elements_tab_section_end'
+            )
+        );
+
+         $switcher_dropdown_display_wrapper_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+        $switcher_position_wrapper_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-section eccw-position-settings">'
             )
         );
 
@@ -1280,11 +1313,16 @@ class ECCW_admin_settings {
                 'type' => 'sectionend',
                 'id'   => 'eccw_switcher_position_sec_tab_section_end'
             ),
+
+        );
+        $switcher_position_wrapper_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
         );
 
-
-
-        $all_settings = array_merge( $switcher_elements_display,  $switcher_dropdown_display,  $switcher_position );
+        $all_settings = array_merge( $switcher_elements_display_wrapper_start, $switcher_elements_display,$switcher_elements_display_wrapper_end,  $switcher_dropdown_display_wrapper_start, $switcher_dropdown_display,$switcher_dropdown_display_wrapper_end, $switcher_position_wrapper_start, $switcher_position,$switcher_position_wrapper_end );
         
 
         return $all_settings;
