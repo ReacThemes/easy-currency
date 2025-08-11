@@ -13,6 +13,7 @@
       this.eccwTemplateLayoutDisplayShowHide();
       this.initializeRangeSlider();
       this.applyLayoutSelection();
+      this.eccwTabSwitch();
 
       $(document)
         .on(
@@ -747,6 +748,20 @@
 
       initializeSliders();
     },
+    eccwTabSwitch: function() {
+        $(document).on('click', '.eccw-tab-toggle .eccw-tab-option', function() {
+            let $this = $(this);
+            let value = $this.data('value');
+            let $wrapper = $this.closest('.eccw-tab-toggle');
+
+            $wrapper.find('.eccw-tab-option').removeClass('active');
+            $this.addClass('active');
+
+            let inputName = $wrapper.data('input');
+            $('input[name="' + inputName + '"]').val(value).trigger('change'); 
+        });
+    },
+
   };
 
   ECCWAdmin.init();
@@ -778,7 +793,6 @@
       $form.addClass("side");
     }
   }
-
 
 
 })(jQuery);

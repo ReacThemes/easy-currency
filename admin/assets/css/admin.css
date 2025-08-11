@@ -308,6 +308,10 @@
 .eccw-style-modal-switcher-form.side .eccw-dropdown-display {
   display: none;
 }
+.eccw-style-modal-switcher-form .eccw-position-settings .form-table .forminp {
+  display: flex;
+  align-items: center;
+}
 
 .eccw-template-preview-wrapper {
   display: flex;
@@ -468,6 +472,28 @@
 
 .eccw-switch input:checked + .eccw-slider:before {
   transform: translateX(24px);
+}
+
+.eccw-tab-toggle {
+  display: inline-flex;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f7f7f7;
+}
+
+.eccw-tab-option {
+  flex: 1;
+  text-align: center;
+  padding: 6px 10px;
+  font-weight: 500;
+  transition: background 0.3s, color 0.3s;
+}
+
+.eccw-tab-option.active {
+  background: #2271b1;
+  color: white;
 }
 
 /*# sourceMappingURL=admin.css.map */

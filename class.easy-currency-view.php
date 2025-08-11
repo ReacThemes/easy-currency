@@ -98,12 +98,13 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $default_currency    = $settings['default_currency'];
         $flag_visibility     = $settings['flag_visibility'];
         $currency_countries  = $settings['currency_countries'];
+        $shortcode_id = $args['shortcode_id'] ?? 'default';
 
         $show_toggle   = $args['show_toggle'] ?? false;
         $wrapper_class = $args['wrapper_class'] ?? 'switcher-list-content';
-        $position      = $args['eccw_position'] ?? 'left';
+        $unique_class = 'eccw-switcher-design' . sanitize_html_class($shortcode_id);
 
-        $wrapper_class .= ' position-' . esc_attr($position);
+        $wrapper_class .=  " " . esc_attr($unique_class);
 
         try {
             $currency_countries_json = json_decode( $currency_countries['body'], true );
@@ -171,24 +172,40 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
 
 
     public function eccw_get_currency_switcher($atts = []) {
-       
         $atts = shortcode_atts([
             'show_toggle'   => 'true',
             'wrapper_class' => 'switcher-list-content',
-            'eccw_position'      => 'left' 
+            'shortcode_id'  => isset($atts['id']) ? sanitize_text_field($atts['id']) : '', 
         ], $atts, 'eccw_currency_switcher');
 
         $show_toggle   = filter_var($atts['show_toggle'], FILTER_VALIDATE_BOOLEAN);
         $wrapper_class = sanitize_text_field($atts['wrapper_class']);
-        $position      = sanitize_text_field($atts['eccw_position']);
+        $shortcode_id  = $atts['shortcode_id'];
+
+        $switcher_settings = get_option('eccw_switcher_styles', []);
+
+        if (!empty($shortcode_id) && isset($switcher_settings[$shortcode_id]) && is_array($switcher_settings[$shortcode_id])) {
+            $get_switcher_settings = $switcher_settings[$shortcode_id];
+
+            $switcher_type = $get_switcher_settings['switcher_layout_view_option']['layout_style'] ?? 'default_layout';
+            $template_style = $get_switcher_settings['switcher_dropdown_option']['template'] ?? 'default_template';
+
+        } else {
+            $get_switcher_settings = [];
+            $switcher_type = 'dropdown';
+            $template_style = 'eccw_template_1';
+        }
 
         return $this->eccw_render_currency_switcher([
-            'show_toggle'   => $show_toggle,
-            'wrapper_class' => $wrapper_class,
-            'eccw_position'  => $position
+            'show_toggle'    => $show_toggle,
+            'wrapper_class'  => $wrapper_class,
+            'shortcode_id'   => $shortcode_id,
+            'switcher_type'  => $switcher_type,
+            'template_style' => $template_style,
+            'style_options'  => $get_switcher_settings, 
         ]);
-
     }
+
 }
 
 new ECCW_CURRENCY_VIEW();
