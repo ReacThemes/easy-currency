@@ -463,7 +463,16 @@
             $(this).html('<img draggable="false" role="img" class="emoji" alt="📋" src="https://s.w.org/images/core/emoji/16.0.1/svg/1f4cb.svg">');
           });
 
-          $(this).html('<img draggable="false" role="img" class="emoji" alt="✅" src="https://s.w.org/images/core/emoji/16.0.1/svg/2705.svg">');
+          const button = $(this);
+          button.html(
+            '<img draggable="false" role="img" class="emoji" alt="✅" src="https://s.w.org/images/core/emoji/16.0.1/svg/2705.svg">'
+          );
+
+          setTimeout(() => {
+            button.html(
+              '<img draggable="false" role="img" class="emoji" alt="📋" src="https://s.w.org/images/core/emoji/16.0.1/svg/1f4cb.svg">'
+            );
+          }, 5000);
 
         } catch (err) {
           alert("Failed to copy");

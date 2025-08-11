@@ -58,7 +58,6 @@ class ECCW_admin_settings {
     public function eccw_template_preview_field($field) {
         $value = isset($field['value']) ? $field['value'] : '';
 
-      //  error_log(print_r($value, true));
         $name  = esc_attr($field['id']);
 
         $templates = array(
@@ -76,7 +75,6 @@ class ECCW_admin_settings {
         $count2 = 1;
         $reset_done = false;
         foreach ($templates as $key => $img_url) {
-            error_log(print_r($key, true));
             $dropdown_class = ( $count == '1' || $count == '2')  ? 'dropdown-template' : 'side-template';
             $checked = $value == $key ? 'checked' : '';
            
@@ -118,6 +116,7 @@ class ECCW_admin_settings {
             </th>
             <td class="forminp forminp-checkbox">
                 <label class="eccw-switch">
+                    <input type="hidden" name="<?php echo esc_attr( $field['id'] ); ?>" value="no" />
                     <input type="checkbox" name="<?php echo esc_attr( $field['id'] ); ?>" value="yes" <?php checked( $value, 'yes' ); ?> />
                     <span class="eccw-slider"></span>
                 </label>
@@ -635,8 +634,6 @@ class ECCW_admin_settings {
 
         $design = isset($saved_settings[$current_shortcodeId]) ? $saved_settings[$current_shortcodeId] : [];
 
-        error_log(print_r($design, true ));
-
         $layout_style = array(
             'section_title_layout_style' => array(
                 'name' => __('Switcher Layout Style', 'easy-currency'),
@@ -1090,14 +1087,6 @@ class ECCW_admin_settings {
                 'desc' => '',
                 'id' => 'eccw_switcher_flag_section_title'
             ),
-             'flag_visibility' => array(
-                'name' => __('Show Flag', 'easy-currency'),
-                'type' => 'select',
-                'options' => ['yes' => 'Yes', 'no' => 'No'],
-                'desc' => __('Show flag on the currency switcher.', 'easy-currency'),
-                'id' => 'design[flag_visibility]',
-                'default' => isset($design['flag_visibility']) ? $design['flag_visibility'] : 'yes',
-            ),
             'switcher_dropdown_option_flag_size' => array(
                 'name' => __('Flag Size (Width)', 'easy-currency'),
                 'type' => 'text',
@@ -1134,6 +1123,8 @@ class ECCW_admin_settings {
         $saved_settings = get_option('eccw_switcher_styles');
 
         $design = isset($saved_settings[$current_shortcodeId]) ? $saved_settings[$current_shortcodeId] : [];
+
+        error_log(print_r( $design, true ) );
 
         $switcher_elements_display_wrapper_start = array(
             array(
@@ -1176,8 +1167,6 @@ class ECCW_admin_settings {
                 'default' => isset($design['eccw_switcher_currency_code_show_hide']) ? $design['eccw_switcher_currency_code_show_hide'] : 'yes',
                 'desc'  => __('Show Currency Code on the currency switcher.', 'easy-currency'),
             ),
-
-
             'eccw_selements_tab_section_end' => array(
                 'type' => 'sectionend',
                 'id' => 'eccw_switcher_elements_tab_section_end'
@@ -1549,8 +1538,6 @@ class ECCW_admin_settings {
 
             $data = map_deep( wp_unslash($_POST['eccw_currency_table']), 'sanitize_text_field' ) ?? [];
             
-
-
             $default_currency = isset($data['default']) && !empty($data['default']) ? $data['default'] : 'usd';
             $currency_settings = array(
                 'default_currency' => $default_currency,
@@ -1561,16 +1548,12 @@ class ECCW_admin_settings {
                 $currency_settings['options'] = $options;
             }
 
-            
-
             if(isset($_POST['design'])){
                 $design = map_deep( wp_unslash($_POST['design']), 'sanitize_text_field' ) ?? [];
                 $currency_settings['design'] = $design;
             }
 
-            // Filter out any rows that are completely empty
             $filtered_data = array_filter($data, function($row) {
-                // Check if any field in the row is not empty
                 return !empty($row['code']) || !empty($row['rate']) || !empty($row['symbol_position']) || !empty($row['decimal']) || !empty($row['separator']) || !empty($row['description']);
             });
             
@@ -1578,7 +1561,6 @@ class ECCW_admin_settings {
             $filtered_data = array_values($filtered_data);
             $currency_settings['eccw_currency_table'] = $filtered_data;
 
-            
             // Update the option with filtered data
             update_option('eccw_currency_settings', $currency_settings);
 
