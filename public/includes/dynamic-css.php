@@ -8,21 +8,21 @@ function eccw_enqueue_all_dynamic_css() {
     
     $all_css = '';
 
-    if (!empty($eccw_options['design'])) {
-        $design_selectors = [
-            'switcher_button'                => '.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle',
-            'switcher_dropdown'              => '.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select',
-            'switcher_dropdown_option'       => '.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select li',
-            'switcher_dropdown_option_hover' => '.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select li:hover, .easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select li.selected',
-            'switcher_dropdown_option_flag'  => '.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher .flag',
-        ];
+    // if (!empty($eccw_options['design'])) {
+    //     $design_selectors = [
+    //         'switcher_button'                => '.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-toggle',
+    //         'switcher_dropdown'              => '.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select',
+    //         'switcher_dropdown_option'       => '.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select li',
+    //         'switcher_dropdown_option_hover' => '.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select li:hover, .easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select li.selected',
+    //         'switcher_dropdown_option_flag'  => '.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher .flag',
+    //     ];
 
-        foreach ($design_selectors as $key => $selector) {
-            if (!empty($eccw_options['design'][$key])) {
-                $all_css .= eccw_add_dynamic_css($eccw_options['design'][$key], $selector);
-            }
-        }
-    }
+    //     foreach ($design_selectors as $key => $selector) {
+    //         if (!empty($eccw_options['design'][$key])) {
+    //             $all_css .= eccw_add_dynamic_css($eccw_options['design'][$key], $selector);
+    //         }
+    //     }
+    // }
 
     
     if (!empty($switcher_settings) && is_array($switcher_settings)) {

@@ -1686,7 +1686,7 @@ class ECCW_admin_settings {
                                 </div>
                                 
                                 <div class="eccw-button-wrapper">
-                                    <button type="submit" class="eccw-style-modal-switcher-save-closebtn" disabled><?php echo esc_html__('Save & Close', 'easy-currency') ?></button>
+                                    <button type="submit" class="eccw-style-modal-switcher-save-closebtn" disabled><?php echo esc_html__('Save & Exit', 'easy-currency') ?></button>
                                     <button type="submit" class="eccw-style-modal-switcher-save-btn" disabled><?php echo esc_html__('Apply Now', 'easy-currency') ?></button>
                                 </div> 
                             </div>

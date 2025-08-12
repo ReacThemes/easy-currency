@@ -84,9 +84,9 @@
     }
     .easy-currency-switcher-select {
       position: absolute;
-      background: #fff;
+      background: #F8F8F8;
       margin: 0;
-      padding: 0;
+      padding: 24px;
       border-radius: 0;
       max-height: 80vh;
       overflow-y: auto;
@@ -132,6 +132,7 @@
         }
       }
     }
+
   }
 
   &.position-left {

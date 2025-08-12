@@ -112,11 +112,9 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
         }
 
         function eccw_save_shortcode_style_callback() {
-
             check_ajax_referer('eccw_nonce', 'nonce');
 
             $sd_id = absint($_POST['sd_id']);
-           
             if (!$sd_id) {
                 wp_send_json_error('Invalid shortcode ID.');
             }
@@ -125,14 +123,17 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
 
             $style_data = isset($_POST['design']) ? $_POST['design'] : [];
 
-            $styles[$sd_id] = $style_data;
+            if (!isset($styles[$sd_id])) {
+                $styles[$sd_id] = [];
+            }
+
+            $styles[$sd_id] = array_merge($styles[$sd_id], $style_data);
 
             update_option('eccw_switcher_styles', $styles);
 
-            
-
             wp_send_json_success();
         }
+
 
 
         // shortcode Dynamic load modal content

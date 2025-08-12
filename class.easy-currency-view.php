@@ -99,12 +99,36 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $flag_visibility     = $settings['flag_visibility'];
         $currency_countries  = $settings['currency_countries'];
         $shortcode_id = $args['shortcode_id'] ?? 'default';
+        $switcher_type = $args['switcher_type'] ?? '';
+        $side_template_position = $args['side_template_position'] ?? '';
 
         $show_toggle   = $args['show_toggle'] ?? false;
+        $style_options   = $args['style_options'] ?? [];
         $wrapper_class = $args['wrapper_class'] ?? 'switcher-list-content';
         $unique_class = 'eccw-switcher-design' . sanitize_html_class($shortcode_id);
 
-        $wrapper_class .=  " " . esc_attr($unique_class);
+        $side_template_position = ( $switcher_type == 'side' && !empty( $side_template_position ) ) ? 'position-'.$side_template_position : '';
+
+         error_log( print_r($style_options, true ));
+        $template_style     = $style_options['switcher_dropdown_option']['template'];
+
+        $classes = [
+            $unique_class,
+            $template_style,
+            $switcher_type,
+            $side_template_position,
+        ];
+
+        $classes = array_map(function($class) {
+            if (!empty($class)) {
+                return esc_attr(str_replace('_', '-', $class));
+            }
+            return '';
+        }, $classes);
+
+        $classes = array_filter($classes);
+
+        $wrapper_class .= ' ' . implode(' ', $classes);
 
         try {
             $currency_countries_json = json_decode( $currency_countries['body'], true );
@@ -113,7 +137,18 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         }
 
         ob_start();
-        
+
+        $flag_show        = $style_options['eccw_switcher_flag_show_hide'];
+        $cur_name_show    = $style_options['eccw_switcher_currency_name_show_hide'];
+        $cur_symbol_show  = $style_options['eccw_switcher_currency_symbol_show_hide'];
+        $cur_code_show    = $style_options['eccw_switcher_currency_code_show_hide'];
+        $dd_flag_show     = $style_options['eccw_switcher_dropdown_flag_show_hide'];
+        $dd_name_show     = $style_options['eccw_switcher_dropdown_currency_name_show_hide'];
+        $dd_symbol_show   = $style_options['eccw_switcher_dropdown_currency_symbol_show_hide'];
+        $dd_code_show     = $style_options['eccw_switcher_dropdown_currency_code_show_hide'];
+       
+
+
         ?>
             <div class="easy-currency-switcher <?php echo esc_attr( $wrapper_class ); ?>">  
                 <form method="post" action="#" id="easy_currency_switcher_form" class="easy_currency_switcher_form">
@@ -123,20 +158,36 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
                         if( $show_toggle == true ) {
                             $country = $currency_countries_json[$default_currency]['countries'][0];
                             $symbol = $currency_countries_json[$default_currency]['symbol'];
+                            $name = $currency_countries_json[$default_currency]['name'];
                             $flag_url = 'https://flagcdn.com/24x18/' . strtolower($country).'.png';
                            
                     ?>
                     <button type="button" class="easy-currency-switcher-toggle">
                         
                         <div class="easy-currency-elements">
+                            <?php 
+                                if( $flag_show == 'yes') {
+                            ?>
                             <img src="<?php echo esc_url( $flag_url );?>" alt="flag" class="flag">
+                            <?php } ?>
+                            <?php 
+                                if(  $cur_code_show == 'yes') {
+                            ?>
                             <span class="easy-country-code"><?php echo esc_attr($default_currency); ?> </span>
+                            <?php } 
+                            if(  $cur_name_show == 'yes') {
+                            ?>
+                            <span class="easy-country-name"><?php echo esc_attr($name); ?> </span>
+                            <?php }
+                                if( $cur_symbol_show == 'yes') {
+                            ?>
                             <span class="easy-country-symbol">(<?php echo esc_attr($symbol); ?>)</span>
+                            <?php } ?>
                         </div>
                         <span class="dropdown-icon"></span>
                     </button>
                     <?php } ?>
-                    <ul class="easy-currency-switcher-select list <?php echo $flag_visibility == 'yes' ? 'has-flag' : '' ?>">
+                    <ul class="easy-currency-switcher-select list <?php echo $dd_flag_show == 'yes' ? 'has-flag' : '' ?>">
                         <?php 
 
                             try {
@@ -151,13 +202,30 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
                                 $currency_code = $currency['code'];
                                 $country = $currency_countries_json[$currency_code]['countries'][0];
                                 $symbol = $currency_countries_json[$currency_code]['symbol'];
+                                $name = $currency_countries_json[$currency_code]['name'];
                                 $flag_url = 'https://flagcdn.com/24x18/' . strtolower($country).'.png';
 
                                 ?>
                                     <li data-value="<?php echo esc_attr($currency_code) ?>" class="option <?php echo $default_currency == $currency_code ? 'selected' : ''; ?>">
+                                        <?php 
+                                            if( $dd_flag_show == 'yes') {
+                                        ?>
                                         <img src="<?php echo esc_url( $flag_url )?>" alt="<?php echo esc_attr($currency_code)?> flag" class="flag" data-value="<?php echo esc_attr($currency_code) ?>">
+                                        <?php } 
+                                         
+                                            if( $dd_code_show == 'yes') {
+                                        ?>
                                         <span class="eccw-dropdown-country-code"><?php echo esc_html($currency_code); ?></span>
-                                        <span class="eccw-dropdown-symbol-code"><?php echo esc_html($symbol); ?></span> 
+                                        <?php } 
+                                        if( $dd_name_show == 'yes') {
+                                        ?>
+                                        
+                                         <span class="eccw-dropdown-country-name"><?php echo esc_html($name); ?></span>
+                                        <?php }
+                                            if( $dd_symbol_show == 'yes') {
+                                        ?>
+                                        <span class="eccw-dropdown-symbol-code">(<?php echo esc_html($symbol); ?>)</span> 
+                                        <?php } ?>
                                     </li>
                                 <?php
                             } 
@@ -187,13 +255,15 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         if (!empty($shortcode_id) && isset($switcher_settings[$shortcode_id]) && is_array($switcher_settings[$shortcode_id])) {
             $get_switcher_settings = $switcher_settings[$shortcode_id];
 
-            $switcher_type = $get_switcher_settings['switcher_layout_view_option']['layout_style'] ?? 'default_layout';
+            $switcher_type = $get_switcher_settings['switcher_layout_view_option']['layout_style'] ?? 'dropdown';
             $template_style = $get_switcher_settings['switcher_dropdown_option']['template'] ?? 'default_template';
+            $side_template_position = $get_switcher_settings['eccw_position_alignment_toggle'] ?? 'left';
 
         } else {
             $get_switcher_settings = [];
             $switcher_type = 'dropdown';
             $template_style = 'eccw_template_1';
+            $side_template_position = 'left';
         }
 
         return $this->eccw_render_currency_switcher([
@@ -203,6 +273,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
             'switcher_type'  => $switcher_type,
             'template_style' => $template_style,
             'style_options'  => $get_switcher_settings, 
+            'side_template_position'  => $side_template_position, 
         ]);
     }
 
