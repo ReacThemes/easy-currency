@@ -326,20 +326,20 @@ $white-color: #ffffff;
     gap: 15px;
   }
   &.dropdown {
-    .side-template,.eccw-position-settings {
+   .eccw-position-settings {
       display: none;
     }
-    .dropdown-template ,
+    
     .eccw-dropdown-display {
       display: block;
     }
   }
   &.side {
-    .side-template,
+   
     .eccw-position-settings {
       display: block;
     }
-    .dropdown-template,
+    
     .eccw-dropdown-display {
       display: none;
     }
@@ -351,6 +351,16 @@ $white-color: #ffffff;
               display: flex;
               align-items: center;
           }
+      }
+
+      .eccw-slider-range {
+        vertical-align: middle;
+        width: 150px; 
+        margin-right: 10px;
+      }
+      .eccw-slider-range-value {
+        width: 100px!important; 
+        text-align: center;
       }
   }
 }
@@ -533,3 +543,97 @@ $white-color: #ffffff;
     color: white;
 }
 
+/*
+* shortcode create modal css
+*/
+
+.eccw-shortcode-modal,
+.eccw-create-shortcode-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  width: 100%;
+  max-width: 750px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  padding: 25px 30px;
+  z-index: 9999;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #333;
+    text-align: center;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.9rem;
+  }
+
+  #eccw_switcher_name_field {
+      width: 80% !important;
+  }
+
+  form {
+    button {
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 10px 22px;
+      border-radius: 6px;
+      border: none;
+      transition: background-color 0.3s ease;
+      margin-right: 12px;
+      min-width: 90px;
+
+      &.button-primary {
+        background-color: #0057d9;
+        color: #fff;
+
+        &:hover {
+          background-color: #003ea1;
+        }
+      }
+
+      &:hover:not(.button-primary) {
+        background-color: #c6c6c6;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .eccw-shortcode-modal,
+  .eccw-create-shortcode-modal {
+    width: 90%;
+    padding: 20px;
+  }
+
+  form {
+    button {
+      width: 100%;
+      margin: 10px 0 0 0;
+      min-width: auto;
+    }
+  }
+}
+
+#eccw-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;  
+  height: 100vh; 
+  background-color: rgba(0, 0, 0, 0.5); 
+  z-index: 999; 
+  display: none; 
+}

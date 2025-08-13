@@ -109,7 +109,6 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
 
         $side_template_position = ( $switcher_type == 'side' && !empty( $side_template_position ) ) ? 'position-'.$side_template_position : '';
 
-         error_log( print_r($style_options, true ));
         $template_style     = $style_options['switcher_dropdown_option']['template'];
 
         $classes = [

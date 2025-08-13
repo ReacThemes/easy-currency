@@ -387,15 +387,44 @@
 
     // shortcode generator js
     eccwShortcodeCreation: function () {
+      // $(".eccw-designer-header button").on("click", function (e) {
+      //   e.preventDefault();
+      //   $.post(
+      //     eccw_vars.ajaxurl,
+      //     {
+      //       action: "eccw_create_shortcode",
+      //       nonce: eccw_vars.nonce,
+      //     },
+      //     function (response) {
+      //       if (response.success) {
+      //         const id = response.data.id;
+      //         const code = response.data.shortcode;
+
+      //         const card = `
+      //             <div class="eccw-designer-card">
+      //                 <div class="eccw-designer-info">
+      //                     <div class="eccw-shortcode-box">
+      //                         <input type="text" readonly="" class="eccw-shortcode-input" value="${code}">
+      //                         <button type="button" class="eccw-copy-btn" title="Copy shortcode">
+      //                             <img draggable="false" role="img" class="emoji" alt="📋" src="https://s.w.org/images/core/emoji/16.0.1/svg/1f4cb.svg">
+      //                         </button>
+      //                     </div>
+      //                 </div>
+      //                 <div class="eccw-designer-actions">
+      //                     <button class="eccw-btn-edit" data-id="${id}">Edit</button>
+      //                     <button class="eccw-btn-delete" data-id="${id}">Delete</button>
+      //                 </div>
+      //             </div>
+      //         `;
+      //         $(".eccw-designer-list").prepend(card);
+      //       }
+      //     }
+      //   );
+      // });
+
       $(".eccw-shortcode-popup-form").on("click", function (e) {
         e.preventDefault();
         $(".eccw-shortcode-modal, .eccw-modal-overlay").fadeIn();
-        var selectedLayout = $(
-          "#design\\[switcher_layout_view_option\\]\\[layout_style\\]"
-        ).val();
-
-        ECCWAdmin.applyLayoutSelection(selectedLayout);
-        updateModalFormClassByLayout(selectedLayout);
       });
 
       $("#eccw-close-modal, #eccw-modal-overlay").on("click", function () {
@@ -403,45 +432,45 @@
       });
 
       // Handle form submit with AJAX
-      $(".create-shortcode-submit-button").on("click", function (e) {
+      $("#eccw-shortcode-form").on("submit", function (e) {
         e.preventDefault();
 
-        let formData = $("#eccw-shortcode-modal :input").serialize();
-        console.log(formData);
+        let switcher_type = $("#switcher_type").val();
+        let template = $("#template").val();
 
         $.post(
           eccw_vars.ajaxurl,
           {
             action: "eccw_create_shortcode",
             nonce: eccw_vars.nonce,
-            form_data: formData,
+            switcher_type: switcher_type,
+            template: template,
           },
           function (response) {
             if (response.success) {
+              // Add new shortcode card on top
               const id = response.data.id;
-              const switcher_type = response.data.switcher_type;
               const code = response.data.shortcode;
 
-              console.log("swicher type here:",switcher_type);
-
               const card = `
-                          <div class="eccw-designer-card">
-                              <div class="eccw-designer-info">
-                                  <div class="eccw-shortcode-box">
-                                      <input type="text" readonly class="eccw-shortcode-input" value="${code}">
-                                      <button type="button" class="eccw-copy-btn" title="Copy shortcode">📋</button>
-                                  </div>
-                              </div>
-                              <div class="eccw-designer-actions">
-                                  <button class="eccw-btn-edit" data-id="${id}" data-switchertype="${switcher_type}">Edit</button>
-                                  <button class="eccw-btn-delete" data-id="${id}" data-switchertype="${switcher_type}">Delete</button>
-                              </div>
-                          </div>`;
+          <div class="eccw-designer-card">
+            <div class="eccw-designer-info">
+              <div class="eccw-shortcode-box">
+                <input type="text" readonly class="eccw-shortcode-input" value="${code}">
+                <button type="button" class="eccw-copy-btn" title="Copy shortcode">📋</button>
+              </div>
+            </div>
+            <div class="eccw-designer-actions">
+              <button class="eccw-btn-edit" data-id="${id}">Edit</button>
+              <button class="eccw-btn-delete" data-id="${id}">Delete</button>
+            </div>
+          </div>`;
 
               $(".eccw-designer-list").prepend(card);
 
+              // Close modal and reset form
               $("#eccw-shortcode-modal, #eccw-modal-overlay").fadeOut();
-              $("#eccw-shortcode-modal :input").val("");
+              $("#eccw-shortcode-form")[0].reset();
             } else {
               alert(response.data || "Error creating shortcode");
             }
@@ -514,38 +543,42 @@
     EccwShortcodeModal: function () {
       $(document).ready(function ($) {
         let currentShortcodeId = null;
-        let switcherType = null;
 
-        $(document).on("click", ".eccw-btn-edit", function (e) {
-          e.preventDefault();
+        // Open modal on Edit button click
 
-          switcherType = $(this).data("switchertype");
-          currentShortcodeId = $(this).data("id");
+        $(".eccw-btn-edit")
+          .off("click")
+          .on("click", function (e) {
+            e.preventDefault();
 
-          $("#eccw-style-modal-switcher-id").val(currentShortcodeId);
-          $("#eccw-style-modal-switcher-type").val(switcherType);
+            currentShortcodeId = $(this).data("id");
+            $("#eccw-style-modal-switcher-id").val(currentShortcodeId);
 
-          $(".eccw-style-modal-switcher-form").empty();
-          $(".eccw-tab-btn").removeClass("active");
-          $(".eccw-tab-btn[data-tab='eccw_general_tab']").addClass("active");
+            $(".eccw-style-modal-switcher-form").empty();
+            $(".eccw-tab-btn").removeClass("active");
+            $(".eccw-tab-btn[data-tab='eccw_general_tab']").addClass("active");
 
-          $(".eccw-style-modal-switcher-form").attr(
-            "data-eccwtab",
-            "eccw_general_tab"
-          );
+            $(".eccw-style-modal-switcher-form").attr(
+              "data-eccwtab",
+              "eccw_general_tab"
+            );
 
-          eccwLoadModalTabContent(
-            currentShortcodeId,
-            "eccw_general_tab",
-            false,
-            function () {
-              $("#eccw-style-modal-switcher").fadeIn();
-
-              updateModalFormClassByLayout(switcherType);
-              ECCWAdmin.applyLayoutSelection(switcherType);
-            }
-          );
-        });
+            eccwLoadModalTabContent(
+              currentShortcodeId,
+              "eccw_general_tab",
+              false,
+              function () {
+                $("#eccw-style-modal-switcher").fadeIn();
+                let savedLayout = localStorage.getItem(
+                  "eccw_selected_layout_style"
+                );
+                if (savedLayout) {
+                  ECCWAdmin.applyLayoutSelection(savedLayout);
+                  updateModalFormClassByLayout(savedLayout);
+                }
+              }
+            );
+          });
 
         // Tab click event
         $(document).on("click", ".eccw-tab-btn", function (e) {
@@ -566,8 +599,10 @@
             tabKey,
             true,
             function () {
-              let savedLayout = $(".eccw-style-modal-switcher-type").val();
-
+              let savedLayout = localStorage.getItem(
+                "eccw_selected_layout_style"
+              );
+              console.log(savedLayout);
               if (savedLayout) {
                 ECCWAdmin.applyLayoutSelection(savedLayout);
                 updateModalFormClassByLayout(savedLayout);
@@ -644,19 +679,16 @@
             closeEccwModal();
           });
 
-        $("#eccw-style-modal-switcher, .eccw-shortcode-modal")
+        $("#eccw-style-modal-switcher")
           .off("click")
           .on("click", function (event) {
-            if (
-              event.target.id === "eccw-style-modal-switcher" ||
-              event.target.id === "eccw-shortcode-modal"
-            ) {
+            if (event.target.id === "eccw-style-modal-switcher") {
               closeEccwModal();
             }
           });
 
         function closeEccwModal() {
-          $("#eccw-style-modal-switcher, .eccw-shortcode-modal,.eccw-modal-overlay").fadeOut();
+          $("#eccw-style-modal-switcher").fadeOut();
         }
       });
     },
@@ -665,7 +697,6 @@
       function saveStyleAndMaybeClose(shouldClose) {
         let form = $(".eccw-style-modal-switcher-form");
         let shortcodeId = $("#eccw-style-modal-switcher-id").val();
-        let switcherType = $("#eccw-style-modal-switcher-type").val();
         let serializedData = form.find(":input").serializeArray();
 
         serializedData.push(
@@ -698,28 +729,65 @@
     },
 
     eccwTemplateLayoutDisplayShowHide: function () {
-      $(document).on(
-        "change",
-        "#design\\[switcher_layout_view_option\\]\\[layout_style\\]",
-        function () {
-          let selectedLayout = $(this).val();
-          ECCWAdmin.applyLayoutSelection(selectedLayout);
-          updateModalFormClassByLayout(selectedLayout);
-        }
+      const storageKey = "eccw_selected_layout_style";
+
+      // Event listener for layout change
+      $(document)
+        .off(
+          "change",
+          'select[name="design[switcher_layout_view_option][layout_style]"]'
+        )
+        .on(
+          "change",
+          'select[name="design[switcher_layout_view_option][layout_style]"]',
+          function () {
+            let selected = $(this).val();
+            updateModalFormClassByLayout(selected);
+            localStorage.setItem(storageKey, selected);
+            ECCWAdmin.applyLayoutSelection(selected);
+          }
+        );
+
+      // Initial apply from storage
+      let savedLayout = localStorage.getItem(storageKey);
+      if (savedLayout) {
+        $(
+          'select[name="design[switcher_layout_view_option][layout_style]"]'
+        ).val(savedLayout);
+
+        ECCWAdmin.applyLayoutSelection(savedLayout);
+      } else {
+        $(
+          'select[name="design[switcher_layout_view_option][layout_style]"]'
+        ).trigger("change");
+      }
+
+      // Watch for new DOM elements in second tab
+      const targetNode = document.querySelector(
+        ".eccw-style-modal-switcher-form"
       );
+      console.log(targetNode);
+
+      if (targetNode) {
+        const observer = new MutationObserver(() => {
+          let savedLayout = localStorage.getItem(storageKey);
+          if (savedLayout) {
+            ECCWAdmin.applyLayoutSelection(savedLayout);
+            updateModalFormClassByLayout(savedLayout);
+          }
+        });
+        observer.observe(targetNode, { childList: true, subtree: true });
+      }
     },
     applyLayoutSelection: function (selected) {
       $(
         ".eccw-template, .eccw-dropdown-display, .eccw-position-settings"
       ).hide();
-      updateModalFormClassByLayout(selected);
 
       if (selected === "dropdown") {
         $(".dropdown-template").show();
-        // $(".dropdown-template").css("display", "block");
         $(".eccw-dropdown-display").show();
       } else if (selected === "side") {
-        // $(".side-template").css("display", "block");
         $(".side-template").show();
         $(".eccw-position-settings").show();
       }
@@ -802,15 +870,8 @@
 
     if (layout === "dropdown") {
       $form.addClass("dropdown");
-      console.log("bottom dropdown", layout);
     } else if (layout === "side") {
       $form.addClass("side");
-      console.log("bottom side", layout);
     }
   }
-
-   $('#eccw-modal-overlay').on('click', function() {
-    $('#eccw-modal-overlay, #eccw-shortcode-modal').fadeOut();
-  });
-
 })(jQuery);

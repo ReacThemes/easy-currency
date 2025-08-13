@@ -7,7 +7,10 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 
     $sql = "CREATE TABLE $table_name (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
+        switcher_name varchar(255),
         shortcode text NOT NULL,
+        switcher_type text NOT NULL,
+        template text NOT NULL,
         created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
         PRIMARY KEY  (id)
     ) $charset_collate;";
