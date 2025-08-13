@@ -51,14 +51,13 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             parse_str($_POST['form_data'], $form_data);
 
             $switcher_name = $form_data['eccw_switcher_name_field'];
-            $switcher_type = $form_data['design']['switcher_layout_view_option']['layout_style'];
             $template = $form_data['design']['switcher_dropdown_option']['template'];
 
             global $wpdb;
             $table = $wpdb->prefix . 'eccw_shortcodes';
             $shortcode = '[eccw_currency_switcher id=1]';
             $wpdb->query(
-                $wpdb->prepare("INSERT INTO $table (switcher_name, shortcode, switcher_type,template ) VALUES (%s, %s, %s,%s )", $switcher_name,$shortcode, $switcher_type,$template )
+                $wpdb->prepare("INSERT INTO $table (switcher_name, shortcode,template ) VALUES (%s, %s, %s )", $switcher_name ,$shortcode, $template )
             );
 
             $id = $wpdb->insert_id;
@@ -72,12 +71,9 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
 
             nocache_headers();
 
-            $results = $wpdb->get_results("SELECT switcher_type FROM $table where id = $id ORDER BY id DESC", ARRAY_A);
-
             wp_send_json_success([
                 'id' => $id,
                 'shortcode' => $new_shortcode,
-                'switcher_type' => $results['switcher_type'],
                 'cache_bust' => time()
             ]);
         }

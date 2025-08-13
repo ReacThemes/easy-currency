@@ -293,28 +293,17 @@
   display: flex;
   gap: 15px;
 }
-.eccw-style-modal-switcher-form.dropdown .eccw-position-settings {
-  display: none;
-}
-.eccw-style-modal-switcher-form.dropdown .eccw-dropdown-display {
-  display: block;
-}
-.eccw-style-modal-switcher-form.side .eccw-position-settings {
-  display: block;
-}
-.eccw-style-modal-switcher-form.side .eccw-dropdown-display {
-  display: none;
-}
-.eccw-style-modal-switcher-form .eccw-position-settings .form-table .forminp {
+
+.eccw-position-settings .form-table .forminp {
   display: flex;
   align-items: center;
 }
-.eccw-style-modal-switcher-form .eccw-position-settings .eccw-slider-range {
+.eccw-position-settings .eccw-slider-range {
   vertical-align: middle;
   width: 150px;
   margin-right: 10px;
 }
-.eccw-style-modal-switcher-form .eccw-position-settings .eccw-slider-range-value {
+.eccw-position-settings .eccw-slider-range-value {
   width: 100px !important;
   text-align: center;
 }

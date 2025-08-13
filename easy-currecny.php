@@ -25,11 +25,14 @@
     define( 'ECCW_PLUGIN_BASE', plugin_basename( ECCW_PL_ROOT ) );
     define( 'ECCW_NAME', 'Easy Currency' );
 
+    include 'global-functions.php';
     include 'admin/includes/admin-settings.php';
     include 'admin/includes/activation.php';
     include 'admin/includes/plugin-scripts.php';
     include 'public/includes/plugin-scripts.php';
     include 'public/includes/dynamic-css.php';
+    include 'public/views/eccw-auto-switcher/eccw-auto-switcher.php';
+    
 
     include 'class.easy-currency.php';
     include 'class.plugin-settings.php';

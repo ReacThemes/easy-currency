@@ -1,4 +1,5 @@
 (function ($) {
+
   var ECCWAdmin = {
     init: function () {
       this.currencyFieldsRepeater();
@@ -10,10 +11,9 @@
       this.EccwShortcodeModal();
       this.SwitcherModalStyle();
       this.initializeEccwModalFormInputs();
-      this.eccwTemplateLayoutDisplayShowHide();
       this.initializeRangeSlider();
-      this.applyLayoutSelection();
       this.eccwTabSwitch();
+      this.initSwitcherToggle();
 
       $(document)
         .on(
@@ -390,12 +390,6 @@
       $(".eccw-shortcode-popup-form").on("click", function (e) {
         e.preventDefault();
         $(".eccw-shortcode-modal, .eccw-modal-overlay").fadeIn();
-        var selectedLayout = $(
-          "#design\\[switcher_layout_view_option\\]\\[layout_style\\]"
-        ).val();
-
-        ECCWAdmin.applyLayoutSelection(selectedLayout);
-        updateModalFormClassByLayout(selectedLayout);
       });
 
       $("#eccw-close-modal, #eccw-modal-overlay").on("click", function () {
@@ -419,11 +413,7 @@
           function (response) {
             if (response.success) {
               const id = response.data.id;
-              const switcher_type = response.data.switcher_type;
               const code = response.data.shortcode;
-
-              console.log("swicher type here:",switcher_type);
-
               const card = `
                           <div class="eccw-designer-card">
                               <div class="eccw-designer-info">
@@ -433,8 +423,8 @@
                                   </div>
                               </div>
                               <div class="eccw-designer-actions">
-                                  <button class="eccw-btn-edit" data-id="${id}" data-switchertype="${switcher_type}">Edit</button>
-                                  <button class="eccw-btn-delete" data-id="${id}" data-switchertype="${switcher_type}">Delete</button>
+                                  <button class="eccw-btn-edit" data-id="${id}">Edit</button>
+                                  <button class="eccw-btn-delete" data-id="${id}">Delete</button>
                               </div>
                           </div>`;
 
@@ -540,9 +530,6 @@
             false,
             function () {
               $("#eccw-style-modal-switcher").fadeIn();
-
-              updateModalFormClassByLayout(switcherType);
-              ECCWAdmin.applyLayoutSelection(switcherType);
             }
           );
         });
@@ -566,12 +553,6 @@
             tabKey,
             true,
             function () {
-              let savedLayout = $(".eccw-style-modal-switcher-type").val();
-
-              if (savedLayout) {
-                ECCWAdmin.applyLayoutSelection(savedLayout);
-                updateModalFormClassByLayout(savedLayout);
-              }
             }
           );
         });
@@ -609,9 +590,6 @@
                         $formWrapper.css("min-height", "");
                         $formWrapper.removeClass("eccw-loading");
                         ECCWAdmin.initializeEccwModalFormInputs($formWrapper);
-                        setTimeout(() => {
-                          ECCWAdmin.eccwTemplateLayoutDisplayShowHide();
-                        }, 50);
 
                         bindSaveButtonEnable();
                         ECCWAdmin.initializeRangeSlider();
@@ -621,9 +599,6 @@
                 } else {
                   $formWrapper.html(response.data.html);
                   ECCWAdmin.initializeEccwModalFormInputs($formWrapper);
-                  setTimeout(() => {
-                    ECCWAdmin.eccwTemplateLayoutDisplayShowHide();
-                  }, 50);
                   $formWrapper.css("min-height", "");
                   ECCWAdmin.initializeRangeSlider();
                   if (callback) callback();
@@ -665,7 +640,6 @@
       function saveStyleAndMaybeClose(shouldClose) {
         let form = $(".eccw-style-modal-switcher-form");
         let shortcodeId = $("#eccw-style-modal-switcher-id").val();
-        let switcherType = $("#eccw-style-modal-switcher-type").val();
         let serializedData = form.find(":input").serializeArray();
 
         serializedData.push(
@@ -697,33 +671,6 @@
       });
     },
 
-    eccwTemplateLayoutDisplayShowHide: function () {
-      $(document).on(
-        "change",
-        "#design\\[switcher_layout_view_option\\]\\[layout_style\\]",
-        function () {
-          let selectedLayout = $(this).val();
-          ECCWAdmin.applyLayoutSelection(selectedLayout);
-          updateModalFormClassByLayout(selectedLayout);
-        }
-      );
-    },
-    applyLayoutSelection: function (selected) {
-      $(
-        ".eccw-template, .eccw-dropdown-display, .eccw-position-settings"
-      ).hide();
-      updateModalFormClassByLayout(selected);
-
-      if (selected === "dropdown") {
-        $(".dropdown-template").show();
-        // $(".dropdown-template").css("display", "block");
-        $(".eccw-dropdown-display").show();
-      } else if (selected === "side") {
-        // $(".side-template").css("display", "block");
-        $(".side-template").show();
-        $(".eccw-position-settings").show();
-      }
-    },
 
     initializeRangeSlider: function () {
       function initializeSliders() {
@@ -775,6 +722,32 @@
           .trigger("change");
       });
     },
+
+    initSwitcherToggle:  function(panelSelector, checkboxName) {
+        var $panel = $(panelSelector);
+
+        if (!$panel.length) return; 
+
+        function toggleSwitcherFields() {
+            var isChecked = $panel.find('input[name="' + checkboxName + '"]').is(':checked');
+
+            if (isChecked) {
+                $panel.find('.eccw-switcher-ui-control').slideDown();
+                $panel.find('.eccw-position-settings').slideDown();
+            } else {
+                $panel.find('.eccw-switcher-ui-control').slideUp();
+                $panel.find('.eccw-position-settings').slideUp();
+            }
+        }
+
+        toggleSwitcherFields();
+
+        $panel.find('input[name="' + checkboxName + '"]').on('change', function() {
+            toggleSwitcherFields();
+        });
+    },
+
+
   };
 
   ECCWAdmin.init();
@@ -795,22 +768,19 @@
 
   bindSaveButtonEnable();
 
-  function updateModalFormClassByLayout(layout) {
-    const $form = $(".eccw-style-modal-switcher-form");
-
-    $form.removeClass("dropdown side");
-
-    if (layout === "dropdown") {
-      $form.addClass("dropdown");
-      console.log("bottom dropdown", layout);
-    } else if (layout === "side") {
-      $form.addClass("side");
-      console.log("bottom side", layout);
-    }
-  }
-
    $('#eccw-modal-overlay').on('click', function() {
     $('#eccw-modal-overlay, #eccw-shortcode-modal').fadeOut();
   });
+
+  $('.eccw-sticky-select2').select2({
+      placeholder: 'Select pages', 
+      allowClear: true 
+  });
+
+   ECCWAdmin.initSwitcherToggle(
+      '#tab_currency_switcher_sticky', 
+      'design[eccw_show_hide_side_currency]'
+  );
+  
 
 })(jQuery);

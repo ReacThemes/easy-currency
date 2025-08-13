@@ -23,10 +23,50 @@ class ECCW_admin_settings {
         add_action('woocommerce_admin_field_html', array($this, 'eccw_admin_field_switcher_html_start_end'));
         add_action('woocommerce_admin_field_tabswitch', array($this, 'eccw_admin_field_switcher_tabswitch'));
         add_action('woocommerce_admin_field_eccw_border_control', array( $this, "eccw_admin_border_control"));
+        add_action('woocommerce_admin_field_select2', array( $this,'eccw_admin_field_eccw_select2'));
 
     }  
 
 
+
+   public function eccw_admin_field_eccw_select2($field) {
+
+        // Get field value
+        $option_value = $field['value'] ?? $field['default'] ?? '';
+        $name = $field['field_name'] ?? $field['id']; 
+
+        $is_multiple = isset($field['custom_attributes']['multiple']);
+
+        echo '<tr valign="top" class="eccw-switcher-ui-control">';
+        echo '<th scope="row" class="titledesc"><label>' . esc_html($field['name']) . '</label></th>';
+        echo '<td class="forminp">';
+
+        $multiple_attr = $is_multiple ? ' multiple="multiple"' : '';
+        $style_width = isset($field['style']) ? $field['style'] : 'width: 300px;';
+        echo '<select name="' . esc_attr($name) . '" id="' . esc_attr($field['id']) . '" class="eccw-sticky-select2" style="' . esc_attr($style_width) . '"' . $multiple_attr . '>';
+
+        if (!empty($field['options']) && is_array($field['options'])) {
+            foreach ($field['options'] as $key => $label) {
+                $is_selected = false;
+
+                if ($is_multiple && is_array($option_value)) {
+                    $is_selected = in_array((string)$key, array_map('strval', $option_value), true);
+                } else {
+                    $is_selected = ((string)$option_value === (string)$key);
+                }
+
+                echo '<option value="' . esc_attr($key) . '" ' . selected($is_selected, true, false) . '>' . esc_html($label) . '</option>';
+            }
+        }
+
+        echo '</select>';
+
+        if (!empty($field['desc'])) {
+            echo '<p class="description">' . esc_html($field['desc']) . '</p>';
+        }
+
+        echo '</td></tr>';
+    }
 
     public function eccw_admin_border_control($value) {
        
@@ -40,7 +80,7 @@ class ECCW_admin_settings {
         $color  = esc_attr($option_value['color'] ?? '');
 
         ?>
-        <tr valign="top">
+        <tr valign="top" class="<?php echo esc_attr($value['class']); ?>">
             <th scope="row" class="titledesc">
                 <?php echo esc_html($value['name']); ?>
             </th>
@@ -117,7 +157,7 @@ class ECCW_admin_settings {
                 'right'  => 'Right'
             );
 
-        echo '<tr valign="top">
+        echo '<tr valign="top" class="'.esc_attr($field['class']).'">
             <th scope="row" class="titledesc">
                 <label>' . esc_html($field['name']) . '</label>
             </th>
@@ -152,14 +192,13 @@ class ECCW_admin_settings {
         $step = isset( $field['step'] ) ? intval( $field['step'] ) : 1;
         $default = get_option( $field['id'], isset($field['default']) ? $field['default'] : $min );
 
-        echo '<tr valign="top">';
+        echo '<tr valign="top" class="'.esc_attr($field['class']).'">';
         echo '<th scope="row" class="titledesc">';
         echo esc_html( $field['name'] );
         echo '</th>';
 
         echo '<td class="forminp">';
 
-        // Slider input
         echo '<input class="eccw-slider-range" type="range" id="' . $id . '" name="' . $name . '" min="' . $min . '" max="' . $max . '" step="' . $step . '" value="' . esc_attr($default) . '" >';
 
         echo '<input class="eccw-slider-range-value" type="number" id="' . $id . '_value" value="' . esc_attr($default) . '" >';
@@ -170,42 +209,33 @@ class ECCW_admin_settings {
 
     public function eccw_template_preview_field($field) {
         $value = isset($field['value']) ? $field['value'] : '';
-
         $name  = esc_attr($field['id']);
 
-        $templates = array(
-            'eccw_template_1' => ECCW_PL_URL . 'admin/assets/img/eccw-template-1.png',
-            'eccw_template_2' => ECCW_PL_URL . 'admin/assets/img/eccw-template-2.png',
-            'eccw_template_3' => ECCW_PL_URL . 'admin/assets/img/eccw-template-3.png',
-            'eccw_template_4' => ECCW_PL_URL . 'admin/assets/img/eccw-template-4.png',
-            'eccw_template_5' => ECCW_PL_URL . 'admin/assets/img/eccw-template-5.png',
-        );
+        $templates = isset($field['templates']) && is_array($field['templates']) 
+            ? $field['templates'] 
+            : array();
 
-        echo '<tr valign="top"><th scope="row" class="titledesc"><label>' . esc_html($field['name']) . '</label></th><td class="forminp">';
+        echo '<tr valign="top" class="'.esc_attr($field['class']).'"><th scope="row" class="titledesc"><label>' . esc_html($field['name']) . '</label></th><td class="forminp">';
 
         echo '<div class="eccw-template-preview-wrapper">';
         $count = 1;
         $count2 = 1;
         $reset_done = false;
-            foreach ($templates as $key => $img_url) {
-                $dropdown_class = ( $count == '1' || $count == '2')  ? 'dropdown-template' : 'side-template';
-                $checked = $value == $key ? 'checked' : '';
-            
-                echo '
-                <label  class="eccw-template '.$dropdown_class.'">
-                    <input type="radio" name="' . $name . '" value="' . $key . '" ' . $checked . ' />
-                    <div  class="eccw-template-preview-image">
-                        <img src="' . esc_url($img_url) . '" alt="layout image"/>
-                        
-                    </div>
-                    <p class="eccw-template-count">' . ucfirst( "Template" . " - " . $count2) . '</p>
-                </label>
-                ';
-            $count++; $count2++; 
-            if ($count2 > 2 && !$reset_done) {
-                $count2 = 1;
-                $reset_done = true;
-            }
+
+        foreach ($templates as $key => $img_url) {
+            $checked = $value == $key ? 'checked' : '';
+
+            echo '
+            <label class="eccw-template">
+                <input type="radio" name="' . $name . '" value="' . $key . '" ' . $checked . ' />
+                <div class="eccw-template-preview-image">
+                    <img src="' . esc_url($img_url) . '" alt="layout image"/>
+                </div>
+                <p class="eccw-template-count">' . ucfirst("Template - " . $count) . '</p>
+            </label>
+            ';
+
+            $count++;
         }
 
         echo '</div>';
@@ -217,22 +247,26 @@ class ECCW_admin_settings {
         echo '</td></tr>';
     }
 
+
     public function eccw_admin_field_switcher_show_hide($field) {  
 
         $value = get_option( $field['id'], $field['default'] ?? '' );
         $desc = ! empty( $field['desc'] ) ? $field['desc'] : '';
 
         ?>
-        <tr valign="top">
+        <tr valign="top" class="<?php echo esc_attr($field['class']); ?>">
             <th scope="row" class="titledesc">
                 <?php echo esc_html( $field['title'] ); ?>
             </th>
             <td class="forminp forminp-checkbox">
                 <label class="eccw-switch">
                     <input type="hidden" name="<?php echo esc_attr( $field['id'] ); ?>" value="no" />
-                    <input type="checkbox" name="<?php echo esc_attr( $field['id'] ); ?>" value="yes" <?php checked( $value, 'yes' ); ?> />
+                    <input type="checkbox" name="<?php echo esc_attr( $field['id'] ); ?>" value="yes" <?php echo ($value === 'yes' || $value === '1') ? 'checked="checked"' : ''; ?> />
                     <span class="eccw-slider"></span>
                 </label>
+                <?php if (!empty($field['desc'])) : ?>
+                    <p class="description"><?php echo esc_html($field['desc']); ?></p>
+                <?php endif; ?>
             </td>
         </tr>
 
@@ -1024,26 +1058,20 @@ class ECCW_admin_settings {
                 'type' => 'text',
                 'id' => 'eccw_switcher_name_field',
                 'placeholder' => 'Switcher Name',
-                'class' => 'eccw-input'
-            ),
-            'switcher_layout_style' => array(
-                'name' => __('Switcher Display View', 'easy-currency'),
-                'type' => 'select',
-                'id' => 'design[switcher_layout_view_option][layout_style]',
-                'options' => array(
-                    'dropdown' => 'Dropdown',
-                    'side' => 'Sticky',
-                ),
-                'default' => 'dropdown',
-                'class' => 'eccw-text-input ', // Add custom class here
+                'class' => 'eccw-input eccw-switcher-ui-control'
             ),
             'switcher_template' => array(
                 'name'     => __('Template', 'easy-currency'),
                 'type'     => 'template_preview',
                 'id'       => 'design[switcher_dropdown_option][template]',
-                'default' => 'eccw_template_1',
+                'default'  => 'eccw_template_1',
                 'value'    => 'eccw_template_1',
                 'desc'     => __('Choose your currency switcher template', 'easy-currency'),
+                'templates' => array( 
+                    'eccw_template_1' => ECCW_PL_URL . 'admin/assets/img/eccw-template-1.png',
+                    'eccw_template_2' => ECCW_PL_URL . 'admin/assets/img/eccw-template-2.png',
+                ),
+                'class' => 'eccw-switcher-ui-control'
             ),
             'layout_section_end' => array(
                 'type' => 'sectionend',
@@ -1067,7 +1095,6 @@ class ECCW_admin_settings {
         // Retrieve saved settings
         $saved_settings = get_option('eccw_switcher_styles');
 
-        error_log( print_r($current_shortcodeId, true ));
 
         $design = isset($saved_settings[$current_shortcodeId]) ? $saved_settings[$current_shortcodeId] : [];
 
@@ -1080,7 +1107,7 @@ class ECCW_admin_settings {
         $switcher_elements_display = array(
             
             'eccw_elements_style_title' => array(
-                'name' => __('Switcher Elements Settings', 'easy-currency'),
+                'name' => __('Display Switcher', 'easy-currency'),
                 'type' => 'title',
                 'desc' => '',
                 'id' => 'eccw_switcher_elements_settings'
@@ -1090,28 +1117,28 @@ class ECCW_admin_settings {
                 'id'    => 'design[eccw_switcher_flag_show_hide]',
                 'type'  => 'switcher',
                 'default' => isset($design['eccw_switcher_flag_show_hide']) ? $design['eccw_switcher_flag_show_hide'] : 'yes',
-                'desc'  => __('Show flag on the currency switcher.', 'easy-currency'),
+                'class' => 'eccw-switcher-ui-control',
             ),
             'eccw_switcher_ele_currency_name' => array(
                 'title' => __('Enable Currency Name', 'easy-currency'),
                 'id'    => 'design[eccw_switcher_currency_name_show_hide]',
                 'type'  => 'switcher',
                 'default' => isset($design['eccw_switcher_currency_name_show_hide']) ? $design['eccw_switcher_currency_name_show_hide'] : 'yes',
-                'desc'  => __('Show Currency Name on the currency switcher.', 'easy-currency'),
+                'class' => 'eccw-switcher-ui-control',
             ),
             'eccw_switcher_ele_currency_symbol' => array(
                 'title' => __('Enable Currency Symbol', 'easy-currency'),
                 'id'    => 'design[eccw_switcher_currency_symbol_show_hide]',
                 'type'  => 'switcher',
                 'default' => isset($design['eccw_switcher_currency_symbol_show_hide']) ? $design['eccw_switcher_currency_symbol_show_hide'] : 'yes',
-                'desc'  => __('Show Currency Symbol on the currency switcher.', 'easy-currency'),
+                'class' => 'eccw-switcher-ui-control',
             ),
             'eccw_switcher_ele_currency_code' => array(
                 'title' => __('Enable Currency Code', 'easy-currency'),
                 'id'    => 'design[eccw_switcher_currency_code_show_hide]',
                 'type'  => 'switcher',
                 'default' => isset($design['eccw_switcher_currency_code_show_hide']) ? $design['eccw_switcher_currency_code_show_hide'] : 'yes',
-                'desc'  => __('Show Currency Code on the currency switcher.', 'easy-currency'),
+                'class' => 'eccw-switcher-ui-control',
             ),
             'eccw_selements_tab_section_end' => array(
                 'type' => 'sectionend',
@@ -1126,57 +1153,76 @@ class ECCW_admin_settings {
             )
         );
 
-        $switcher_dropdown_display_wrapper_start = array(
+        $all_settings = array_merge( $switcher_elements_display_wrapper_start, $switcher_elements_display,$switcher_elements_display_wrapper_end );
+        
+        return $all_settings;
+
+    }
+
+    public function eccw_switcher_sticky_field() {
+
+        $saved_settings = get_option('eccw_currency_settings');
+
+      //  error_log( print_r($saved_settings, true ));
+        $design = isset($saved_settings['design']) ? $saved_settings['design'] : [];
+
+        $switcher_sticky_layout_start = array(
             array(
                 'type' => 'html',
-                'html' => '<div class="eccw-section eccw-dropdown-display">'
+                'html' => '<div class="eccw-sticky-layout">'
             )
         );
-
-        $switcher_dropdown_display = array(
-            'eccw_switcher_dropdown_style_title' => array(
-                'name' => __('Switcher Dropdown Elements Settings', 'easy-currency'),
+        $sticky_fields = array(
+            'section_sticky_title_layout_style' => array(
+                'name' => 'Display Side Switcher',
                 'type' => 'title',
                 'desc' => '',
-                'id' => 'eccw_switcher_dropdown_elements_settings'
+                'id' => 'eccw_settings_sticky_layout_section_title'
             ),
-            'eccw_dropdown_flag_visibility' => array(
-                'title' => __('Enable Flag', 'easy-currency'),
-                'id'    => 'design[eccw_switcher_dropdown_flag_show_hide]',
+            'eccw_enable_disable_side_currency' => array(
+                'title' => __('Show / Hide', 'easy-currency'),
+                'id'    => 'design[eccw_show_hide_side_currency]',
                 'type'  => 'switcher',
-                'default' => isset($design['eccw_switcher_dropdown_flag_show_hide']) ? $design['eccw_switcher_dropdown_flag_show_hide'] : 'yes',
-                'desc'  => __('Show flag on the currency switcher.', 'easy-currency'),
-                
+                'default' => isset($design['eccw_show_hide_side_currency']) ? $design['eccw_show_hide_side_currency'] : 'yes',
+                'class' => 'eccw-switcher-ui-control-show-hide',
             ),
-            'eccw_switcher_dropdown_ele_currency_name' => array(
-                'title' => __('Enable Currency Name', 'easy-currency'),
-                'id'    => 'design[eccw_switcher_dropdown_currency_name_show_hide]',
-                'type'  => 'switcher',
-                'default' => isset($design['eccw_switcher_dropdown_currency_name_show_hide']) ? $design['eccw_switcher_dropdown_currency_name_show_hide'] : 'yes',
-                'desc'  => __('Show Currency Name on the currency switcher.', 'easy-currency'),
+            'switcher_sticky_template' => array(
+                'name'     => __('Template', 'easy-currency'),
+                'type'     => 'template_preview',
+                'id'       => 'design[switcher_sticky][template]',
+                'default'  => isset($design['switcher_sticky']['template']) ? $design['switcher_sticky']['template'] : 'eccw_sticky_template_1',
+                'value'    => isset($design['switcher_sticky']['template']) ? $design['switcher_sticky']['template'] : 'eccw_sticky_template_1',
+                'desc'     => __('Choose your currency switcher template', 'easy-currency'),
+                'templates' => array( 
+                    'eccw_sticky_template_1' => ECCW_PL_URL . 'admin/assets/img/eccw-template-3.png',
+                    'eccw_sticky_template_2' => ECCW_PL_URL . 'admin/assets/img/eccw-template-4.png',
+                    'eccw_sticky_template_3' => ECCW_PL_URL . 'admin/assets/img/eccw-template-5.png',
+                ),
+                'class' => 'eccw-switcher-ui-control',
             ),
-            'eccw_switcher_dropdown_ele_currency_symbol' => array(
-                'title' => __('Enable Currency Symbol', 'easy-currency'),
-                'id'    => 'design[eccw_switcher_dropdown_currency_symbol_show_hide]',
-                'type'  => 'switcher',
-                'default' => isset($design['eccw_switcher_dropdown_currency_symbol_show_hide']) ? $design['eccw_switcher_dropdown_currency_symbol_show_hide'] : 'yes',
-                'desc'  => __('Show Currency Symbol on the currency switcher.', 'easy-currency'),
-            ),
-            'eccw_switcher_dropdown_ele_currency_code' => array(
-                'title' => __('Enable Currency Code', 'easy-currency'),
-                'id'    => 'design[eccw_switcher_dropdown_currency_code_show_hide]',
-                'type'  => 'switcher',
-                'default' => isset($design['eccw_switcher_dropdown_currency_code_show_hide']) ? $design['eccw_switcher_dropdown_currency_code_show_hide'] : 'yes',
-                'desc'  => __('Show Currency Code on the currency switcher.', 'easy-currency'),
+           'sticky_show_on_pages' => array(
+                'name'    => __('Show On Pages', 'easy-currency'),
+                'type'    => 'select2', 
+                'id'      => 'eccw_sticky_show_on_pages', 
+                'default'  => isset($design['eccw_sticky_show_on_pages']) ? $design['eccw_sticky_show_on_pages'] : '',
+                'value'    => isset($design['eccw_sticky_show_on_pages']) ? $design['eccw_sticky_show_on_pages'] : '',
+                'options' => eccw_get_pages_list_for_select(),
+                'desc'    => __('Select the pages where the currency switcher will be shown.', 'easy-currency'),
+                'class'   => 'eccw-sticky-select2',
+                'custom_attributes' => array(
+                    'multiple' => 'multiple'
+                ),
+                'field_name' => 'design[eccw_sticky_show_on_pages][]'
             ),
 
-            'eccw_switcher_dropdown_selements_tab_section_end' => array(
+
+
+            'eccw_sitcky_section_end' => array(
                 'type' => 'sectionend',
-                'id' => 'eccw_switcher_dropdown_elements_tab_section_end'
+                'id' => 'eccw_settings_sticky_layout_section_end'
             )
         );
-
-         $switcher_dropdown_display_wrapper_end = array(
+        $switcher_sticky_layout_end = array(
             array(
                 'type' => 'html',
                 'html' => '</div>'
@@ -1194,7 +1240,7 @@ class ECCW_admin_settings {
             'eccw_position_settings_title' => array(
                 'title' => __('Custom Position Settings', 'easy-currency'),
                 'type'  => 'title',
-                'desc'  => __('Configure the custom position fields for your products.', 'easy-currency'),
+                'desc'  => __('Configure the custom position fields for the side currency', 'easy-currency'),
                 'id'    => 'custom_position_options',
             ),
             'eccw_elemets_toggle_position' => array(
@@ -1206,7 +1252,8 @@ class ECCW_admin_settings {
                     'left'  => 'Left',
                     'right' => 'Right'
                 ),
-                'desc'    => 'Choose Left or Right alignment.'
+                'desc'    => 'Choose Left or Right alignment.',
+                'class' => 'eccw-switcher-ui-control',
             ),
 
             'vertical' => array(
@@ -1218,7 +1265,7 @@ class ECCW_admin_settings {
                 'step'    => 1,
                 'default' => isset($design['eccw_switcher_elements_vertical']) ? $design['eccw_switcher_elements_vertical'] : '50',
                 'desc'    => __('Set the vertical position in percentage.', 'easy-currency'),
-                
+                'class' => 'eccw-switcher-ui-control',
             ),
 
             'horizontal' => array(
@@ -1230,6 +1277,7 @@ class ECCW_admin_settings {
                 'step'    => 1,
                 'default' => isset($design['eccw_switcher_elements_horizontal']) ? $design['eccw_switcher_elements_horizontal'] : 0,
                 'desc'    => __('Set the horizontal position in pixels.', 'easy-currency'),
+                'class' => 'eccw-switcher-ui-control',
             ),
 
             'horizontal_hover' => array(
@@ -1241,6 +1289,7 @@ class ECCW_admin_settings {
                 'step'    => 1,
                 'default' => isset($design['eccw_switcher_elements_horizontal_hover']) ? $design['eccw_switcher_elements_horizontal_hover'] : 0,
                 'desc'    => __('Set the horizontal position on hover in pixels.', 'easy-currency'),
+                'class' => 'eccw-switcher-ui-control',
             ),
 
             'item_move_horizontal' => array(
@@ -1252,7 +1301,8 @@ class ECCW_admin_settings {
                 'step'    => 1,
                 'default' => isset($design['eccw_switcher_elements_item_move_horizontal']) ? $design['eccw_switcher_elements_item_move_horizontal'] : 0,
                 'desc'    => __('Set the horizontal movement of the item in pixels.', 'easy-currency'),
-                'desc_tip' => 'hello faridmia'
+                'desc_tip' => '',
+                'class' => 'eccw-switcher-ui-control',
             ),
 
             'eccw_switcher_position_tab_section_end' => array(
@@ -1268,11 +1318,10 @@ class ECCW_admin_settings {
             )
         );
 
-        $all_settings = array_merge( $switcher_elements_display_wrapper_start, $switcher_elements_display,$switcher_elements_display_wrapper_end,  $switcher_dropdown_display_wrapper_start, $switcher_dropdown_display,$switcher_dropdown_display_wrapper_end, $switcher_position_wrapper_start, $switcher_position,$switcher_position_wrapper_end );
+        $all_settings = array_merge(  $switcher_sticky_layout_start, $sticky_fields, $switcher_sticky_layout_end, $switcher_position_wrapper_start, $switcher_position,$switcher_position_wrapper_end );
         
 
         return $all_settings;
-
     }
 
 
@@ -1298,7 +1347,8 @@ class ECCW_admin_settings {
                     <li><a href="#tab_currency_design">Design</a></li>
                     
                     <li><a href="#tab_currency_usage">Usage</a></li>
-                    <li><a href="#tab_currency_switcher_shortcode">Switcher Shortcode</a></li>
+                    <li><a href="#tab_currency_switcher_shortcode">Shortcode</a></li>
+                    <li><a href="#tab_currency_switcher_sticky">Sticky Side</a></li>
                 </ul>
                 <div class="tab-contents-wrapper">
                     <div id="tab_currency" class="tab-content">
@@ -1425,21 +1475,19 @@ class ECCW_admin_settings {
                                 
                         <div class="eccw-designer-container">
                             <div class="eccw-designer-header">
-                                <h2><?php echo esc_html__('Switcher Generator', 'easy-currency') ?></h2>
+                                <h2><?php echo esc_html__('Shortcode Generator', 'easy-currency') ?></h2>
                                 <button class="eccw-shortcode-popup-form"><?php echo esc_html__('+ Create', 'easy-currency') ?></button>
                             </div>
 
                             <div class="eccw-shortcode-modal" id="eccw-shortcode-modal">
                                 <span class="eccw-style-modal-switcher-close">&times;</span>
                                 <h3><?php echo esc_html__('Create New Switcher', 'easy-currency'); ?></h3>
-                                <form class="eccw-shortcode-form" id="eccw-shortcode-form">
+                                <div class="eccw-shortcode-form" id="eccw-shortcode-form">
                                     <?php woocommerce_admin_fields($this->eccw_create_switcher_shortcode_popup_field()); ?>
                                     <button type="submit" class="create-shortcode-submit-button button button-primary"><?php echo esc_html__('Save', 'easy-currency'); ?></button>
-                                </form>
+                                </div>
                             </div>
                             <div class="eccw-modal-overlay" id="eccw-modal-overlay"></div>
-
-
                             <div class="eccw-designer-list">
                                 <?php 
                                     global $ECCW_Admin_Ajax;
@@ -1447,8 +1495,6 @@ class ECCW_admin_settings {
 
                                     foreach ($shortcodes as $shortcode) { 
 
-                                        error_log( print_r( $shortcode, true ));
-                                        
                                         ?>
                                         <div class="eccw-designer-card">
                                             <div class="eccw-designer-info">
@@ -1465,8 +1511,8 @@ class ECCW_admin_settings {
                                                 </div>
                                             </div>
                                             <div class="eccw-designer-actions">
-                                                <button class="eccw-btn-edit" data-id="<?php echo esc_attr($shortcode['id']); ?>" data-switchertype="<?php echo esc_attr($shortcode['switcher_type']); ?>"><?php echo esc_html__('Edit', 'easy-currency') ?></button>
-                                                <button class="eccw-btn-delete" data-id="<?echo  esc_attr($shortcode['id']); ?>" data-switchertype="<?php echo esc_attr($shortcode['switcher_type']); ?>"><?php echo esc_html__('Delete', 'easy-currency') ?></button>
+                                                <button class="eccw-btn-edit" data-id="<?php echo esc_attr($shortcode['id']); ?>"><?php echo esc_html__('Edit', 'easy-currency') ?></button>
+                                                <button class="eccw-btn-delete" data-id="<?echo  esc_attr($shortcode['id']); ?>"><?php echo esc_html__('Delete', 'easy-currency') ?></button>
                                             </div>
                                         </div>
                                     <?php }
@@ -1495,6 +1541,11 @@ class ECCW_admin_settings {
                                 </div> 
                             </div>
                         </div>
+                    </div>
+
+                    <div id="tab_currency_switcher_sticky" class="tab-content">
+                         <?php woocommerce_admin_fields($this->eccw_switcher_sticky_field()); ?>       
+                       
                     </div>
                 </div>
             </div>
