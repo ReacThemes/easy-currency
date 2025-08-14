@@ -734,9 +734,12 @@
             if (isChecked) {
                 $panel.find('.eccw-switcher-ui-control').slideDown();
                 $panel.find('.eccw-position-settings').slideDown();
+                $panel.find('.eccw-sticky-elements-display').slideDown();
             } else {
                 $panel.find('.eccw-switcher-ui-control').slideUp();
                 $panel.find('.eccw-position-settings').slideUp();
+                $panel.find('.eccw-sticky-elements-display').slideUp();
+                
             }
         }
 

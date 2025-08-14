@@ -90,134 +90,105 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
     }
 
  
-    public function eccw_render_currency_switcher ( $args = [] ) {
-        
-        $settings = $this->eccw_get_currency_common_settings();
-
+    public function eccw_render_currency_switcher($args = []) {
+       
+        $settings            = $this->eccw_get_currency_common_settings();
         $eccw_currency_table = $settings['eccw_currency_table'];
         $default_currency    = $settings['default_currency'];
-        $flag_visibility     = $settings['flag_visibility'];
         $currency_countries  = $settings['currency_countries'];
-        $shortcode_id = $args['shortcode_id'] ?? 'default';
 
-        $style_options   = $args['style_options'] ?? [];
+       
+        $shortcode_id  = $args['shortcode_id'] ?? 'default';
+        $style_options = $args['style_options'] ?? [];
         $wrapper_class = $args['wrapper_class'] ?? 'switcher-list-content';
-        $unique_class = 'eccw-switcher-design' . sanitize_html_class($shortcode_id);
 
-        $template_style     = $style_options['switcher_dropdown_option']['template'];
-
-        $classes = [
-            $unique_class,
-            $template_style,
-        ];
-
-        $classes = array_map(function($class) {
-            if (!empty($class)) {
-                return esc_attr(str_replace('_', '-', $class));
-            }
-            return '';
-        }, $classes);
-
-        $classes = array_filter($classes);
-
+        
+        $unique_class   = 'eccw-switcher-design' . sanitize_html_class($shortcode_id);
+        $template_style = $style_options['switcher_dropdown_option']['template'] ?? '';
+        $classes        = array_filter([$unique_class, $template_style]);
+        $classes        = array_map(fn($c) => esc_attr(str_replace('_', '-', $c)), $classes);
         $wrapper_class .= ' ' . implode(' ', $classes);
 
-        try {
-            $currency_countries_json = json_decode( $currency_countries['body'], true );
-        } catch ( Exception $ex ) {
-            $currency_countries_json = null; 
-        }
+        
+        $currency_countries_json = json_decode($currency_countries['body'] ?? '', true) ?? [];
+
+      
+        $flag_show       = $style_options['eccw_switcher_flag_show_hide'] ?? 'yes';
+        $cur_name_show   = $style_options['eccw_switcher_currency_name_show_hide'] ?? 'yes';
+        $cur_symbol_show = $style_options['eccw_switcher_currency_symbol_show_hide'] ?? 'yes';
+        $cur_code_show   = $style_options['eccw_switcher_currency_code_show_hide'] ?? 'yes';
+
+       
+        $default_country = $currency_countries_json[$default_currency]['countries'][0] ?? '';
+        $default_symbol  = $currency_countries_json[$default_currency]['symbol'] ?? '';
+        $default_name    = $currency_countries_json[$default_currency]['name'] ?? '';
+        $default_flag      = ECCW_PL_URL . 'public/assets/images/flags/' . strtolower($default_country) . '.png';
 
         ob_start();
-
-        $flag_show        = $style_options['eccw_switcher_flag_show_hide'];
-        $cur_name_show    = $style_options['eccw_switcher_currency_name_show_hide'];
-        $cur_symbol_show  = $style_options['eccw_switcher_currency_symbol_show_hide'];
-        $cur_code_show    = $style_options['eccw_switcher_currency_code_show_hide'];
-
         ?>
-            <div class="easy-currency-switcher <?php echo esc_attr( $wrapper_class ); ?>">  
-                <form method="post" action="#" id="easy_currency_switcher_form" class="easy_currency_switcher_form">
-                    <?php wp_nonce_field( 'eccw_currency_update_nonce', 'eccw_nonce'); ?>
-                    <input type="hidden" name="easy_currency">
-                    <?php 
-                            $country = $currency_countries_json[$default_currency]['countries'][0];
-                            $symbol = $currency_countries_json[$default_currency]['symbol'];
-                            $name = $currency_countries_json[$default_currency]['name'];
-                            $flag_url = 'https://flagcdn.com/24x18/' . strtolower($country).'.png';
-                           
-                    ?>
-                    <button type="button" class="easy-currency-switcher-toggle">
-                        
-                        <div class="easy-currency-elements">
-                            <?php 
-                                if( $flag_show == 'yes') {
-                            ?>
-                            <img src="<?php echo esc_url( $flag_url );?>" alt="flag" class="flag">
-                            <?php } ?>
-                            <?php 
-                                if(  $cur_code_show == 'yes') {
-                            ?>
-                            <span class="easy-country-code"><?php echo esc_attr($default_currency); ?> </span>
-                            <?php } 
-                            if(  $cur_name_show == 'yes') {
-                            ?>
-                            <span class="easy-country-name"><?php echo esc_attr($name); ?> </span>
-                            <?php }
-                                if( $cur_symbol_show == 'yes') {
-                            ?>
-                            <span class="easy-country-symbol">(<?php echo esc_attr($symbol); ?>)</span>
-                            <?php } ?>
-                        </div>
-                        <span class="dropdown-icon"></span>
-                    </button>
-                    <ul class="easy-currency-switcher-select list <?php echo $flag_show == 'yes' ? 'has-flag' : '' ?>">
-                        <?php 
+        <div class="easy-currency-switcher <?php echo esc_attr($wrapper_class); ?>">  
+            <form method="post" id="easy_currency_switcher_form" class="easy_currency_switcher_form">
+                <?php wp_nonce_field('eccw_currency_update_nonce', 'eccw_nonce'); ?>
+                <input type="hidden" name="easy_currency">
 
-                            try {
-                                $currency_countries_json = json_decode( $currency_countries['body'], true );
-                            } catch ( Exception $ex ) {
-                                $currency_countries_json = null; 
-                            }
+                <!-- Toggle Button -->
+                <button type="button" class="easy-currency-switcher-toggle">
+                    <div class="easy-currency-elements">
+                        <?php if ($flag_show === 'yes'): ?>
+                            <img src="<?php echo esc_url($default_flag); ?>" alt="flag" class="flag">
+                        <?php endif; ?>
 
-                        if(is_array($eccw_currency_table) && count($eccw_currency_table) > 0){
-                            foreach ($eccw_currency_table as $key => $currency) {
+                        <?php if ($cur_code_show === 'yes'): ?>
+                            <span class="easy-country-code"><?php echo esc_html($default_currency); ?></span>
+                        <?php endif; ?>
 
-                                $currency_code = $currency['code'];
-                                $country = $currency_countries_json[$currency_code]['countries'][0];
-                                $symbol = $currency_countries_json[$currency_code]['symbol'];
-                                $name = $currency_countries_json[$currency_code]['name'];
-                                $flag_url = 'https://flagcdn.com/24x18/' . strtolower($country).'.png';
+                        <?php if ($cur_name_show === 'yes'): ?>
+                            <span class="easy-country-name"><?php echo esc_html($default_name); ?></span>
+                        <?php endif; ?>
 
-                                ?>
-                                    <li data-value="<?php echo esc_attr($currency_code) ?>" class="option <?php echo $default_currency == $currency_code ? 'selected' : ''; ?>">
-                                        <?php 
-                                            if( $flag_show == 'yes') {
-                                        ?>
-                                        <img src="<?php echo esc_url( $flag_url )?>" alt="<?php echo esc_attr($currency_code)?> flag" class="flag" data-value="<?php echo esc_attr($currency_code) ?>">
-                                        <?php } 
-                                         
-                                            if( $cur_code_show == 'yes') {
-                                        ?>
-                                        <span class="eccw-dropdown-country-code"><?php echo esc_html($currency_code); ?></span>
-                                        <?php } 
-                                        if( $cur_name_show == 'yes') {
-                                        ?>
-                                        
-                                         <span class="eccw-dropdown-country-name"><?php echo esc_html($name); ?></span>
-                                        <?php }
-                                            if( $cur_symbol_show == 'yes') {
-                                        ?>
-                                        <span class="eccw-dropdown-symbol-code">(<?php echo esc_html($symbol); ?>)</span> 
-                                        <?php } ?>
-                                    </li>
-                                <?php
-                            } 
-                        }
-                        ?>  
-                    </ul>
-                </form>
-            </div>
+                        <?php if ($cur_symbol_show === 'yes'): ?>
+                            <span class="easy-country-symbol">(<?php echo esc_html($default_symbol); ?>)</span>
+                        <?php endif; ?>
+                    </div>
+                    <span class="dropdown-icon"></span>
+                </button>
+
+                <!-- Dropdown List -->
+                <ul class="easy-currency-switcher-select list <?php echo $flag_show === 'yes' ? 'has-flag' : ''; ?>">
+                    <?php if (!empty($eccw_currency_table) && is_array($eccw_currency_table)): ?>
+                        <?php foreach ($eccw_currency_table as $currency): 
+                            $code    = $currency['code'];
+                            $country = $currency_countries_json[$code]['countries'][0] ?? '';
+                            $symbol  = $currency_countries_json[$code]['symbol'] ?? '';
+                            $name    = $currency_countries_json[$code]['name'] ?? '';
+                            $flag      = ECCW_PL_URL . 'public/assets/images/flags/' . strtolower($country) . '.png';
+                            ?>
+                            <li data-value="<?php echo esc_attr($code); ?>" 
+                                class="option <?php echo $default_currency === $code ? 'selected' : ''; ?>">
+
+                                <?php if ($flag_show === 'yes'): ?>
+                                    <img src="<?php echo esc_url($flag); ?>" 
+                                        alt="<?php echo esc_attr($code); ?> flag" 
+                                        class="flag" data-value="<?php echo esc_attr($code); ?>">
+                                <?php endif; ?>
+
+                                <?php if ($cur_code_show === 'yes'): ?>
+                                    <span class="eccw-dropdown-country-code"><?php echo esc_html($code); ?></span>
+                                <?php endif; ?>
+
+                                <?php if ($cur_name_show === 'yes'): ?>
+                                    <span class="eccw-dropdown-country-name"><?php echo esc_html($name); ?></span>
+                                <?php endif; ?>
+
+                                <?php if ($cur_symbol_show === 'yes'): ?>
+                                    <span class="eccw-dropdown-symbol-code">(<?php echo esc_html($symbol); ?>)</span>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </ul>
+            </form>
+        </div>
         <?php
         return ob_get_clean();
     }

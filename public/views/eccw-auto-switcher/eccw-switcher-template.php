@@ -21,42 +21,66 @@
 
     $wrapper_class = ' ' . implode(' ', $classes);
 
-
-ob_start();
+    ob_start();
 ?>
 
-<div class="easy-currency-switcher-auto-select <?php echo esc_attr($wrapper_class); ?>">  
+<div class="easy-currency-switcher-auto-select <?php echo esc_attr($wrapper_class); ?>">
     <form method="post" action="#" id="easy_currency_switcher_form" class="easy_currency_switcher_form">
-        <?php wp_nonce_field( 'eccw_currency_update_nonce', 'eccw_nonce'); ?>
+        <?php wp_nonce_field('eccw_currency_update_nonce', 'eccw_nonce'); ?>
         <input type="hidden" name="easy_currency">
+
         <ul class="easy-currency-switcher-select list">
-            <?php 
-            try {
-                $currency_countries_json = json_decode($currency_countries['body'], true);
-            } catch (Exception $ex) {
-                $currency_countries_json = null;
+            <?php
+            $currency_countries_json = null;
+            if (!empty($currency_countries['body'])) {
+                try {
+                    $currency_countries_json = json_decode($currency_countries['body'], true);
+                } catch (Exception $ex) {
+                    $currency_countries_json = null;
+                }
             }
 
-            if (is_array($eccw_currency_table) && count($eccw_currency_table) > 0) {
+            if (!empty($eccw_currency_table) && is_array($eccw_currency_table)) {
                 foreach ($eccw_currency_table as $currency) {
-                    $currency_code = $currency['code'];
-                    $country = $currency_countries_json[$currency_code]['countries'][0];
-                    $symbol = $currency_countries_json[$currency_code]['symbol'];
-                    $name = $currency_countries_json[$currency_code]['name'];
-                    $flag_url = 'https://flagcdn.com/24x18/' . strtolower($country) . '.png';
+                    $currency_code = $currency['code'] ?? '';
+                    $country       = $currency_countries_json[$currency_code]['countries'][0] ?? '';
+                    $symbol        = $currency_countries_json[$currency_code]['symbol'] ?? '';
+                    $name          = $currency_countries_json[$currency_code]['name'] ?? '';
+                    $flag_url      = ECCW_PL_URL . 'public/assets/images/flags/' . strtolower($country) . '.png';
+
+                    $is_selected = ($default_currency === $currency_code) ? 'selected' : '';
                     ?>
-                    <li data-value="<?php echo esc_attr($currency_code); ?>" class="option <?php echo $default_currency == $currency_code ? 'selected' : ''; ?>">
-                        <?php 
-                            if (in_array( $eccw_template, ['eccw_sticky_template_1', 'eccw_sticky_template_3'])) {
-                        ?>
-                        <img src="<?php echo esc_url($flag_url); ?>" alt="<?php echo esc_attr($currency_code); ?> flag" class="flag" data-value="<?php echo esc_attr($currency_code); ?>">
-                        <span class="eccw-side-country-code"><?php echo esc_html($currency_code); ?></span>
-                        <?php } else { ?>
-                            <span class="eccw-side-country-code"><?php echo esc_html($currency_code); ?></span>
-                            <img src="<?php echo esc_url($flag_url); ?>" alt="<?php echo esc_attr($currency_code); ?> flag" class="flag" data-value="<?php echo esc_attr($currency_code); ?>">
-                        <?php } ?>
-                        <span class="eccw-side-country-name"><?php echo esc_html($name); ?></span>
-                        <span class="eccw-side-symbol-code">(<?php echo esc_html($symbol); ?>)</span> 
+                    <li data-value="<?php echo esc_attr($currency_code); ?>" class="option <?php echo esc_attr($is_selected); ?>">
+                        
+                        <?php if (in_array($eccw_template, ['eccw_sticky_template_1', 'eccw_sticky_template_3'])): ?>
+                            
+                            <?php if ($flag_show_hide == 'yes' || $flag_show_hide == '1'): ?>
+                                <img src="<?php echo esc_url($flag_url); ?>" alt="<?php echo esc_attr($currency_code); ?> flag" class="flag" data-value="<?php echo esc_attr($currency_code); ?>">
+                            <?php endif; ?>
+
+                            <?php if ($code_show_hide === 'yes' || $code_show_hide === '1'): ?>
+                                <span class="eccw-side-country-code"><?php echo esc_html($currency_code); ?></span>
+                            <?php endif; ?>
+
+                        <?php else: ?>
+
+                            <?php if ($code_show_hide === 'yes' || $code_show_hide === '1'): ?>
+                                <span class="eccw-side-country-code"><?php echo esc_html($currency_code); ?></span>
+                            <?php endif; ?>
+
+                            <?php if ( $flag_show_hide === 'yes' || $flag_show_hide === '1'): ?>
+                                <img src="<?php echo esc_url($flag_url); ?>" alt="<?php echo esc_attr($currency_code); ?> flag" class="flag" data-value="<?php echo esc_attr($currency_code); ?>">
+                            <?php endif; ?>
+
+                        <?php endif; ?>
+
+                        <?php if ($currency_name_show_hide === '1' || $currency_name_show_hide === 'yes'): ?>
+                            <span class="eccw-side-country-name"><?php echo esc_html($name); ?></span>
+                        <?php endif; ?>
+
+                        <?php if ($symbol_show_hide === 'yes' || $symbol_show_hide === '1'): ?>
+                            <span class="eccw-side-symbol-code">(<?php echo esc_html($symbol); ?>)</span>
+                        <?php endif; ?>
                     </li>
                     <?php
                 }
@@ -65,6 +89,7 @@ ob_start();
         </ul>
     </form>
 </div>
+
 
 <?php
 echo ob_get_clean();

@@ -75,7 +75,7 @@
 .tabs.eccw-settings-tabs .tab-contents-wrapper .tab-content .add-currency {
   margin-top: 10px;
 }
-.tabs.eccw-settings-tabs .tab-contents-wrapper .tab-content#tab_currency_design > h2 {
+.tabs.eccw-settings-tabs .tab-contents-wrapper .tab-content#tab_currency_design > h2, .tabs.eccw-settings-tabs .tab-contents-wrapper .tab-content.eccw-sticky-elements-display {
   background: #f4f4f4;
   padding: 20px;
 }
@@ -282,14 +282,18 @@
   cursor: pointer;
 }
 
-.eccw-style-modal-switcher-form {
+.eccw-style-modal-switcher-form,
+#tab_currency_switcher_sticky {
   margin-top: 60px;
 }
-.eccw-style-modal-switcher-form h2 {
+.eccw-style-modal-switcher-form h2,
+#tab_currency_switcher_sticky h2 {
   background: #f4f4f4;
   padding: 20px;
+  margin-bottom: 35px !important;
 }
-.eccw-style-modal-switcher-form .eccw-dimension-field-wrapper {
+.eccw-style-modal-switcher-form .eccw-dimension-field-wrapper,
+#tab_currency_switcher_sticky .eccw-dimension-field-wrapper {
   display: flex;
   gap: 15px;
 }

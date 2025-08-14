@@ -46,16 +46,35 @@ class ECCW_admin_settings {
         echo '<select name="' . esc_attr($name) . '" id="' . esc_attr($field['id']) . '" class="eccw-sticky-select2" style="' . esc_attr($style_width) . '"' . $multiple_attr . '>';
 
         if (!empty($field['options']) && is_array($field['options'])) {
-            foreach ($field['options'] as $key => $label) {
-                $is_selected = false;
+            foreach ($field['options'] as $group_label => $group_options) {
 
-                if ($is_multiple && is_array($option_value)) {
-                    $is_selected = in_array((string)$key, array_map('strval', $option_value), true);
+                
+                if (is_array($group_options)) {
+                    echo '<optgroup label="' . esc_attr($group_label) . '">';
+                    foreach ($group_options as $key => $label) {
+                        $is_selected = false;
+
+                        if ($is_multiple && is_array($option_value)) {
+                            $is_selected = in_array((string)$key, array_map('strval', $option_value), true);
+                        } else {
+                            $is_selected = ((string)$option_value === (string)$key);
+                        }
+
+                        echo '<option value="' . esc_attr($key) . '" ' . selected($is_selected, true, false) . '>' . esc_html($label) . '</option>';
+                    }
+                    echo '</optgroup>';
                 } else {
-                    $is_selected = ((string)$option_value === (string)$key);
-                }
+                  
+                    $is_selected = false;
 
-                echo '<option value="' . esc_attr($key) . '" ' . selected($is_selected, true, false) . '>' . esc_html($label) . '</option>';
+                    if ($is_multiple && is_array($option_value)) {
+                        $is_selected = in_array((string)$group_label, array_map('strval', $option_value), true);
+                    } else {
+                        $is_selected = ((string)$option_value === (string)$group_label);
+                    }
+
+                    echo '<option value="' . esc_attr($group_label) . '" ' . selected($is_selected, true, false) . '>' . esc_html($group_options) . '</option>';
+                }
             }
         }
 
@@ -1163,7 +1182,6 @@ class ECCW_admin_settings {
 
         $saved_settings = get_option('eccw_currency_settings');
 
-      //  error_log( print_r($saved_settings, true ));
         $design = isset($saved_settings['design']) ? $saved_settings['design'] : [];
 
         $switcher_sticky_layout_start = array(
@@ -1228,6 +1246,62 @@ class ECCW_admin_settings {
                 'html' => '</div>'
             )
         );
+
+        $switcher_sticky_display_wrapper_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-section eccw-sticky-elements-display">'
+            )
+        );
+        $switcher_sticky_show_hide_display = array(
+            
+            'eccw_sticky_display_style_title' => array(
+                'name' => __('Display Switcher', 'easy-currency'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_switcher_elements_settings'
+            ),
+            'eccw_sticky_flag_visibility' => array(
+                'title' => __('Enable Flag', 'easy-currency'),
+                'id'    => 'design[eccw_sticky_flag_show_hide]',
+                'type'  => 'switcher',
+                'default' => isset($design['eccw_sticky_flag_show_hide']) ? $design['eccw_sticky_flag_show_hide'] : 'yes',
+                'class' => 'eccw-switcher-ui-control',
+            ),
+            'eccw_sticky_ele_currency_name' => array(
+                'title' => __('Enable Currency Name', 'easy-currency'),
+                'id'    => 'design[eccw_sticky_currency_name_show_hide]',
+                'type'  => 'switcher',
+                'default' => isset($design['eccw_sticky_currency_name_show_hide']) ? $design['eccw_sticky_currency_name_show_hide'] : 'yes',
+                'class' => 'eccw-switcher-ui-control',
+            ),
+            'eccw_sticky_ele_currency_symbol' => array(
+                'title' => __('Enable Currency Symbol', 'easy-currency'),
+                'id'    => 'design[eccw_switcher_currency_symbol_show_hide]',
+                'type'  => 'switcher',
+                'default' => isset($design['eccw_sticky_ele_currency_symbol']) ? $design['eccw_sticky_ele_currency_symbol'] : 'yes',
+                'class' => 'eccw-switcher-ui-control',
+            ),
+            'eccw_sticky_ele_currency_code' => array(
+                'title' => __('Enable Currency Code', 'easy-currency'),
+                'id'    => 'design[eccw_sticky_currency_code_show_hide]',
+                'type'  => 'switcher',
+                'default' => isset($design['eccw_sticky_currency_code_show_hide']) ? $design['eccw_sticky_currency_code_show_hide'] : 'yes',
+                'class' => 'eccw-switcher-ui-control',
+            ),
+            'eccw_sticky_show_hide_tab_section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_sticky_show_hide_tab_section_end'
+            )
+        );
+
+        $switcher_sticky_display_wrapper_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
 
         $switcher_position_wrapper_start = array(
             array(
@@ -1318,7 +1392,7 @@ class ECCW_admin_settings {
             )
         );
 
-        $all_settings = array_merge(  $switcher_sticky_layout_start, $sticky_fields, $switcher_sticky_layout_end, $switcher_position_wrapper_start, $switcher_position,$switcher_position_wrapper_end );
+        $all_settings = array_merge(  $switcher_sticky_layout_start, $sticky_fields, $switcher_sticky_layout_end, $switcher_sticky_display_wrapper_start, $switcher_sticky_show_hide_display, $switcher_sticky_display_wrapper_end, $switcher_position_wrapper_start, $switcher_position,$switcher_position_wrapper_end );
         
 
         return $all_settings;

@@ -2,6 +2,22 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 function eccw_get_pages_list_for_select() {
+    
+    $special_pages = array(
+        'home'              => 'Home Page',
+        'single'            => 'Single Post/Page',
+        'shop'              => 'Shop Page',
+        'category'          => 'Category Page',
+        'front_page'        => 'Front Page',
+        'woocommerce'       => 'WooCommerce',
+        'product_category'  => 'Product Category Page',
+        'cart'              => 'Cart Page',
+        'product'           => 'Single Product Page',
+        'checkout'          => 'Checkout Page',
+        'product_tag'       => 'Product Tag Page',
+        'blog'              => 'Blog Page'
+    );
+
     $pages = get_posts(array(
         'post_type'      => 'page',
         'post_status'    => 'publish',
@@ -10,16 +26,21 @@ function eccw_get_pages_list_for_select() {
         'posts_per_page' => -1
     ));
 
-    $options = array();
-
+    $normal_pages = array();
     if (!empty($pages)) {
         foreach ($pages as $page) {
-            $options[(string)$page->ID] = $page->post_title; 
+            $normal_pages[(string)$page->ID] = $page->post_title; 
         }
     }
 
-    return (array) $options; 
+    $options = array(
+        'Special Pages' => $special_pages,
+        'Normal Pages'  => $normal_pages
+    );
+
+    return $options;
 }
+
 
 function eccw_get_currency_common_settings() {
 

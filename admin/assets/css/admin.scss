@@ -85,7 +85,8 @@ $white-color: #ffffff;
       .add-currency {
         margin-top: 10px;
       }
-      &#tab_currency_design > h2 {
+      &#tab_currency_design > h2,
+      &.eccw-sticky-elements-display {
         background: #f4f4f4;
         padding: 20px;
       }
@@ -313,11 +314,13 @@ $white-color: #ffffff;
     cursor: pointer;
 }
 
-.eccw-style-modal-switcher-form  {
+.eccw-style-modal-switcher-form,
+#tab_currency_switcher_sticky  {
   margin-top: 60px;
   h2 {
     background: #f4f4f4;
     padding: 20px;
+    margin-bottom: 35px !important;
   }
   
   .eccw-dimension-field-wrapper {

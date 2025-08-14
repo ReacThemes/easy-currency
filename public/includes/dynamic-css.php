@@ -4,6 +4,12 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 add_action('wp_enqueue_scripts', 'eccw_enqueue_all_dynamic_css');
 function eccw_enqueue_all_dynamic_css() {
     $switcher_settings = get_option('eccw_switcher_styles', []);
+
+    error_log( print_r( $switcher_settings, true ));
+
+   // unset( $switcher_settings['switcher_dropdown_option']['template']);
+
+
     $eccw_options = get_option('eccw_currency_settings');
     
     $all_css = '';
@@ -28,6 +34,8 @@ function eccw_enqueue_all_dynamic_css() {
     if (!empty($switcher_settings) && is_array($switcher_settings)) {
         foreach ($switcher_settings as $shortcode_id => $style) {
             $unique_class = '.eccw-switcher-design' . sanitize_html_class($shortcode_id);
+            error_log( print_r( $style, true ));
+
 
             $style_selectors = [
                 'switcher_dropdown_option'       => $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-select li',
