@@ -35,14 +35,22 @@ function eccw_enqueue_all_dynamic_css()
     if (!empty($switcher_settings) && is_array($switcher_settings)) {
         foreach ($switcher_settings as $shortcode_id => $style) {
             $unique_class = '.eccw-switcher-design' . sanitize_html_class($shortcode_id);
-            // error_log(print_r($style, true));
+            if ( isset( $style['switcher_dropdown_option']['template'] ) ) {
+                unset( $style['switcher_dropdown_option']['template'] );
+            }
+           
+            $dropdown_icon_color = !empty($style['switcher_button']['color']) ? $style['switcher_button']['color'] : '';
+            $switcher_border = !empty($style['switcher_button']['border_control']) ? $style['switcher_button']['border_control'] : '';
+             error_log(print_r( $switcher_border , true));
 
             $style_selectors = [
                 'switcher_dropdown_option'       => $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-select li',
-                'switcher_button'                => $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-toggle',
+                'switcher_button' => 
+                    $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-toggle',
                 'switcher_dropdown'              => $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-select',
                 'switcher_dropdown_option_hover' => $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-select li:hover, ' . $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-select li.selected',
-                'switcher_option_flag'           => $unique_class . ' .flag',
+                'switcher_option_flag' => $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-toggle .flag, ' . $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-select.list li img',
+
             ];
 
             foreach ($style_selectors as $key => $selector) {
@@ -50,6 +58,21 @@ function eccw_enqueue_all_dynamic_css()
                     $all_css .= eccw_add_dynamic_css($style[$key], $selector);
                 }
             }
+
+            if( $dropdown_icon_color ) {
+                $all_css .= $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-toggle .dropdown-icon::before, ' .
+                            $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-toggle .dropdown-icon::after { background-color: ' . $dropdown_icon_color . '; }';
+            }
+
+            if ( !empty($switcher_border) && is_array($switcher_border) && empty($switcher_border['default'] )) {
+                $all_css .= $unique_class . ' .easy_currency_switcher_form .easy-currency-switcher-toggle { ' .
+                    'border-top: '    . $switcher_border['top']    . ' ' . $switcher_border['style'] . ' ' . $switcher_border['color'] . '; ' .
+                    'border-right: '  . $switcher_border['right']  . ' ' . $switcher_border['style'] . ' ' . $switcher_border['color'] . '; ' .
+                    'border-bottom: ' . $switcher_border['bottom'] . ' ' . $switcher_border['style'] . ' ' . $switcher_border['color'] . '; ' .
+                    'border-left: '   . $switcher_border['left']   . ' ' . $switcher_border['style'] . ' ' . $switcher_border['color'] . '; ' .
+                '}';
+            }
+
         }
     }
 
@@ -64,7 +87,14 @@ function eccw_add_dynamic_css($css_array, $element_class)
         $custom_css = $element_class . ' {';
         foreach ($css_array as $prop => $value) {
             $prop  = sanitize_key($prop);
-            $value = wp_strip_all_tags($value);
+
+            if (is_array($value)) {
+                // Convert array to CSS shorthand string (top right bottom left)
+                $value = implode(' ', array_map('wp_strip_all_tags', $value));
+            } elseif (is_string($value)) {
+                $value = wp_strip_all_tags($value);
+            }
+
             if ($prop && $value) {
                 $custom_css .= "{$prop}: {$value};";
             }
@@ -74,3 +104,4 @@ function eccw_add_dynamic_css($css_array, $element_class)
     }
     return '';
 }
+

@@ -1,5 +1,4 @@
 (function ($) {
-
   var ECCWAdmin = {
     init: function () {
       this.currencyFieldsRepeater();
@@ -42,86 +41,90 @@
           this.removeCurrencyRow
         );
     },
+
     initializeEccwModalFormInputs: function (context = document) {
+      // ---------- Range Slider ----------
       $(context)
         .find(".eccw-rang-input")
-        .each(function (index, element) {
-          if ($(element).hasClass("initialized")) return;
+        .each(function () {
+          const $input = $(this);
 
-          let copy = $(element).clone();
-          let postfix = $(element).attr("unit");
+          if ($input.hasClass("initialized")) return;
 
-          $(copy).addClass("copied").attr("type", "hidden");
-          $(element).after(copy).removeAttr("name").removeAttr("id");
+          const unit = $input.attr("unit") || "";
+          const value = $input.val();
+          const $copy = $input
+            .clone()
+            .addClass("copied")
+            .attr("type", "hidden");
 
-          $(element)
-            .addClass("initialized")
-            .ionRangeSlider({
-              skin: "modern",
-              min: 0,
-              max: 600,
-              from: this.value,
-              to: 600,
-              postfix: postfix,
-              onStart: function (data) {
-                $(copy).prop("value", data.from + "px");
-              },
-              onChange: function (data) {
-                $(copy).prop("value", data.from + "px");
-              },
-            });
+          $input.after($copy).removeAttr("name").removeAttr("id");
+
+          $input.addClass("initialized").ionRangeSlider({
+            skin: "modern",
+            min: 0,
+            max: 600,
+            from: value,
+            postfix: unit,
+            onStart: function (data) {
+              $copy.val(data.from + unit);
+            },
+            onChange: function (data) {
+              $copy.val(data.from + unit);
+            },
+          });
+
+          const $resetBtn = $(
+            '<button type="button" class="eccw-range-reset">Reset</button>'
+          );
+          $input.after($resetBtn);
+
+          $resetBtn.on("click", function () {
+            const slider = $input.data("ionRangeSlider");
+            slider.update({ from: 0 });
+            $copy.val("");
+            $input.val("");
+          });
         });
 
-      // Color Picker
+      // ---------- Color Picker ----------
       $(context)
         .find(".eccw-color-input,.eccw-border-picker")
         .wpColorPicker({
-          change: function (event, ui) {
+          change: function () {
             $(
               ".eccw-style-modal-switcher-save-btn, .eccw-style-modal-switcher-save-closebtn"
             ).prop("disabled", false);
           },
         });
 
-      // Dimension Field Handling
+      // ---------- Dimension Fields ----------
       $(context)
         .find(".eccw-dimension-input")
         .each(function () {
           let fields = $(this).attr("fields");
-          let unit = $(this).attr("unit");
+          let unit = $(this).attr("unit") || "";
+
           if (fields) {
             fields = JSON.parse(fields);
-
-            let dimensionWrapper = $(
+            const wrapper = $(
               '<div class="eccw-dimension-field-wrapper"></div>'
             );
-            $(this).after(dimensionWrapper);
+            $(this).after(wrapper);
 
-            let inputs = "";
-            $.each(fields, function (indexInArray, valueOfElement) {
-              inputs +=
-                '<input type="' +
-                valueOfElement.type +
-                '" name="' +
-                valueOfElement.name +
-                '" value="' +
-                valueOfElement.value +
-                '" placeholder="' +
-                valueOfElement.placeholder +
-                '" class="eccw-input eccw-dimension-field"/>';
+            $.each(fields, function (_, field) {
+              wrapper.append(
+                `<input type="${field.type}" name="${field.name}" value="${field.value}" placeholder="${field.placeholder}" class="eccw-input eccw-dimension-field"/>`
+              );
             });
 
-            dimensionWrapper.html(inputs + " " + unit);
+            wrapper.append(" " + unit);
           }
         });
 
-      $(context)
-        .find(".eccw-dimension-field")
-        .keyup(function (e) {
-          e.preventDefault();
-          let value = $(this).val();
-          $(this).parent().prev().val(value);
-        });
+      $(context).on("keyup", ".eccw-dimension-field", function () {
+        $(this).parent().prev().val($(this).val());
+      });
     },
 
     ajaxLoader: function (action) {
@@ -552,8 +555,7 @@
             currentShortcodeId,
             tabKey,
             true,
-            function () {
-            }
+            function () {}
           );
         });
 
@@ -631,7 +633,9 @@
           });
 
         function closeEccwModal() {
-          $("#eccw-style-modal-switcher, .eccw-shortcode-modal,.eccw-modal-overlay").fadeOut();
+          $(
+            "#eccw-style-modal-switcher, .eccw-shortcode-modal,.eccw-modal-overlay"
+          ).fadeOut();
         }
       });
     },
@@ -670,7 +674,6 @@
         saveStyleAndMaybeClose(true);
       });
     },
-
 
     initializeRangeSlider: function () {
       function initializeSliders() {
@@ -723,34 +726,53 @@
       });
     },
 
-    initSwitcherToggle:  function(panelSelector, checkboxName) {
-        var $panel = $(panelSelector);
+    initSwitcherToggle: function (panelSelector, checkboxName) {
+      var $panel = $(panelSelector);
 
-        if (!$panel.length) return; 
+      if (!$panel.length) return;
 
-        function toggleSwitcherFields() {
-            var isChecked = $panel.find('input[name="' + checkboxName + '"]').is(':checked');
+      function toggleSwitcherFields() {
+        var isChecked = $panel
+          .find('input[name="' + checkboxName + '"]')
+          .is(":checked");
+        var $targets = $panel.find(
+          ".eccw-switcher-ui-control, .eccw-position-settings, .eccw-sticky-elements-display, .eccw-sticky-color-style-display"
+        );
 
-            if (isChecked) {
-                $panel.find('.eccw-switcher-ui-control').slideDown();
-                $panel.find('.eccw-position-settings').slideDown();
-                $panel.find('.eccw-sticky-elements-display').slideDown();
-            } else {
-                $panel.find('.eccw-switcher-ui-control').slideUp();
-                $panel.find('.eccw-position-settings').slideUp();
-                $panel.find('.eccw-sticky-elements-display').slideUp();
-                
-            }
+        if (isChecked) {
+          $targets.slideDown();
+          toggleTemplateSpecificFields();
+        } else {
+          $targets.slideUp();
+          $targets.add(".eccw-sticky-ccode-color-style-display").slideUp();
         }
+      }
 
-        toggleSwitcherFields();
+      function toggleTemplateSpecificFields() {
+        var selectedTemplate = $panel
+          .find('input[name="design[switcher_sticky][template]"]:checked')
+          .val();
 
-        $panel.find('input[name="' + checkboxName + '"]').on('change', function() {
-            toggleSwitcherFields();
+        if (selectedTemplate === "eccw_sticky_template_2") {
+          $panel.find(".eccw-sticky-ccode-color-style-display").slideDown();
+        } else {
+          $panel.find(".eccw-sticky-ccode-color-style-display").slideUp();
+        }
+      }
+
+      toggleSwitcherFields();
+
+      $panel
+        .find('input[name="' + checkboxName + '"]')
+        .on("change", function () {
+          toggleSwitcherFields();
         });
+      $panel.on(
+        "change",
+        'input[name="design[switcher_sticky][template]"]',
+        toggleTemplateSpecificFields
+      );
     },
-
-
   };
 
   ECCWAdmin.init();
@@ -771,19 +793,17 @@
 
   bindSaveButtonEnable();
 
-   $('#eccw-modal-overlay').on('click', function() {
-    $('#eccw-modal-overlay, #eccw-shortcode-modal').fadeOut();
+  $("#eccw-modal-overlay").on("click", function () {
+    $("#eccw-modal-overlay, #eccw-shortcode-modal").fadeOut();
   });
 
-  $('.eccw-sticky-select2').select2({
-      placeholder: 'Select pages', 
-      allowClear: true 
+  $(".eccw-sticky-select2").select2({
+    placeholder: "Select pages",
+    allowClear: true,
   });
 
-   ECCWAdmin.initSwitcherToggle(
-      '#tab_currency_switcher_sticky', 
-      'design[eccw_show_hide_side_currency]'
+  ECCWAdmin.initSwitcherToggle(
+    "#tab_currency_switcher_sticky",
+    "design[eccw_show_hide_side_currency]"
   );
-  
-
 })(jQuery);

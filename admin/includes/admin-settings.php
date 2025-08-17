@@ -147,6 +147,7 @@ class ECCW_admin_settings
                     </div>
 
                     <select name="<?php echo esc_attr($value['id']); ?>[style]" style="min-width:100px;">
+                        <option value="default" <?php selected($style, 'default'); ?>>Default</option>
                         <option value="none" <?php selected($style, 'none'); ?>>None</option>
                         <option value="solid" <?php selected($style, 'solid'); ?>>Solid</option>
                         <option value="dashed" <?php selected($style, 'dashed'); ?>>Dashed</option>
@@ -677,6 +678,58 @@ class ECCW_admin_settings
 
         $design = isset($saved_settings[$current_shortcodeId]) ? $saved_settings[$current_shortcodeId] : [];
 
+        global $wpdb;
+        $table = $wpdb->prefix . 'eccw_shortcodes';
+
+        $template = isset( $design['switcher_dropdown_option_edit']['template'] ) ? $design['switcher_dropdown_option_edit']['template'] : 'eccw_template_1';
+
+        $wpdb->query(
+            $wpdb->prepare("UPDATE $table SET template = %s WHERE id = %d", $template, $current_shortcodeId)
+        );
+
+        $results = $wpdb->get_results("SELECT * FROM $table where id = $current_shortcodeId ORDER BY id DESC", ARRAY_A);
+
+        $template_style = isset( $results['0']['template'] ) ? $results['0']['template'] : 'eccw_template_1';
+
+
+        $switcher_layout_style_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-style-section eccw-layout-style-display">'
+            )
+        );
+        $layout_style = array(
+            'section_title_edit_layout_style' => array(
+                'name' => '',
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_settings_tab_layout_section_title_update'
+            ),
+            'switcher_template_edit' => array(
+                'name'     => __('Template', 'easy-currency'),
+                'type'     => 'template_preview',
+                'id'       => 'design[switcher_dropdown_option_edit][template]',
+                'default'  => $template_style,
+                'value'    => $template_style,
+                'desc'     => __('Edit your currency switcher template', 'easy-currency'),
+                'templates' => array(
+                    'eccw_template_1' => ECCW_PL_URL . 'admin/assets/img/eccw-template-1.png',
+                    'eccw_template_2' => ECCW_PL_URL . 'admin/assets/img/eccw-template-2.png',
+                ),
+                'class' => 'eccw-switcher-ui-control'
+            ),
+            'layout_section_edit_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_settings_tab_layout_section_edit_end'
+            )
+        );
+        $switcher_layout_style_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
         $switcher_button_style_start = array(
             array(
                 'type' => 'html',
@@ -686,7 +739,7 @@ class ECCW_admin_settings
 
         $settings = array(
             'section_title' => array(
-                'name' => __('Switcher Style', 'easy-currency'),
+                'name' => __('Switcher Toggle Style', 'easy-currency'),
                 'type' => 'title',
                 'desc' => '',
                 'id' => 'eccw_settings_tab_section_title'
@@ -695,7 +748,7 @@ class ECCW_admin_settings
                 'name' => __('Width', 'easy-currency'),
                 'type' => 'number',
                 'id' => 'design[switcher_button][width]',
-                'default' => isset($design['switcher_button']['width']) ? str_replace('px', '', $design['switcher_button']['width']) : '52',
+                'default' => isset($design['switcher_button']['width']) ? str_replace('px', '', $design['switcher_button']['width']) : '218',
                 'class' => 'eccw-currency-switcher-button-width eccw-rang-input', // Add custom class here
                 'custom_attributes' => array(
                     'unit' => 'px',
@@ -718,8 +771,8 @@ class ECCW_admin_settings
             'switcher_button_border_control_style' => array(
                 'name' => 'Border Control',
                 'type'  => 'eccw_border_control',
-                'id' => 'design[switcher_button_border_control]',
-                'default' => isset($design['switcher_button_border_control']) ? $design['switcher_button_border_control'] : '',
+                'id' => 'design[switcher_button][border_control]',
+                'default' => isset($design['switcher_button']['border_control']) ? $design['switcher_button']['border_control'] : '',
                 'desc'  => 'Set border width for each side, style and color.'
             ),
             'switcher_button_border_radius' => array(
@@ -809,7 +862,7 @@ class ECCW_admin_settings
                 'name' => __('Width', 'easy-currency'),
                 'type' => 'number',
                 'id' => 'design[switcher_dropdown][width]',
-                'default' => isset($design['switcher_dropdown']['width']) ? str_replace('px', '', $design['switcher_dropdown']['width']) : '180',
+                'default' => isset($design['switcher_dropdown']['width']) ? str_replace('px', '', $design['switcher_dropdown']['width']) : '218',
                 'class' => 'eccw-currency-switcher-dropdown-width eccw-rang-input', // Add custom class here
                 'custom_attributes' => array(
                     'unit' => 'px',
@@ -1041,10 +1094,10 @@ class ECCW_admin_settings
             'switcher_dropdown_option_flag_size' => array(
                 'name' => __('Flag Size (Width)', 'easy-currency'),
                 'type' => 'text',
-                'desc' => 'enter number with px. ex: 15px',
+                'desc' => 'enter number with px. ex: 35px',
                 'id' => 'design[switcher_option_flag][width]',
                 'default' => isset($design['switcher_option_flag']['width']) ? $design['switcher_option_flag']['width'] : '',
-                'placeholder' => '15px',
+                'placeholder' => '35px',
                 'class' => 'eccw-input'
             ),
             'eccw_flag_tab_section_end' => array(
@@ -1060,7 +1113,7 @@ class ECCW_admin_settings
             )
         );
 
-        $all_settings = array_merge($switcher_button_style_start, $settings, $switcher_button_style_end, $switcher_elements_style_start, $settings_dropdown, $switcher_elements_style_end, $switcher_dropdown_ele_style_start, $settings_dropdown_option, $switcher_dropdown_ele_style_end, $switcher_flag_style_wrapper_start, $flag_style, $switcher_flag_style_wrapper_end);
+        $all_settings = array_merge( $switcher_layout_style_start,$layout_style, $switcher_layout_style_end, $switcher_button_style_start, $settings, $switcher_button_style_end, $switcher_elements_style_start, $settings_dropdown, $switcher_elements_style_end, $switcher_dropdown_ele_style_start, $settings_dropdown_option, $switcher_dropdown_ele_style_end, $switcher_flag_style_wrapper_start, $flag_style, $switcher_flag_style_wrapper_end);
 
 
         return $all_settings;
@@ -1068,9 +1121,7 @@ class ECCW_admin_settings
 
     public function eccw_create_switcher_shortcode_popup_field()
     {
-        // $saved_settings = get_option('eccw_switcher_styles');
-
-        // $design = isset($saved_settings[$current_shortcodeId]) ? $saved_settings[$current_shortcodeId] : [];
+        
         $switcher_layout_style_start = array(
             array(
                 'type' => 'html',
@@ -1155,7 +1206,7 @@ class ECCW_admin_settings
                 'title' => __('Enable Currency Name', 'easy-currency'),
                 'id'    => 'design[eccw_switcher_currency_name_show_hide]',
                 'type'  => 'switcher',
-                'default' => isset($design['eccw_switcher_currency_name_show_hide']) ? $design['eccw_switcher_currency_name_show_hide'] : 'yes',
+                'default' => isset($design['eccw_switcher_currency_name_show_hide']) ? $design['eccw_switcher_currency_name_show_hide'] : 'no',
                 'class' => 'eccw-switcher-ui-control',
             ),
             'eccw_switcher_ele_currency_symbol' => array(
@@ -1196,6 +1247,8 @@ class ECCW_admin_settings
         $saved_settings = get_option('eccw_currency_settings');
 
         $design = isset($saved_settings['design']) ? $saved_settings['design'] : [];
+
+        error_log( print_r( $design, true ));
 
         $switcher_sticky_layout_start = array(
             array(
@@ -1405,7 +1458,116 @@ class ECCW_admin_settings
             )
         );
 
-        $all_settings = array_merge($switcher_sticky_layout_start, $sticky_fields, $switcher_sticky_layout_end, $switcher_sticky_display_wrapper_start, $switcher_sticky_show_hide_display, $switcher_sticky_display_wrapper_end, $switcher_position_wrapper_start, $switcher_position, $switcher_position_wrapper_end);
+        $sticky_color_style_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-style-section eccw-sticky-color-style-display">'
+            )
+        );
+
+        $sticky_color_settings = array(
+            'eccw_sitcky_color_section_title' => array(
+                'name' => __('Sticky Color Settings', 'easy-currency'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_color_settings_tab_section_title'
+            ),
+            'eccw_sticky_color_bg' => array(
+                'name' => __('Background Color', 'easy-currency'),
+                'type' => 'text',
+                'id' => 'design[sticky_option_color][background]',
+                'default' => isset($design['sticky_option_color']['background']) ? $design['sticky_option_color']['background'] : '#EFEFEF',
+                'class' => 'eccw-color-input ', // Add custom class here
+            ),
+            'eccw_sticky_color' => array(
+                'name' => __('Color', 'easy-currency'),
+                'type' => 'text',
+                'id' => 'design[sticky_option_color][color]',
+                'default' => isset($design['sticky_option_color']['color']) ? $design['sticky_option_color']['color'] : '#000',
+                'class' => 'eccw-color-input ', // Add custom class here
+            ),
+            'eccw_sticky_color_hover_bg' => array(
+                'name' => __('Hover Background Color', 'easy-currency'),
+                'type' => 'text',
+                'id' => 'design[sticky_option_hover][background]',
+                'default' => isset($design['sticky_option_hover']['background']) ? $design['sticky_option_hover']['background'] : '#000',
+                'class' => 'eccw-color-input ', // Add custom class here
+            ),
+            'eccw_sticky_hover_color' => array(
+                'name' => __('Color', 'easy-currency'),
+                'type' => 'text',
+                'id' => 'design[sticky_option_hover][color]',
+                'default' => isset($design['sticky_option_hover']['color']) ? $design['sticky_option_hover']['color'] : '#fff',
+                'class' => 'eccw-color-input ', // Add custom class here
+            ),
+            'eccw_color_sticky_section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_sticky_color_tab_section_end'
+            )
+        );
+        $sticky_color_style_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+        $sticky_ccode_color_style_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-style-section eccw-sticky-ccode-color-style-display">'
+            )
+        );
+
+        $sticky_ccode_color_settings = array(
+            'eccw_sitcky_ccode_color_section_title' => array(
+                'name' => __('Country Code Color', 'easy-currency'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_color_ccode_settings_title'
+            ),
+            'eccw_sticky_ccode_color_bg' => array(
+                'name' => __('Background Color', 'easy-currency'),
+                'type' => 'text',
+                'id' => 'design[sticky_option_ccode_color][background]',
+                'default' => isset($design['sticky_option_ccode_color']['background']) ? $design['sticky_option_ccode_color']['background'] : '#EFEFEF',
+                'class' => 'eccw-color-input ', // Add custom class here
+            ),
+            'eccw_sticky_ccode_color' => array(
+                'name' => __('Color', 'easy-currency'),
+                'type' => 'text',
+                'id' => 'design[sticky_option_ccode_color][color]',
+                'default' => isset($design['sticky_option_ccode_color']['color']) ? $design['sticky_option_ccode_color']['color'] : '#000',
+                'class' => 'eccw-color-input ', // Add custom class here
+            ),
+            'eccw_sticky_color_ccode_hover_bg' => array(
+                'name' => __('Hover Background Color', 'easy-currency'),
+                'type' => 'text',
+                'id' => 'design[sticky_option_ccode_hover][background]',
+                'default' => isset($design['sticky_option_ccode_hover']['background']) ? $design['sticky_option_ccode_hover']['background'] : '#000',
+                'class' => 'eccw-color-input ', // Add custom class here
+            ),
+            'eccw_sticky_ccode_hover_color' => array(
+                'name' => __('Color', 'easy-currency'),
+                'type' => 'text',
+                'id' => 'design[sticky_option_ccode_hover][color]',
+                'default' => isset($design['sticky_option_ccode_hover']['color']) ? $design['sticky_option_ccode_hover']['color'] : '#fff',
+                'class' => 'eccw-color-input ', // Add custom class here
+            ),
+            'eccw_color_ccode_sticky_section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_sticky_ccode_color_tab_section_end'
+            )
+        );
+
+        $sticky_ccode_color_style_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+        $all_settings = array_merge($switcher_sticky_layout_start, $sticky_fields, $switcher_sticky_layout_end, $switcher_sticky_display_wrapper_start, $switcher_sticky_show_hide_display, $switcher_sticky_display_wrapper_end, $switcher_position_wrapper_start, $switcher_position, $switcher_position_wrapper_end,  $sticky_color_style_start,  $sticky_color_settings, $sticky_color_style_end,$sticky_ccode_color_style_start, $sticky_ccode_color_settings, $sticky_ccode_color_style_end );
 
 
         return $all_settings;

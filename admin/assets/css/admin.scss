@@ -621,3 +621,17 @@ $white-color: #ffffff;
   z-index: 999; 
   display: none; 
 }
+.select2-container .select2-selection--multiple .select2-selection__choice {
+  padding-left: 30px !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  padding-left: 30px !important;
+}
+
+.eccw-range-reset {
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+}

@@ -105,6 +105,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         
         $unique_class   = 'eccw-switcher-design' . sanitize_html_class($shortcode_id);
         $template_style = $style_options['switcher_dropdown_option']['template'] ?? '';
+
         $classes        = array_filter([$unique_class, $template_style]);
         $classes        = array_map(fn($c) => esc_attr(str_replace('_', '-', $c)), $classes);
         $wrapper_class .= ' ' . implode(' ', $classes);
