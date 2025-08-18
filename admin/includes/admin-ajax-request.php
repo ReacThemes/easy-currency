@@ -10,8 +10,43 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             add_action('wp_ajax_eccw_delete_shortcode', array ( $this,'eccw_delete_shortcode_callback'));
             add_action('wp_ajax_eccw_save_shortcode_style', array ( $this,'eccw_save_shortcode_style_callback'));
             add_action('wp_ajax_eccw_load_modal_content', array ( $this,'eccw_load_modal_content_callback'));
+            add_action('wp_ajax_eccw_search_shortcode', array ( $this, 'eccw_search_shortcode_callback') );
 
         }
+
+        
+
+        public function eccw_search_shortcode_callback() {
+            check_ajax_referer('eccw_nonce', 'nonce');
+            
+            $search = isset($_GET['q']) ? sanitize_text_field($_GET['q']) : '';
+
+            global $wpdb;
+            $table = $wpdb->prefix . 'eccw_shortcodes';
+
+            if (empty($search)) {
+               
+                $results = $wpdb->get_results(
+                    "SELECT id, switcher_name AS text FROM $table ORDER BY created_at DESC", 
+                    ARRAY_A
+                );
+            } else {
+               
+                $results = $wpdb->get_results(
+                    $wpdb->prepare(
+                        "SELECT id, switcher_name AS text 
+                        FROM $table 
+                        WHERE switcher_name LIKE %s
+                        ORDER BY created_at DESC",
+                        '%' . $wpdb->esc_like($search) . '%'
+                    ),
+                    ARRAY_A
+                );
+            }
+
+            wp_send_json(['items' => $results]);
+        }
+
 
         public function eccw_update_currency_rates(){
 

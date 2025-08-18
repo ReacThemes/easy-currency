@@ -27,8 +27,47 @@ class ECCW_admin_settings
         add_action('woocommerce_admin_field_tabswitch', array($this, 'eccw_admin_field_switcher_tabswitch'));
         add_action('woocommerce_admin_field_eccw_border_control', array($this, "eccw_admin_border_control"));
         add_action('woocommerce_admin_field_select2', array($this, 'eccw_admin_field_eccw_select2'));
+        add_action('woocommerce_admin_field_eccw_searchable_select', array($this, 'eccw_searchable_select_field') );
     }
 
+   
+
+    public function eccw_searchable_select_field($value) {
+       
+        global $wpdb;
+        $table = $wpdb->prefix . 'eccw_shortcodes';
+        $shortcodes = $wpdb->get_results("SELECT id, switcher_name FROM $table", ARRAY_A);
+        
+        $current_value = isset($value['default']) ? $value['default'] : '';
+        $class = isset($value['class']) ? $value['class'] : '';
+        $current_text = '';
+        
+        foreach ($shortcodes as $shortcode) {
+            if ($shortcode['id'] == $current_value) {
+                $current_text = $shortcode['switcher_name'];
+                break;
+            }
+        }
+        ?>
+        <tr valign="top" class="<?php echo esc_attr($class); ?>">
+            <th scope="row" class="titledesc"><?php echo esc_html($value['name']); ?></th>
+            <td class="forminp forminp-select">
+                <select id="<?php echo esc_attr($value['id']); ?>" 
+                        name="<?php echo esc_attr($value['id']); ?>" 
+                        class="eccw-searchable-select" 
+                        style="width: 400px;"
+                        data-placeholder="<?php esc_attr_e('Search for a shortcode...', 'easy-currency'); ?>">
+                    <?php if (!empty($current_value) && !empty($current_text)): ?>
+                        <option value="<?php echo esc_attr($current_value); ?>" selected>
+                            <?php echo esc_html($current_text); ?>
+                        </option>
+                    <?php endif; ?>
+                </select>
+                <?php if (!empty($value['desc'])) echo '<p class="description">' . esc_html($value['desc']) . '</p>'; ?>
+            </td>
+        </tr>
+        <?php
+    }
 
 
     public function eccw_admin_field_eccw_select2($field)
@@ -350,20 +389,76 @@ class ECCW_admin_settings
                 'id' => 'options[allow_payment_with_selected_currency]',
                 'default' => isset($options['allow_payment_with_selected_currency']) ? $options['allow_payment_with_selected_currency'] : 'no',
             ),
-            'flag_visibility' => array(
-                'name' => __('Show Flag', 'easy-currency'),
-                'type' => 'select',
-                'options' => ['yes' => 'Yes', 'no' => 'No'],
-                'desc' => __('Show flag on the currency switcher.', 'easy-currency'),
-                'id' => 'options[flag_visibility]',
-                'default' => isset($options['flag_visibility']) ? $options['flag_visibility'] : 'yes',
-            ),
             'section_end' => array(
                 'type' => 'sectionend',
                 'id' => 'eccw_settings_tab_section_end'
             )
         );
-        return $settings;
+
+
+        $switcher_location_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-location-display-layout">'
+            )
+        );
+
+        $single_settings = array(
+            'switcher_location_title' => array(
+                'name' => __('Product Single Page ', 'easy-currency'),
+                'type' => 'title',
+                'desc' => 'Display the currency switcher on Single product page.',
+                'id' => 'eccw_settings_switcher_location_title'
+            ),
+            'eccw_enable_disable_location' => array(
+                'title' => __('Show / Hide', 'easy-currency'),
+                'id'    => 'options[eccw_show_hide_single_product_location]',
+                'type'  => 'switcher',
+                'default' => isset($options['eccw_show_hide_single_product_location']) ? $options['eccw_show_hide_single_product_location'] : 'yes',
+                'class' => 'eccw-switcher-ui-control-show-hide',
+            ),
+            'eccw_shortcode_show_on_product' => array(
+                'name' => __('Select Shortcode', 'easy-currency'),
+                'type' => 'eccw_searchable_select',
+                'desc' => __('Choose the shortcode you want to show in single product pages.', 'easy-currency'),
+                'id' => 'options[eccw_shortcode_show_on_product_pages]',
+                'default' => isset($options['eccw_shortcode_show_on_product_pages']) ? $options['eccw_shortcode_show_on_product_pages'] : 'List - Shortcode',
+                'class' => 'eccw-searchable-select-dropdown',
+            ),
+            'switcher_position_in_product_single' => array(
+                'name' => __('Switcher Position in Product page', 'easy-currency'),
+                'type' => 'select',
+                'options' => [
+                    'woocommerce_after_add_to_cart_form' => 'After - Add to cart',
+                    'woocommerce_before_add_to_cart_form' => 'Before - Add to cart',
+                    'woocommerce_product_meta_end' => 'After - Product Meta',
+                    'woocommerce_product_meta_start' => 'Before - Product Meta',
+                    'woocommerce_single_product_summary' => 'Before - Product summary',
+                    'woocommerce_after_single_product_summary' => 'After - Product summary'
+                ],
+                'desc' => __('Choose the position of the switcher shrotcode in the product detail pages.', 'easy-currency'),
+                'id' => 'options[eccw_shortcode_pos_product_singlepage]',
+                'default' => isset($options['eccw_shortcode_pos_product_singlepage']) ? $options['eccw_shortcode_pos_product_singlepage'] : 'woocommerce_before_add_to_cart_form',
+                'class' => 'eccw-switcher-single-product-hook',
+            ),
+
+            'product_single_section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_settings_tab_section_end'
+            )
+        );
+
+        $switcher_location_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+        $all_settings = array_merge($settings, $switcher_location_start, $single_settings,$switcher_location_end );
+
+
+        return $all_settings;
     }
 
     public function get_eccw_settings_design_tab_fields()
@@ -744,6 +839,17 @@ class ECCW_admin_settings
                 'desc' => '',
                 'id' => 'eccw_settings_tab_section_title'
             ),
+             'switcher_button_option_alignment' => array(
+                'name'   => 'Alignment',
+                'id' => 'design[switcher_button][justify-content]',
+                'type'    => 'tabswitch',
+                'default' => isset($design['switcher_button']['justify-content']) ? $design['switcher_button']['justify-content'] : 'center',
+                'options' => array(
+                    'left'   => 'Left',
+                    'center' => 'Center',
+                    'right'  => 'Right'
+                )
+            ),
             'switcher_button_width' => array(
                 'name' => __('Width', 'easy-currency'),
                 'type' => 'number',
@@ -825,6 +931,44 @@ class ECCW_admin_settings
                                 'type' => 'text',
                                 'name' => 'design[switcher_button][padding-right]',
                                 'value' => isset($design['switcher_button']['padding-right']) ? $design['switcher_button']['padding-right'] : '',
+                                'placeholder' => 'right'
+                            ),
+                        )
+                    ),
+                )
+            ),
+            'switcher_button_margin' => array(
+                'name' => __('margin', 'easy-currency'),
+                'type' => 'text',
+                'desc' => 'enter number with px. ex: 2px 2px 2px 2px',
+                'default' => isset($design['switcher_dropdown']['null']) ? $design['switcher_dropdown']['null'] : '',
+                'class' => 'eccw-currency-switcher-dropdown-bg eccw-dimension-input', // Add custom class here
+                'custom_attributes' => array(
+                    'unit' => 'px',
+                    'fields' => wp_json_encode(
+                        array(
+                            array(
+                                'type' => 'text',
+                                'name' => 'design[switcher_button][margin-top]',
+                                'value' => isset($design['switcher_button']['margin-top']) ? $design['switcher_button']['margin-top'] : '',
+                                'placeholder' => 'top'
+                            ),
+                            array(
+                                'type' => 'text',
+                                'name' => 'design[switcher_button][margin-left]',
+                                'value' => isset($design['switcher_button']['margin-left']) ? $design['switcher_button']['margin-left'] : '',
+                                'placeholder' => 'left'
+                            ),
+                            array(
+                                'type' => 'text',
+                                'name' => 'design[switcher_button][margin-bottom]',
+                                'value' => isset($design['switcher_button']['margin-bottom']) ? $design['switcher_button']['margin-bottom'] : '',
+                                'placeholder' => 'bottom'
+                            ),
+                            array(
+                                'type' => 'text',
+                                'name' => 'design[switcher_button][margin-right]',
+                                'value' => isset($design['switcher_button']['margin-right']) ? $design['switcher_button']['margin-right'] : '',
                                 'placeholder' => 'right'
                             ),
                         )
@@ -929,6 +1073,7 @@ class ECCW_admin_settings
                     ),
                 )
             ),
+            
             'eccw_dropdown_settings_tab_section_end' => array(
                 'type' => 'sectionend',
                 'id' => 'eccw_dropdown_settings_tab_section_end'
@@ -1096,7 +1241,7 @@ class ECCW_admin_settings
                 'type' => 'text',
                 'desc' => 'enter number with px. ex: 35px',
                 'id' => 'design[switcher_option_flag][width]',
-                'default' => isset($design['switcher_option_flag']['width']) ? $design['switcher_option_flag']['width'] : '',
+                'default' => isset($design['switcher_option_flag']['width']) ? $design['switcher_option_flag']['width'] : '30px',
                 'placeholder' => '35px',
                 'class' => 'eccw-input'
             ),
@@ -1247,8 +1392,6 @@ class ECCW_admin_settings
         $saved_settings = get_option('eccw_currency_settings');
 
         $design = isset($saved_settings['design']) ? $saved_settings['design'] : [];
-
-        error_log( print_r( $design, true ));
 
         $switcher_sticky_layout_start = array(
             array(
@@ -1718,9 +1861,6 @@ class ECCW_admin_settings
                         </div>
                         <h2><?php echo esc_html__('How to use this converter?', 'easy-currency') ?></h2>
                         <p><label><?php echo esc_html__('Shortcode :', 'easy-currency') ?> </label> [eccw_currency_switcher]</p>
-                        <p><label><?php echo esc_html__('Shortcode in php :', 'easy-currency') ?> </label> echo do_shortcode('[eccw_currency_switcher]')</p>
-                        <p><label><?php echo esc_html__('Shortcode in php :', 'easy-currency') ?> </label> echo do_shortcode("[eccw_currency_switcher eccw_position='left']")</p>
-                        <p><label><?php echo esc_html__('Shortcode in php :', 'easy-currency') ?> </label> echo do_shortcode("[eccw_currency_switcher eccw_position='right']")</p>
                         <p><label><?php echo esc_html__('Elementor widget :', 'easy-currency') ?> </label> Easy Currency Switcher</p>
                     </div>
                     <div id="tab_currency_switcher_shortcode" class="tab-content">
@@ -1743,6 +1883,12 @@ class ECCW_admin_settings
                                 </div>
                             </div>
                             <div class="eccw-modal-overlay" id="eccw-modal-overlay"></div>
+                            <div class="eccw-designer-list-header">
+                                <span class="col-shortcode">Shortcode</span>
+                                <span class="col-name">Name</span>
+                                <span class="col-actions">Actions</span>
+                            </div>
+
                             <div class="eccw-designer-list">
                                 <?php
                                 global $ECCW_Admin_Ajax;
@@ -1752,6 +1898,7 @@ class ECCW_admin_settings
 
                                 ?>
                                     <div class="eccw-designer-card">
+                                        
                                         <div class="eccw-designer-info">
                                             <div class="eccw-shortcode-box">
                                                 <input
@@ -1764,6 +1911,10 @@ class ECCW_admin_settings
                                                 </button>
                                             </div>
                                         </div>
+                                        <div class="switcher-name" title="<?php echo esc_attr($shortcode['switcher_name']); ?>">
+                                            <?php echo esc_html(wp_trim_words($shortcode['switcher_name'], 4, '...')); ?>
+                                        </div>
+
                                         <div class="eccw-designer-actions">
                                             <button class="eccw-btn-edit" data-id="<?php echo esc_attr($shortcode['id']); ?>"><?php echo esc_html__('Edit', 'easy-currency') ?></button>
                                             <button class="eccw-btn-delete" data-id="<? echo  esc_attr($shortcode['id']); ?>"><?php echo esc_html__('Delete', 'easy-currency') ?></button>

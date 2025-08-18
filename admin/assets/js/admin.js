@@ -13,6 +13,7 @@
       this.initializeRangeSlider();
       this.eccwTabSwitch();
       this.initSwitcherToggle();
+      this.eccwSearchableShortcode();
 
       $(document)
         .on(
@@ -96,7 +97,18 @@
               ".eccw-style-modal-switcher-save-btn, .eccw-style-modal-switcher-save-closebtn"
             ).prop("disabled", false);
           },
+          clear: function () {
+            $(
+              ".eccw-style-modal-switcher-save-btn, .eccw-style-modal-switcher-save-closebtn"
+            ).prop("disabled", false);
+          },
         });
+
+      $(context).on("click", ".wp-picker-clear", function () {
+        $(
+          ".eccw-style-modal-switcher-save-btn, .eccw-style-modal-switcher-save-closebtn"
+        ).prop("disabled", false);
+      });
 
       // ---------- Dimension Fields ----------
       $(context)
@@ -773,6 +785,45 @@
         toggleTemplateSpecificFields
       );
     },
+
+    eccwSearchableShortcode: function() {
+      $('#options\\[eccw_shortcode_show_on_product_pages\\]').select2({
+          ajax: {
+              url: eccw_vars.ajaxurl,
+              dataType: 'json',
+              delay: 250,
+              data: function(params) {
+                  return {
+                      action: 'eccw_search_shortcode',
+                      q: params.term,
+                      nonce: eccw_vars.nonce
+                  };
+              },
+              processResults: function(data) {
+                  return {
+                      results: data.items
+                  };
+              },
+              cache: true
+          },
+          placeholder: "Search Shortcode...",
+          minimumInputLength: 3,
+          allowClear: true,
+          width: '400px',
+          templateResult: function(data) {
+              return data.text;
+          },
+          language: {
+              inputTooShort: function() {
+                  return "Please enter 3 or more character";
+              },
+              noResults: function() {
+                  return "No matches found";
+              }
+          }
+      });
+    }
+
   };
 
   ECCWAdmin.init();
@@ -806,4 +857,7 @@
     "#tab_currency_switcher_sticky",
     "design[eccw_show_hide_side_currency]"
   );
+
+  console.log("hello faridmia")
+
 })(jQuery);

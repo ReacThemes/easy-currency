@@ -81,3 +81,49 @@ function eccw_get_currency_common_settings()
         'currency_countries' => $currency_countries,
     ];
 }
+
+ /**
+ * Generate custom CSS from styles array
+ *
+ * @param array $styles Array of CSS rules and values.
+ * @return string Generated CSS.
+ */
+/**
+ * Generate custom CSS from styles array
+ *
+ * @param array $styles Array of CSS rules and values.
+ * @return string Generated CSS.
+ */
+function eccw_generate_css(array $styles)
+{
+    $css = '';
+
+    foreach ($styles as $selector => $properties) {
+        $css .= $selector . " {\n";
+        foreach ($properties as $property => $value) {
+            if ($value !== '') {
+                $css .= "    {$property}: " . wp_strip_all_tags($value) . ";\n";
+            }
+        }
+        $css .= "}\n";
+    }
+
+    return $css;
+}
+
+/**
+ * eccw_do_shortcode function
+ *
+ * @param [type] $shortcode
+ * @param array $atts
+ * @return void
+ */
+function eccw_do_shortcode($shortcode, $atts = []) {
+    $atts_string = '';
+    foreach ($atts as $key => $value) {
+        $atts_string .= $key . '="' . esc_attr($value) . '" ';
+    }
+    $atts_string = trim($atts_string);
+
+    return do_shortcode("[$shortcode $atts_string]");
+}

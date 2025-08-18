@@ -1,4 +1,5 @@
 <?php
+if (! defined('ABSPATH')) exit; // Exit if accessed directly.
 class ECCW_Auto_Switcher
 {
 
@@ -26,7 +27,7 @@ class ECCW_Auto_Switcher
 
         $switcher_settings = get_option('eccw_currency_settings', []);
 
-        error_log( print_r( $switcher_settings, true ));
+    
 
         $this->settings = array(
             'show_hide'                    => $switcher_settings['design']['eccw_show_hide_side_currency'] ?? 'yes',
@@ -246,7 +247,7 @@ class ECCW_Auto_Switcher
         }
 
         // Generate CSS
-        $custom_style = $this->generate_css($styles);
+        $custom_style = eccw_generate_css($styles);
 
         if (!empty($custom_style)) {
             wp_register_style('eccw-sticky-switcher-side', false, array(), ECCW_VERSION);
@@ -255,35 +256,6 @@ class ECCW_Auto_Switcher
         }
     }
 
-
-    /**
-     * Generate custom CSS from styles array
-     *
-     * @param array $styles Array of CSS rules and values.
-     * @return string Generated CSS.
-     */
-    /**
-     * Generate custom CSS from styles array
-     *
-     * @param array $styles Array of CSS rules and values.
-     * @return string Generated CSS.
-     */
-    public function generate_css(array $styles)
-    {
-        $css = '';
-
-        foreach ($styles as $selector => $properties) {
-            $css .= $selector . " {\n";
-            foreach ($properties as $property => $value) {
-                if ($value !== '') {
-                    $css .= "    {$property}: " . wp_strip_all_tags($value) . ";\n";
-                }
-            }
-            $css .= "}\n";
-        }
-
-        return $css;
-    }
 }
 
 $switcher_settings = get_option('eccw_currency_settings', []);

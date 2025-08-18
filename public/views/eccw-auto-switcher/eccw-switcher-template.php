@@ -1,4 +1,5 @@
 <?php
+if (! defined('ABSPATH')) exit; // Exit if accessed directly.
     $common_settings = eccw_get_currency_common_settings();
     extract($common_settings);
     extract($this->settings);

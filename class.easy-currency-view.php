@@ -5,11 +5,20 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
 
     protected $ecccw_get_plugin_settings;
     protected $plugin_settings;
+    public $shortcode_id_proudct_page;
  
     public function __construct(){
 
         $this->ecccw_get_plugin_settings = new ECCW_Plugin_Settings();
         $this->plugin_settings = $this->ecccw_get_plugin_settings->ecccw_get_plugin_settings();
+
+        $saved_settings = get_option('eccw_currency_settings');
+        $options = isset($saved_settings['options']) ? $saved_settings['options'] : [];
+        $switcher_pos = $options['eccw_shortcode_pos_product_singlepage'];
+        $this->shortcode_id_proudct_page = $options['eccw_shortcode_show_on_product_pages'];
+
+        add_action( $switcher_pos, [$this, 'eccw_single_shortcode_position']);
+
 
 
         add_action( 'init', [$this, 'eccw_add_currency_nonce'] );
@@ -102,18 +111,15 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $style_options = $args['style_options'] ?? [];
         $wrapper_class = $args['wrapper_class'] ?? 'switcher-list-content';
 
-        
         $unique_class   = 'eccw-switcher-design' . sanitize_html_class($shortcode_id);
-        $template_style = $style_options['switcher_dropdown_option']['template'] ?? '';
+        $template_style = $style_options['switcher_dropdown_option_edit']['template'] ?? '';
 
         $classes        = array_filter([$unique_class, $template_style]);
         $classes        = array_map(fn($c) => esc_attr(str_replace('_', '-', $c)), $classes);
         $wrapper_class .= ' ' . implode(' ', $classes);
 
-        
         $currency_countries_json = json_decode($currency_countries['body'] ?? '', true) ?? [];
 
-      
         $flag_show       = $style_options['eccw_switcher_flag_show_hide'] ?? 'yes';
         $cur_name_show   = $style_options['eccw_switcher_currency_name_show_hide'] ?? 'yes';
         $cur_symbol_show = $style_options['eccw_switcher_currency_symbol_show_hide'] ?? 'yes';
@@ -124,6 +130,8 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $default_symbol  = $currency_countries_json[$default_currency]['symbol'] ?? '';
         $default_name    = $currency_countries_json[$default_currency]['name'] ?? '';
         $default_flag      = ECCW_PL_URL . 'public/assets/images/flags/' . strtolower($default_country) . '.png';
+
+       // error_log( print_r( $style_options, true ));
 
         ob_start();
         ?>
@@ -223,6 +231,18 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
             'style_options'  => $get_switcher_settings, 
         ]);
     }
+
+    public function eccw_single_shortcode_position() {
+        echo 
+            eccw_do_shortcode(
+                'eccw_currency_switcher',
+                [ 'id' => $this->shortcode_id_proudct_page ]
+            );
+    }
+
+   
+
+
 
 }
 

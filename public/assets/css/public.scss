@@ -2,7 +2,6 @@
   &.easy-currency-switcher .easy_currency_switcher_form .easy-currency-switcher-select {
     border: 1px solid #EBEBEB;
     margin-top: 10px;
-    background: #FFFFFF;
     li{
       
       img{
@@ -11,11 +10,19 @@
         
       }      
       span{
-        color: #000000;
+        
         font-weight: 500;
       }
     } 
   }
+  .easy_currency_switcher_form .easy-currency-switcher-select {
+    color: #000000;
+    background: #FFFFFF;
+    li.selected, li:hover {
+      color: #000;
+    }
+  }
+  
 }
 .easy-currency-switcher {
   @keyframes growOut {
@@ -52,14 +59,17 @@
       padding-left: 10px;
       padding-right: 10px;
       color: #181823;
+      position: relative;
       &:focus {
         outline: none;
         box-shadow: none;
       }
 
       .dropdown-icon {
-          position: relative;
-          margin: 0 8px !important;
+         position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
           height: 8px;
           width: 8px;
 
@@ -88,6 +98,7 @@
         display: flex;
         align-items: center;
         column-gap: 10px;
+        padding-right: 20px;
       }
       .flag {
         width: 35px;
@@ -145,14 +156,16 @@
         background: none;
         border-radius: 0;
         transform: translateX(0);
-        justify-content: flex-start !important;
+        justify-content: flex-start;
         padding: 9px 6px 9px 10px;
         height: unset;
         &.selected {
           background: #e5e5e5;
+         // background: #000;
         }
         &:hover {
-          background: #e5e5e5;
+           background: #e5e5e5;
+          //background: #000;
         }
       }
       &.list {
@@ -170,12 +183,12 @@
     &.eccw-template-1{
     .easy-currency-switcher-select {
       margin-top: 10px;
+      
       &::after {
         border-color: currentColor;
       }
       &.open {
-        background: #e5e5e5;
-        border: 1px solid #dfdfdf;
+        
         &::after {
         }
       }
@@ -188,18 +201,7 @@
         span{
           font-size: 14px;
         }
-        &.selected {
-          background: #e5e5e5;
-          span{
-            color: #181823;
-          }
-        }
-        &:hover {
-          background: #e5e5e5;
-          span{
-            color: #181823;
-          }
-        }
+       
       }
       &.list {
         li {
@@ -214,6 +216,31 @@
     }
   }
 
+}
+
+
+.eccw-template-1 {
+  .easy-currency-switcher-select { 
+    background: #e5e5e5;
+    border: 1px solid #dfdfdf;
+    //  &.selected {
+    //   background: #e5e5e5;
+    //     span{
+    //       color: #181823;
+    //     }
+    //   }
+    //   &:hover {
+    //     background: #e5e5e5;
+    //     span{
+    //       color: #181823;
+    //     }
+    //   }
+    &.list {
+      li.selected,li:hover  {
+        color: #000;
+      }
+    }
+  }
 }
 .easy-currency-switcher-auto-select {
 	form {
@@ -240,6 +267,7 @@
 		background: #EFEFEF;
 		border-radius: 0 20px 20px 0;
 		transition: all .3s;
+    color: #000000;
 		img {
 			height: 32px;
 			width: 32px;
@@ -250,12 +278,12 @@
 		&:hover {
 			transform: translatex(0);
 			background: #000;
+      color: #FFFFFF;
 			span {
-				color: #FFFFFF;
+				
 			}
 		}
 		span {
-			color: #000000;
 			font-size: 16px;
 			font-weight: 500;
 			transition: all .3s;
@@ -264,8 +292,9 @@
 	li.selected {
 		transform: translatex(0);
 		background: #000;
+    color: #FFFFFF;
 		span {
-			color: #FFFFFF;
+			
 		}
 	}
 }
