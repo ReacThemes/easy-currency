@@ -36,3 +36,17 @@ This plugin utilizes a third-party service, APILayer (https://apilayer.com/), to
 
 Privacy Policy link: https://www.ideracorp.com/legal/APILayer
 Terms of Use link: https://www.ideracorp.com/Legal/Terms-of-Use
+
+
+= 1.0.2 =
+* Added: Sticky Side currency added.
+* Added: Sticky side 3 layout style added.
+* Added: Dropdown view 2 layout style added.
+* Added: Dropdown view shortcode repeater generator added.
+* Added: Dropdown single page shortcode system added.
+* Added: Currency customization feature added.
+* Fixed: Minor bugs fix.
+* Fixed: Css Issue fix.
+
+= 1.0.0 =	
+* Initial release
