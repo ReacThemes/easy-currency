@@ -652,4 +652,29 @@
   gap: 10px;
   width: 30%;
   justify-content: flex-end;
+}
+
+.eccw-border-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.eccw-border-tab-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.easy-currency-border-style-control {
+  min-width: 100px;
+}
+
+.eccw-border-picker {
+  width: 100px;
+}
+
+.eccw-searchable-select {
+  width: 400px;
 }/*# sourceMappingURL=admin.css.map */

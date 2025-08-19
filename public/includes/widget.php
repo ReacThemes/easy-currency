@@ -321,8 +321,6 @@ class Easy_Currency_Switcher_Widget extends \Elementor\Widget_Base {
 		];
 
 		echo wp_kses( $switcher_html, $allowed_html);
-
-        
     }
     
 }

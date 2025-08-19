@@ -85,8 +85,5 @@ class ECCW_CURRENCY_SWITCHER {
 		//Switcher Widget		
 		require_once(__DIR__ . '/public/includes/widget.php');
 		\Elementor\Plugin::instance()->widgets_manager->register(new \Easy_Currency_Switcher_Widget());
-
     }
-
-
 }

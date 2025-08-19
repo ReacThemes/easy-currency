@@ -7,17 +7,16 @@
  * Author URI:  http://themewant.com/
  * Requires at least: 6.0
  * Requires PHP:7.4
- * Version:     1.0.0
+ * Version:     1.0.1
  * License:     GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: easy-currency
- * Domain Path: /languages
  * Requires Plugins:  woocommerce
 */
     if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     
-    define( 'ECCW_VERSION', '1.0.0' );
+    define( 'ECCW_VERSION', '1.0.1' );
     define( 'ECCW_PL_ROOT', __FILE__ );
     define( 'ECCW_PL_URL', plugins_url( '/', ECCW_PL_ROOT ) );
     define( 'ECCW_PL_PATH', plugin_dir_path( ECCW_PL_ROOT ) );
@@ -26,6 +25,7 @@
     define( 'ECCW_NAME', 'Easy Currency' );
 
     include 'global-functions.php';
+    include 'admin/includes/admin-settings-custom-field.php';
     include 'admin/includes/admin-settings.php';
     include 'admin/includes/activation.php';
     include 'admin/includes/plugin-scripts.php';

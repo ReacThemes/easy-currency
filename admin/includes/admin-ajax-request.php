@@ -14,39 +14,6 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
 
         }
 
-        
-
-        public function eccw_search_shortcode_callback() {
-            check_ajax_referer('eccw_nonce', 'nonce');
-            
-            $search = isset($_GET['q']) ? sanitize_text_field($_GET['q']) : '';
-
-            global $wpdb;
-            $table = $wpdb->prefix . 'eccw_shortcodes';
-
-            if (empty($search)) {
-               
-                $results = $wpdb->get_results(
-                    "SELECT id, switcher_name AS text FROM $table ORDER BY created_at DESC", 
-                    ARRAY_A
-                );
-            } else {
-               
-                $results = $wpdb->get_results(
-                    $wpdb->prepare(
-                        "SELECT id, switcher_name AS text 
-                        FROM $table 
-                        WHERE switcher_name LIKE %s
-                        ORDER BY created_at DESC",
-                        '%' . $wpdb->esc_like($search) . '%'
-                    ),
-                    ARRAY_A
-                );
-            }
-
-            wp_send_json(['items' => $results]);
-        }
-
 
         public function eccw_update_currency_rates(){
 
@@ -81,54 +48,118 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             
         }
 
-        public function eccw_create_shortcode() {
-            check_ajax_referer('eccw_nonce', 'nonce');
-            parse_str($_POST['form_data'], $form_data);
+        public function eccw_search_shortcode_callback() {
 
-            $switcher_name = $form_data['eccw_switcher_name_field'];
-            $template = $form_data['design']['switcher_dropdown_option']['template'];
+            check_ajax_referer('eccw_nonce', 'nonce');
+
+            $search = isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '';
+
+            $cache_key = 'eccw_search_' . md5($search);
+    
+            $results = wp_cache_get($cache_key, 'eccw_shortcodes');
 
             global $wpdb;
-            $table = $wpdb->prefix . 'eccw_shortcodes';
-            $shortcode = '[eccw_currency_switcher id=1]';
-            $wpdb->query(
-                $wpdb->prepare("INSERT INTO $table (switcher_name, shortcode,template ) VALUES (%s, %s, %s )", $switcher_name ,$shortcode, $template )
+
+            if ($results === false) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+                $results = $wpdb->get_results(
+                    $wpdb->prepare(
+                        "SELECT id, switcher_name AS text
+                        FROM {$wpdb->prefix}eccw_shortcodes
+                        WHERE switcher_name LIKE %s
+                        ORDER BY created_at DESC",
+                        '%' . $wpdb->esc_like( $search ) . '%'
+                    ),
+                    ARRAY_A
+                );
+
+                wp_cache_set($cache_key, $results, 'eccw_shortcodes', MINUTE_IN_SECONDS);
+            }
+
+            wp_send_json(['items' => $results]);
+        }
+
+        public function eccw_create_shortcode() {
+            check_ajax_referer( 'eccw_nonce', 'nonce' );
+
+            if ( ! isset( $_POST['form_data'] ) || empty( $_POST['form_data'] ) ) {
+                wp_send_json_error( [ 'message' => __( 'Form data is missing', 'easy-currency' ) ] );
+                return;
+            }
+
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+            $form_data_raw = wp_unslash( $_POST['form_data'] );
+
+            parse_str( $form_data_raw, $form_data );
+
+            $form_data = array_map( 'sanitize_text_field', $form_data );
+
+            $switcher_name = isset( $form_data['eccw_switcher_name_field'] ) ? $form_data['eccw_switcher_name_field'] : '';
+            $template      = isset( $form_data['design']['switcher_dropdown_option']['template'] ) ? $form_data['design']['switcher_dropdown_option']['template'] : '';
+
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'eccw_shortcodes';
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $wpdb->insert(
+                $table_name,
+                [
+                    'switcher_name' => $switcher_name,
+                    'shortcode'     => '[eccw_currency_switcher id=1]',
+                    'template'      => $template,
+                ],
+                ['%s', '%s', '%s']
             );
 
             $id = $wpdb->insert_id;
-
             $new_shortcode = "[eccw_currency_switcher id=$id]";
-            $wpdb->query(
-                $wpdb->prepare("UPDATE $table SET shortcode = %s WHERE id = %d", $new_shortcode, $id)
+
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $wpdb->update(
+                $table_name,
+                ['shortcode' => $new_shortcode],
+                ['id' => $id],
+                ['%s'],
+                ['%d']
             );
 
+
+            // Clear transient & object cache
             delete_transient('eccw_shortcode_list');
+            wp_cache_delete('eccw_shortcode_list', 'options');
 
             nocache_headers();
 
             wp_send_json_success([
                 'id' => $id,
                 'shortcode' => $new_shortcode,
-                'cache_bust' => time()
+                'cache_bust' => time(),
             ]);
+
         }
 
-        public function eccw_get_all_shortcodes_cached() {
-            $cached = get_transient('eccw_shortcode_list');
 
-            if ($cached !== false) {
-                return $cached;
+        public function eccw_get_all_shortcodes_cached() {
+
+            $cache_key = 'eccw_shortcode_list';
+            $results = wp_cache_get($cache_key, 'eccw_shortcodes');
+
+            if ($results !== false) {
+                return $results;
             }
 
             global $wpdb;
-            $table = $wpdb->prefix . 'eccw_shortcodes';
-
-            $results = $wpdb->get_results("SELECT * FROM $table ORDER BY id DESC", ARRAY_A);
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $results = $wpdb->get_results(
+                "SELECT * FROM {$wpdb->prefix}eccw_shortcodes ORDER BY id DESC",
+                ARRAY_A
+            );
 
             set_transient('eccw_shortcode_list', $results, 5 * MINUTE_IN_SECONDS);
+            wp_cache_set('eccw_shortcode_list', $results, 'options', 5 * MINUTE_IN_SECONDS);
 
             return $results;
         }
+
 
         public function eccw_delete_shortcode_callback() {
             check_ajax_referer('eccw_nonce', 'nonce');
@@ -139,12 +170,20 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
 
             $id = absint($_POST['id']);
             global $wpdb;
-            $table = $wpdb->prefix . 'eccw_shortcodes';
 
-            $deleted = $wpdb->delete($table, ['id' => $id], ['%d']);
+            $table_name = $wpdb->prefix . 'eccw_shortcodes';
+
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $deleted = $wpdb->query(
+                $wpdb->prepare(
+                    "DELETE FROM {$wpdb->prefix}eccw_shortcodes WHERE id = %d",
+                    $id
+                )
+            );
 
             if ($deleted !== false) {
-                delete_transient('eccw_shortcode_list'); 
+                delete_transient('eccw_shortcode_list');
+                wp_cache_delete('eccw_shortcode_list', 'options'); // Clear object cache
                 wp_send_json_success('Shortcode deleted');
             } else {
                 wp_send_json_error('Could not delete');
@@ -154,6 +193,10 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
         function eccw_save_shortcode_style_callback() {
             check_ajax_referer('eccw_nonce', 'nonce');
 
+            if( !isset( $_POST['sd_id'] ) || empty( $_POST['sd_id'] )) {
+                return;
+            }
+
             $sd_id = absint($_POST['sd_id']);
             if (!$sd_id) {
                 wp_send_json_error('Invalid shortcode ID.');
@@ -161,7 +204,12 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
 
             $styles = get_option('eccw_switcher_styles', []);
 
-            $style_data = isset($_POST['design']) ? $_POST['design'] : [];
+            $style_data = isset( $_POST['design'] ) 
+            ? (is_array( $_POST['design'] ) 
+                ? array_map('sanitize_text_field', wp_unslash( $_POST['design'] )) 
+                : sanitize_text_field(wp_unslash( $_POST['design'] ) )
+            ) 
+            : [];
 
             if (!isset($styles[$sd_id])) {
                 $styles[$sd_id] = [];
@@ -179,12 +227,15 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
         // shortcode Dynamic load modal content
 
         public function eccw_load_modal_content_callback() {
+
             if (!current_user_can('manage_woocommerce')) {
                 wp_send_json_error(['message' => 'Unauthorized']);
             }
 
+            check_ajax_referer('eccw_nonce', 'nonce');
+
             $shortcode_id = isset($_POST['shortcode_id']) ? absint($_POST['shortcode_id']) : 0;
-            $tab_key      = isset($_POST['tab_key']) ? sanitize_text_field($_POST['tab_key']) : 'eccw_general_tab';
+            $tab_key      = isset($_POST['tab_key']) ? sanitize_text_field(wp_unslash( $_POST['tab_key'] )) : 'eccw_general_tab';
 
             ob_start();
             $admin_settings = ECCW_admin_settings::get_instance();
@@ -202,9 +253,6 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             $html = ob_get_clean();
             wp_send_json_success(['html' => $html]);
         }
-
-
-
 
     }
     

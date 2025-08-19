@@ -27,29 +27,28 @@ class ECCW_Auto_Switcher
 
         $switcher_settings = get_option('eccw_currency_settings', []);
 
-    
-
         $this->settings = array(
-            'show_hide'                    => $switcher_settings['design']['eccw_show_hide_side_currency'] ?? 'yes',
-            'eccw_template'                => $switcher_settings['design']['switcher_sticky']['template'] ?? '',
-            'show_pages'                   => $switcher_settings['design']['eccw_sticky_show_on_pages'] ?? array(),
-            'sticky_position'              => $switcher_settings['design']['eccw_position_alignment_toggle'] ?? 'right',
-            'sticky_vertical'              => $switcher_settings['design']['eccw_sticky_vertical'] ?? 'top',
-            'sticky_horizontal'            => $switcher_settings['design']['eccw_sticky_horizontal'] ?? '0',
-            'sticky_horizontal_hover'      => $switcher_settings['design']['eccw_sticky_horizontal_hover'] ?? '0',
-            'sticky_horizontal_item_hover' => $switcher_settings['design']['eccw_sticky_item_move_horizontal'] ?? '0',
-            'flag_show_hide'               => $switcher_settings['design']['eccw_sticky_flag_show_hide'] ?? 'yes',
-            'currency_name_show_hide'      => $switcher_settings['design']['eccw_sticky_currency_name_show_hide'] ?? 'yes',
-            'symbol_show_hide'             => $switcher_settings['design']['eccw_switcher_currency_symbol_show_hide'] ?? 'yes',
-            'code_show_hide'               => $switcher_settings['design']['eccw_sticky_currency_code_show_hide'] ?? 'yes',
-            'sticky_option_bg'             => $switcher_settings['design']['sticky_option_color']['background'] ?? '',
-            'sticky_option_color'          => $switcher_settings['design']['sticky_option_color']['color'] ?? '',
-            'sticky_option_hover_bg'       => $switcher_settings['design']['sticky_option_hover']['background'] ?? '',
-            'sticky_option_hover_color'    => $switcher_settings['design']['sticky_option_hover']['color'] ?? '',
+            'show_hide'                          => $switcher_settings['design']['eccw_show_hide_side_currency'] ?? 'yes',
+            'eccw_template'                      => $switcher_settings['design']['switcher_sticky']['template'] ?? 'eccw-sticky-template-1',
+            'show_pages'                         => $switcher_settings['design']['eccw_sticky_show_on_pages'] ?? array(),
+            'sticky_position'                    => $switcher_settings['design']['eccw_position_alignment_toggle'] ?? 'right',
+            'sticky_vertical'                    => $switcher_settings['design']['eccw_sticky_vertical'] ?? 'top',
+            'sticky_horizontal'                  => $switcher_settings['design']['eccw_sticky_horizontal'] ?? '',
+            'sticky_horizontal_hover'            => $switcher_settings['design']['eccw_sticky_horizontal_hover'] ?? '',
+            'sticky_horizontal_item_hover'       => $switcher_settings['design']['eccw_sticky_item_move_horizontal'] ?? '',
+            'flag_show_hide'                     => $switcher_settings['design']['eccw_sticky_flag_show_hide'] ?? 'yes',
+            'currency_name_show_hide'            => $switcher_settings['design']['eccw_sticky_currency_name_show_hide'] ?? 'no',
+            'symbol_show_hide'                   => $switcher_settings['design']['eccw_switcher_currency_symbol_show_hide'] ?? 'yes',
+            'code_show_hide'                     => $switcher_settings['design']['eccw_sticky_currency_code_show_hide'] ?? 'yes',
+            'sticky_option_bg'                   => $switcher_settings['design']['sticky_option_color']['background'] ?? '',
+            'sticky_option_color'                => $switcher_settings['design']['sticky_option_color']['color'] ?? '',
+            'sticky_option_hover_bg'             => $switcher_settings['design']['sticky_option_hover']['background'] ?? '',
+            'sticky_option_hover_color'          => $switcher_settings['design']['sticky_option_hover']['color'] ?? '',
             'sticky_ccode_option_bg'             => $switcher_settings['design']['sticky_option_ccode_color']['background'] ?? '',
             'sticky_ccode_option_color'          => $switcher_settings['design']['sticky_option_ccode_color']['color'] ?? '',
             'sticky_ccode_option_hover_bg'       => $switcher_settings['design']['sticky_option_ccode_hover']['background'] ?? '',
             'sticky_ccode_option_hover_color'    => $switcher_settings['design']['sticky_option_ccode_hover']['color'] ?? '',
+            'sticky_option_flag_size'            => $switcher_settings['design']['switcher_sticky_option_flag']['width'] ?? '',
         );
 
         $this->settings = apply_filters('eccw_sticky_switcher_data', $this->settings);
@@ -177,6 +176,7 @@ class ECCW_Auto_Switcher
             'sticky_horizontal',
             'sticky_horizontal_hover',
             'sticky_horizontal_item_hover',
+            'sticky_option_flag_size',
         ];
 
         foreach ($unit_fields as $field) {
@@ -215,6 +215,10 @@ class ECCW_Auto_Switcher
                 'transform' => "translateX(" . $this->settings['sticky_horizontal_item_hover'] . ")",
             ];
         }
+
+        $styles[".easy-currency-switcher-auto-select .easy-currency-switcher-select.list li img"] = [
+            'width' => $this->settings['sticky_option_flag_size'],
+        ];
 
         $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li"] = [
             'background' => $this->settings['sticky_option_bg'] ?? '',

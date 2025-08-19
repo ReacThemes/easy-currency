@@ -37,13 +37,14 @@ function eccw_get_pages_list_for_select()
         'orderby'        => 'title',
         'order'          => 'ASC',
         'posts_per_page' => -1,
-        'post__not_in'   => $special_page_ids
     ));
 
     $normal_pages = array();
-    if (!empty($pages)) {
-        foreach ($pages as $page) {
-            $normal_pages[(string)$page->ID] = $page->post_title;
+    if ( ! empty( $pages ) ) {
+        foreach ( $pages as $page ) {
+            if ( ! in_array( $page->ID, $special_page_ids, true ) ) {
+                $normal_pages[ (string) $page->ID ] = $page->post_title;
+            }
         }
     }
 
@@ -99,6 +100,11 @@ function eccw_generate_css(array $styles)
     $css = '';
 
     foreach ($styles as $selector => $properties) {
+
+        if (empty(array_filter($properties))) {
+            continue;
+        }
+
         $css .= $selector . " {\n";
         foreach ($properties as $property => $value) {
             if ($value !== '') {

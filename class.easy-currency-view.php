@@ -2,10 +2,10 @@
 if (!defined('ABSPATH')) die('No direct access allowed');
 class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER { 
 
-
     protected $ecccw_get_plugin_settings;
     protected $plugin_settings;
     public $shortcode_id_proudct_page;
+    protected $single_shortcode_onoff;
  
     public function __construct(){
 
@@ -15,11 +15,11 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $saved_settings = get_option('eccw_currency_settings');
         $options = isset($saved_settings['options']) ? $saved_settings['options'] : [];
         $switcher_pos = $options['eccw_shortcode_pos_product_singlepage'];
-        $this->shortcode_id_proudct_page = $options['eccw_shortcode_show_on_product_pages'];
+
+        $this->shortcode_id_proudct_page = isset( $options['eccw_shortcode_show_on_product_pages'] ) ? $options['eccw_shortcode_show_on_product_pages'] : '';
+        $this->single_shortcode_onoff = isset( $options['eccw_show_hide_single_product_location'] ) ? $options['eccw_show_hide_single_product_location'] : 0;
 
         add_action( $switcher_pos, [$this, 'eccw_single_shortcode_position']);
-
-
 
         add_action( 'init', [$this, 'eccw_add_currency_nonce'] );
         add_action( 'init', [$this, 'ecccw_update_currency'] );
@@ -97,7 +97,6 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
             'currency_countries' => $currency_countries,
         ];
     }
-
  
     public function eccw_render_currency_switcher($args = []) {
        
@@ -112,7 +111,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $wrapper_class = $args['wrapper_class'] ?? 'switcher-list-content';
 
         $unique_class   = 'eccw-switcher-design' . sanitize_html_class($shortcode_id);
-        $template_style = $style_options['switcher_dropdown_option_edit']['template'] ?? '';
+        $template_style = $style_options['switcher_dropdown_option_edit']['template'] ?? 'eccw-template-1';
 
         $classes        = array_filter([$unique_class, $template_style]);
         $classes        = array_map(fn($c) => esc_attr(str_replace('_', '-', $c)), $classes);
@@ -131,7 +130,6 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $default_name    = $currency_countries_json[$default_currency]['name'] ?? '';
         $default_flag      = ECCW_PL_URL . 'public/assets/images/flags/' . strtolower($default_country) . '.png';
 
-       // error_log( print_r( $style_options, true ));
 
         ob_start();
         ?>
@@ -233,17 +231,12 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
     }
 
     public function eccw_single_shortcode_position() {
-        echo 
-            eccw_do_shortcode(
-                'eccw_currency_switcher',
-                [ 'id' => $this->shortcode_id_proudct_page ]
-            );
+
+        if( $this->single_shortcode_onoff == '1'  ) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            echo eccw_do_shortcode('eccw_currency_switcher', [ 'id' => $this->shortcode_id_proudct_page ]);
+        }
     }
-
-   
-
-
-
 }
 
 new ECCW_CURRENCY_VIEW();

@@ -140,7 +140,6 @@
   border-bottom: 1px solid #dfdfdf;
   -moz-column-gap: 5px;
        column-gap: 5px;
-  background: none;
   border-radius: 0;
   transform: translateX(0);
   justify-content: flex-start;

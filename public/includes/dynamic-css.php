@@ -4,13 +4,11 @@ if (! defined('ABSPATH')) exit; // Exit if accessed directly.
 add_action('wp_enqueue_scripts', 'eccw_enqueue_all_dynamic_css', 999999);
 function eccw_enqueue_all_dynamic_css()
 {
+
     $switcher_settings = get_option('eccw_switcher_styles', []);
-
-
     $eccw_options = get_option('eccw_currency_settings');
 
     $all_css = '';
-
 
     if (!empty($switcher_settings) && is_array($switcher_settings)) {
         foreach ($switcher_settings as $shortcode_id => $style) {
@@ -24,7 +22,6 @@ function eccw_enqueue_all_dynamic_css()
                
             }
 
-           //error_log( print_r( $style['switcher_button'], true ));
            
             $dropdown_icon_color = !empty($style['switcher_button']['color']) ? $style['switcher_button']['color'] : '';
             $switcher_border = !empty($style['switcher_button']['border_control']) ? $style['switcher_button']['border_control'] : '';
@@ -105,7 +102,6 @@ function eccw_enqueue_all_dynamic_css()
             '}';
         }
 
-
         }
     }
 
@@ -151,5 +147,3 @@ function eccw_add_dynamic_css($css_array, $element_class)
 
     return '';
 }
-
-

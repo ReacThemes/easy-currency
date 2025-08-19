@@ -699,26 +699,31 @@
             $("#" + escapedId + "_value").val($(this).val());
           });
 
-        $(".eccw-slider-range-value")
-          .off("input change")
-          .on("input change", function () {
-            let numberInputId = $(this).attr("id");
+       $(".eccw-slider-range-value")
+  .off("input change")
+  .on("input change", function () {
+    let numberInputId = $(this).attr("id");
+    let sliderId = numberInputId.replace(/_value$/, "");
+    let escapedSliderId = sliderId.replace(/([\[\]])/g, "\\$1");
 
-            let sliderId = numberInputId.replace(/_value$/, "");
-            let escapedSliderId = sliderId.replace(/([\[\]])/g, "\\$1");
+    let newVal = $(this).val();
 
-            let newVal = $(this).val();
+    // jei khetre user empty kore, tokhon empty e thakuk
+    if (newVal === "") {
+      $("#" + escapedSliderId).val("");
+      return;
+    }
 
-            let $slider = $("#" + escapedSliderId);
-            let min = parseInt($slider.attr("min"), 10);
-            let max = parseInt($slider.attr("max"), 10);
+    let $slider = $("#" + escapedSliderId);
+    let min = parseInt($slider.attr("min"), 10);
+    let max = parseInt($slider.attr("max"), 10);
 
-            if (newVal === "") newVal = min;
-            else newVal = Math.min(Math.max(parseInt(newVal, 10), min), max);
+    newVal = Math.min(Math.max(parseInt(newVal, 10), min), max);
 
-            $(this).val(newVal);
-            $slider.val(newVal);
-          });
+    $(this).val(newVal);
+    $slider.val(newVal);
+ });
+
       }
 
       initializeSliders();
