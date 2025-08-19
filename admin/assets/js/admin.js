@@ -1,4 +1,6 @@
 (function ($) {
+
+
   var ECCWAdmin = {
     init: function () {
       this.currencyFieldsRepeater();
@@ -750,12 +752,15 @@
         var $targets = $panel.find(
           ".eccw-switcher-ui-control, .eccw-position-settings, .eccw-sticky-elements-display, .eccw-sticky-color-style-display"
         );
+         const $targetFields = $('.eccw-searchable-select-dropdown, .eccw-switcher-single-product-hook').closest('tr');
 
         if (isChecked) {
           $targets.slideDown();
+          $targetFields.slideDown();
           toggleTemplateSpecificFields();
         } else {
           $targets.slideUp();
+          $targetFields.slideUp();
           $targets.add(".eccw-sticky-ccode-color-style-display").slideUp();
         }
       }
@@ -858,6 +863,10 @@
     "design[eccw_show_hide_side_currency]"
   );
 
-  console.log("hello faridmia")
+  ECCWAdmin.initSwitcherToggle(
+    "#tab_currency_options",
+    "options[eccw_show_hide_single_product_location]"
+  );
+
 
 })(jQuery);
