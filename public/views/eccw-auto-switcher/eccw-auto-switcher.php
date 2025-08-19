@@ -192,29 +192,26 @@ class ECCW_Auto_Switcher
 
         $styles = [];
 
-        if ($pos === 'left') {
-            $styles[".easy-currency-switcher-auto-select"] = [
+        if( $pos == 'left') {
+            $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos}"] = [
                 'top'  => $this->settings['sticky_vertical'] . '%',
                 'left' => $this->settings['sticky_horizontal'],
             ];
-            $styles[".easy-currency-switcher-select.list li"] = [
-                'transform' => "translateX(" . $this->settings['sticky_horizontal_hover'] . ")",
-            ];
-            $styles[".easy-currency-switcher-select.list li:hover, .easy-currency-switcher-select.list li.selected"] = [
-                'transform' => "translateX(" . $this->settings['sticky_horizontal_item_hover'] . ")",
-            ];
-        } else { 
-            $styles[".easy-currency-switcher-auto-select.eccw-position-right"] = [
-                'top'   => $this->settings['sticky_vertical'] . '%',
+        } else {
+            $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos}"] = [
+                'top'  => $this->settings['sticky_vertical'] . '%',
                 'right' => $this->settings['sticky_horizontal'],
             ];
-            $styles[".easy-currency-switcher-auto-select.eccw-position-right .easy-currency-switcher-select.list li"] = [
-                'transform' => "translateX(" . $this->settings['sticky_horizontal_hover'] . ")",
-            ];
-            $styles[".easy-currency-switcher-auto-select.eccw-position-right .easy-currency-switcher-select.list li:hover, .easy-currency-switcher-auto-select.eccw-position-right .easy-currency-switcher-select.list li.selected"] = [
-                'transform' => "translateX(" . $this->settings['sticky_horizontal_item_hover'] . ")",
-            ];
         }
+        
+        $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li"] = [
+            'transform' => "translateX(" . $this->settings['sticky_horizontal_hover'] . ")",
+        ];
+        $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li:hover, 
+        ..{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li.selected"] = [
+            'transform' => "translateX(" . $this->settings['sticky_horizontal_item_hover'] . ")",
+        ];
+        
 
         $styles[".easy-currency-switcher-auto-select .easy-currency-switcher-select.list li img"] = [
             'width' => $this->settings['sticky_option_flag_size'],

@@ -91,4 +91,5 @@ if (! defined('ABSPATH')) exit; // Exit if accessed directly.
     </form>
 </div>
 <?php
-echo wp_kses_post( ob_get_clean() );
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+echo  ob_get_clean();

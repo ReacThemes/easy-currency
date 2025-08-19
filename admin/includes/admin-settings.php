@@ -1260,7 +1260,7 @@ class ECCW_admin_settings
                             <p class="eccw-err-msg"></p>
                         </div>
                         <h2><?php echo esc_html__('How to use this converter?', 'easy-currency') ?></h2>
-                        <p><label><?php echo esc_html__('Shortcode :', 'easy-currency') ?> </label> [eccw_currency_switcher]</p>
+                        <p><label><?php echo esc_html__('Shortcode :', 'easy-currency') ?> </label> [eccw_currency_switcher id=1]</p>
                         <p><label><?php echo esc_html__('Elementor widget :', 'easy-currency') ?> </label> Easy Currency Switcher</p>
                     </div>
                     <div id="tab_currency_switcher_shortcode" class="tab-content">
