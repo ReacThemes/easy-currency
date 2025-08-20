@@ -36,10 +36,12 @@ class ECCW_Auto_Switcher
             'sticky_horizontal'                  => $switcher_settings['design']['eccw_sticky_horizontal'] ?? '',
             'sticky_horizontal_hover'            => $switcher_settings['design']['eccw_sticky_horizontal_hover'] ?? '',
             'sticky_horizontal_item_hover'       => $switcher_settings['design']['eccw_sticky_item_move_horizontal'] ?? '',
+            
             'flag_show_hide'                     => $switcher_settings['design']['eccw_sticky_flag_show_hide'] ?? 'yes',
             'currency_name_show_hide'            => $switcher_settings['design']['eccw_sticky_currency_name_show_hide'] ?? 'no',
             'symbol_show_hide'                   => $switcher_settings['design']['eccw_switcher_currency_symbol_show_hide'] ?? 'yes',
             'code_show_hide'                     => $switcher_settings['design']['eccw_sticky_currency_code_show_hide'] ?? 'yes',
+
             'sticky_option_bg'                   => $switcher_settings['design']['sticky_option_color']['background'] ?? '',
             'sticky_option_color'                => $switcher_settings['design']['sticky_option_color']['color'] ?? '',
             'sticky_option_hover_bg'             => $switcher_settings['design']['sticky_option_hover']['background'] ?? '',

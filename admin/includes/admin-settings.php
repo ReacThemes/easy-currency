@@ -112,8 +112,7 @@ class ECCW_admin_settings
                     'woocommerce_before_add_to_cart_form' => 'Before - Add to cart',
                     'woocommerce_product_meta_end' => 'After - Product Meta',
                     'woocommerce_product_meta_start' => 'Before - Product Meta',
-                    'woocommerce_single_product_summary' => 'Before - Product summary',
-                    'woocommerce_after_single_product_summary' => 'After - Product summary'
+                    'before_short_description' => 'After - After Price',
                 ],
                 'desc' => __('Choose the position of the switcher shrotcode in the product detail pages.', 'easy-currency'),
                 'id' => 'options[eccw_shortcode_pos_product_singlepage]',
@@ -745,7 +744,7 @@ class ECCW_admin_settings
                 'title' => __('Enable Currency Name', 'easy-currency'),
                 'id'    => 'design[eccw_switcher_currency_name_show_hide]',
                 'type'  => 'switcher',
-                'default' => isset($design['eccw_switcher_currency_name_show_hide']) ? $design['eccw_switcher_currency_name_show_hide'] : 'no',
+                'default' => isset($design['eccw_switcher_currency_name_show_hide']) ? $design['eccw_switcher_currency_name_show_hide'] : '',
                 'class' => 'eccw-switcher-ui-control',
             ),
             'eccw_switcher_ele_currency_symbol' => array(
@@ -875,7 +874,7 @@ class ECCW_admin_settings
                 'title' => __('Enable Currency Name', 'easy-currency'),
                 'id'    => 'design[eccw_sticky_currency_name_show_hide]',
                 'type'  => 'switcher',
-                'default' => isset($design['eccw_sticky_currency_name_show_hide']) ? $design['eccw_sticky_currency_name_show_hide'] : 'yes',
+                'default' => isset($design['eccw_sticky_currency_name_show_hide']) ? $design['eccw_sticky_currency_name_show_hide'] : 'no',
                 'class' => 'eccw-switcher-ui-control',
             ),
             'eccw_sticky_ele_currency_symbol' => array(

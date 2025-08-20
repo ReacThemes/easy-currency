@@ -285,7 +285,7 @@
   transform: translatey(-50%);
 }
 .eccw-sticky-template-2.easy-currency-switcher-auto-select.eccw-position-right .easy-currency-switcher-select.list {
-  transform: translatex(82.6%);
+  transform: translatex(60.6%);
   transition: all 0.3s;
 }
 .eccw-sticky-template-2.easy-currency-switcher-auto-select.eccw-position-right .easy-currency-switcher-select.list:hover {
@@ -339,7 +339,7 @@
   transform: translatey(-50%);
 }
 .eccw-sticky-template-2.easy-currency-switcher-auto-select.eccw-position-left .easy-currency-switcher-select.list {
-  transform: translatex(-82.6%);
+  transform: translatex(-60.6%);
   transition: all 0.3s;
 }
 .eccw-sticky-template-2.easy-currency-switcher-auto-select.eccw-position-left .easy-currency-switcher-select.list:hover {
@@ -467,4 +467,9 @@
 }
 .eccw-sticky-template-3.easy-currency-switcher-auto-select.eccw-position-left .easy-currency-switcher-select.list li.selected {
   background: #FFEEEF;
+}
+
+.wp-block-woocommerce-add-to-cart-form .easy-currency-switcher,
+.entry-summary .easy-currency-switcher {
+  margin-bottom: 20px;
 }/*# sourceMappingURL=public.css.map */

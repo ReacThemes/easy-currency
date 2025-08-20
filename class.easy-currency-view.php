@@ -17,15 +17,23 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $switcher_pos = isset( $options['eccw_shortcode_pos_product_singlepage'] ) ? $options['eccw_shortcode_pos_product_singlepage'] : '';
 
         $this->shortcode_id_proudct_page = isset( $options['eccw_shortcode_show_on_product_pages'] ) ? $options['eccw_shortcode_show_on_product_pages'] : '';
-        $this->single_shortcode_onoff = isset( $options['eccw_show_hide_single_product_location'] ) ? $options['eccw_show_hide_single_product_location'] : 0;
+        $this->single_shortcode_onoff = ( ! empty( $options['eccw_show_hide_single_product_location'] ) ) ? 1 : 0;
 
-        add_action( $switcher_pos, [$this, 'eccw_single_shortcode_position']);
+        
+
+        if( $switcher_pos == 'before_short_description') {
+            add_action( "woocommerce_single_product_summary", [$this, 'eccw_single_shortcode_position'], 19 );
+        }  else {
+           add_action( $switcher_pos, [$this, 'eccw_single_shortcode_position']);
+        }
 
         add_action( 'init', [$this, 'eccw_add_currency_nonce'] );
         add_action( 'init', [$this, 'ecccw_update_currency'] );
         add_shortcode( 'eccw_currency_switcher', [$this, 'eccw_get_currency_switcher'] );
 
     }
+
+ 
 
 
     public function eccw_set_cookie($name, $value, $duration_days) {
@@ -120,7 +128,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $currency_countries_json = json_decode($currency_countries['body'] ?? '', true) ?? [];
 
         $flag_show       = $style_options['eccw_switcher_flag_show_hide'] ?? 'yes';
-        $cur_name_show   = $style_options['eccw_switcher_currency_name_show_hide'] ?? 'yes';
+        $cur_name_show   = $style_options['eccw_switcher_currency_name_show_hide'] ?? 'no';
         $cur_symbol_show = $style_options['eccw_switcher_currency_symbol_show_hide'] ?? 'yes';
         $cur_code_show   = $style_options['eccw_switcher_currency_code_show_hide'] ?? 'yes';
 
@@ -128,7 +136,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $default_country = $currency_countries_json[$default_currency]['countries'][0] ?? '';
         $default_symbol  = $currency_countries_json[$default_currency]['symbol'] ?? '';
         $default_name    = $currency_countries_json[$default_currency]['name'] ?? '';
-        $default_flag      = ECCW_PL_URL . 'public/assets/images/flags/' . strtolower($default_country) . '.png';
+        $default_flag    = ECCW_PL_URL . 'public/assets/images/flags/' . strtolower($default_country) . '.png';
 
 
         ob_start();
@@ -232,7 +240,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
 
     public function eccw_single_shortcode_position() {
 
-        if( $this->single_shortcode_onoff == '1'  ) {
+        if( $this->single_shortcode_onoff == '1' ) {
             // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             echo eccw_do_shortcode('eccw_currency_switcher', [ 'id' => $this->shortcode_id_proudct_page ]);
         }
@@ -240,3 +248,5 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
 }
 
 new ECCW_CURRENCY_VIEW();
+
+
