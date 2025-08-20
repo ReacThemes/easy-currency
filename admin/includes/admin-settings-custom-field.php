@@ -32,7 +32,6 @@ class ECCW_admin_settings_Customfields
 
         global $ECCW_Admin_Ajax;
         $shortcodes = $ECCW_Admin_Ajax->eccw_get_all_shortcodes_cached();
-       // $shortcodes = $wpdb->get_results( "SELECT id, switcher_name FROM {$wpdb->prefix}eccw_shortcodes", ARRAY_A );
 
         $current_value = isset( $value['default'] ) ? $value['default'] : '';
         $class         = isset( $value['class'] ) ? $value['class'] : '';

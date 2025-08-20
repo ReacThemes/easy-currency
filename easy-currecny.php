@@ -27,8 +27,11 @@
     include 'global-functions.php';
     include 'admin/includes/admin-settings-custom-field.php';
     include 'admin/includes/admin-settings.php';
+    include 'admin/includes/admin-menu-shortcode.php';
     include 'admin/includes/activation.php';
     include 'admin/includes/plugin-scripts.php';
+   
+
     include 'public/includes/plugin-scripts.php';
     include 'public/includes/dynamic-css.php';
     include 'public/views/eccw-auto-switcher/eccw-auto-switcher.php';
@@ -46,3 +49,8 @@
     register_activation_hook(__FILE__, 'eccw_save_plugin_default_settings');
 
     ECCW_CURRENCY_SWITCHER::instance();
+
+   
+	Shortcode_In_Menus_Admin::get_instance();
+
+	Shortcode_In_Menus::get_instance();

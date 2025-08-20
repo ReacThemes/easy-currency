@@ -832,6 +832,44 @@
               }
           }
       });
+
+       $('#eccw-menu-shortcode-id').select2({
+          ajax: {
+              url: eccw_vars.ajaxurl,
+              dataType: 'json',
+              delay: 250,
+              data: function(params) {
+                  return {
+                      action: 'eccw_search_shortcode',
+                      q: params.term,
+                      nonce: eccw_vars.nonce
+                  };
+              },
+              processResults: function(data) {
+                  return {
+                      results: data.items
+                  };
+              },
+              cache: true
+          },
+          placeholder: "Search Shortcode...",
+          minimumInputLength: 3,
+          allowClear: true,
+          width: '300px',
+          templateResult: function(data) {
+              return data.text;
+          },
+          language: {
+              inputTooShort: function() {
+                  return "Please enter 3 or more character";
+              },
+              noResults: function() {
+                  return "No matches found";
+              }
+          }
+      });
+
+
     }
 
   };
@@ -862,6 +900,8 @@
     placeholder: "Select pages",
     allowClear: true,
   });
+
+
 
   ECCWAdmin.initSwitcherToggle(
     "#tab_currency_switcher_sticky",
