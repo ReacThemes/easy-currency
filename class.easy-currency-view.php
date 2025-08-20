@@ -14,7 +14,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
 
         $saved_settings = get_option('eccw_currency_settings');
         $options = isset($saved_settings['options']) ? $saved_settings['options'] : [];
-        $switcher_pos = $options['eccw_shortcode_pos_product_singlepage'];
+        $switcher_pos = isset( $options['eccw_shortcode_pos_product_singlepage'] ) ? $options['eccw_shortcode_pos_product_singlepage'] : '';
 
         $this->shortcode_id_proudct_page = isset( $options['eccw_shortcode_show_on_product_pages'] ) ? $options['eccw_shortcode_show_on_product_pages'] : '';
         $this->single_shortcode_onoff = isset( $options['eccw_show_hide_single_product_location'] ) ? $options['eccw_show_hide_single_product_location'] : 0;
