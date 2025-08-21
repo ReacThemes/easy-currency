@@ -49,8 +49,3 @@
     register_activation_hook(__FILE__, 'eccw_save_plugin_default_settings');
 
     ECCW_CURRENCY_SWITCHER::instance();
-
-   
-	Shortcode_In_Menus_Admin::get_instance();
-
-	Shortcode_In_Menus::get_instance();

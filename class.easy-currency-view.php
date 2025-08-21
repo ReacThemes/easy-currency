@@ -44,7 +44,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
     public function eccw_add_currency_nonce(){
 
         if ( ! isset( $_COOKIE['eccw_currency_nonce'] ) ) {
-            $this->eccw_set_cookie('eccw_currency_nonce', wp_create_nonce( 'apply_custom_currency_rate' ), 30);
+           $this->eccw_set_cookie('eccw_currency_nonce', wp_create_nonce( 'apply_custom_currency_rate' ), 30);
         }
 
     }

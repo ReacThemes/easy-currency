@@ -133,3 +133,32 @@ function eccw_do_shortcode($shortcode, $atts = []) {
 
     return do_shortcode("[$shortcode $atts_string]");
 }
+
+
+if (!function_exists('eccw_is_checkout_ajax_request')) {
+    function eccw_is_checkout_ajax_request() {
+        if (defined('DOING_AJAX')) {
+            $ajax_request = $_REQUEST['wc-ajax'] ?? null;
+            return in_array($ajax_request, array('update_order_review', 'checkout', 'get_refreshed_fragments'));
+        }
+        return false;
+    }
+}
+
+
+/**
+ * Forces the currency for REST API calls.
+ * 
+ * @param bool $is_request_to_rest_api
+ * @return bool
+ */
+add_filter('woocommerce_rest_is_request_to_rest_api', function($is_request_to_rest_api) {
+  if($is_request_to_rest_api) {
+    // If the call is to the REST API, force the currency to USD
+    add_filter('wc_aelia_cs_selected_currency', function($currency) {
+      return 'USD';
+    }, 10);
+  }
+
+  return $is_request_to_rest_api;
+}, 999);

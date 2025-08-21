@@ -661,7 +661,7 @@
         let serializedData = form.find(":input").serializeArray();
 
         serializedData.push(
-          { name: "action", value: "eccw_save_shortcode_style" },
+          { name: "action", value: "eccw_eccw_shortcode_save_style" },
           { name: "sd_id", value: shortcodeId },
           { name: "nonce", value: eccw_vars.nonce }
         );

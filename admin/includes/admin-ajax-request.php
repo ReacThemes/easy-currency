@@ -8,7 +8,7 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             add_action( "wp_ajax_eccw_update_currency_rates", array ( $this, 'eccw_update_currency_rates' ) );
             add_action('wp_ajax_eccw_create_shortcode', array ( $this,  'eccw_create_shortcode') );
             add_action('wp_ajax_eccw_delete_shortcode', array ( $this,'eccw_delete_shortcode_callback'));
-            add_action('wp_ajax_eccw_save_shortcode_style', array ( $this,'eccw_save_shortcode_style_callback'));
+            add_action('wp_ajax_eccw_eccw_shortcode_save_style', array ( $this,'eccw_eccw_shortcode_save_style_callback'));
             add_action('wp_ajax_eccw_load_modal_content', array ( $this,'eccw_load_modal_content_callback'));
             add_action('wp_ajax_eccw_search_shortcode', array ( $this, 'eccw_search_shortcode_callback') );
 
@@ -190,7 +190,7 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             }
         }
 
-        function eccw_save_shortcode_style_callback() {
+        function eccw_eccw_shortcode_save_style_callback() {
             check_ajax_referer('eccw_nonce', 'nonce');
 
             if( !isset( $_POST['sd_id'] ) || empty( $_POST['sd_id'] )) {

@@ -108,7 +108,7 @@ class ECCW_admin_settings
                 'name' => __('Switcher Position in Product page', 'easy-currency'),
                 'type' => 'select',
                 'options' => [
-                    'woocommerce_after_add_to_cart_form' => 'After - Add to cart',
+                    'woocommerce_after_add_to_cart_form' => 'After - Add to cart', 
                     'woocommerce_before_add_to_cart_form' => 'Before - Add to cart',
                     'woocommerce_product_meta_end' => 'After - Product Meta',
                     'woocommerce_product_meta_start' => 'Before - Product Meta',
