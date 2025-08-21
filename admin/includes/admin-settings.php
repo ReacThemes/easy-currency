@@ -119,7 +119,6 @@ class ECCW_admin_settings
                 'default' => isset($options['eccw_shortcode_pos_product_singlepage']) ? $options['eccw_shortcode_pos_product_singlepage'] : 'woocommerce_before_add_to_cart_form',
                 'class' => 'eccw-switcher-single-product-hook',
             ),
-
             'product_single_section_end' => array(
                 'type' => 'sectionend',
                 'id' => 'eccw_settings_tab_section_end'

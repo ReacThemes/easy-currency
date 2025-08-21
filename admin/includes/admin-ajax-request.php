@@ -199,7 +199,7 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
 
             $sd_id = absint($_POST['sd_id']);
 
-            error_log( print_r( $sd_id, true ));
+        
             if (!$sd_id) {
                 wp_send_json_error('Invalid shortcode ID.');
             }
