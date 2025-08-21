@@ -45,7 +45,10 @@ Terms of Use link: https://www.ideracorp.com/Legal/Terms-of-Use
 * Added: Dropdown view shortcode repeater generator added.
 * Added: Dropdown single page shortcode system added.
 * Added: Currency customization feature added.
+* Added: Currency Shortcode Menu support
 * Fixed: Minor bugs fix.
+* Fixed currency symbol change issue fix
+* Fixed order page price details issue fix
 * Fixed: Css Issue fix.
 
 = 1.0.0 =	

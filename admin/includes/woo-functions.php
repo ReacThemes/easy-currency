@@ -24,6 +24,12 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
             add_filter('woocommerce_variable_price_html', array($this, 'eccw_convert_variable_price_html'), 10, 2);
             add_filter('woocommerce_variable_sale_price_html', array($this, 'eccw_convert_variable_price_html'), 10, 2);
             add_filter('woocommerce_get_price_html', array($this, 'eccw_convert_variable_price_html'), 20, 2);
+
+            // variation price 
+
+            add_filter('woocommerce_product_variation_get_price', array($this, 'eccw_convert_variation_price'), 10, 2);
+            add_filter('woocommerce_product_variation_get_regular_price', array($this, 'eccw_convert_variation_price'), 10, 2);
+
            
             add_filter('woocommerce_currency_symbol', array($this, 'change_currency_symbol'), 10, 2);
             
@@ -82,6 +88,10 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
 
     public function eccw_convert_variable_price_html($price_html, $product) {
 
+        if( $this->eccw_should_skip_currency_conversion() ) {
+            return $price_html;
+        }
+
         if ( ! $product->is_type('variable') ) {
             return $price_html; 
         }
@@ -110,6 +120,24 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
         }
 
         return $price_html;
+    }
+
+    public function eccw_convert_variation_price($price, $product) {
+      
+        $plugin_settings = $this->plugin_settings;
+        $allow_payment_with_selected_currency = $plugin_settings['options']['allow_payment_with_selected_currency'] ?? 'no';
+        
+        if( $this->eccw_should_skip_currency_conversion() ) {
+            return $price;
+        }
+        
+        // Get currency rate and convert
+        $currency_rate = $this->currency_server->eccw_get_currency_rate();
+        if ($currency_rate && $currency_rate > 1 && $price > 0) {
+            return (float)$price * $currency_rate;
+        }
+        
+        return $price;
     }
 
     public function change_currency_symbol($currency_symbol, $currency) {
