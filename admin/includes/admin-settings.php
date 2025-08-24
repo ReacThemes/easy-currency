@@ -778,6 +778,37 @@ class ECCW_admin_settings
         return $all_settings;
     }
 
+    public function get_eccw_settings_modal_custom_css_func($current_shortcodeId = null) {
+        
+        $saved_settings = get_option('eccw_switcher_styles');
+        $design = isset($saved_settings[$current_shortcodeId]) ? $saved_settings[$current_shortcodeId] : [];
+
+       
+        $settings = apply_filters("after_eccw_modal_tab_custom_css", []);
+
+        if (empty($settings)) {
+            $settings = array(
+                array(
+                    'type' => 'html',
+                    'html' => '
+                    <div class="eccw-pro-required-msg">
+                        <div class="eccw-pro-icon">⚠️</div>
+                        <div class="eccw-pro-content">
+                            <h3>' . __('Pro Feature Required', 'easy-currency') . '</h3>
+                            <p>' . __('This feature is available in the Pro version. Please upgrade to unlock custom CSS styling options for your switcher.', 'easy-currency') . '</p>
+                            <a href="https://easy-currency.themewant.com/" target="_blank" class="eccw-pro-btn">' . __('Upgrade to Pro', 'easy-currency') . '</a>
+                        </div>
+                    </div>'
+                )
+            );
+        }
+
+        return $settings;
+    }
+
+
+
+
     public function eccw_switcher_sticky_field()
     {
 
@@ -1333,6 +1364,7 @@ class ECCW_admin_settings
                                 <div class="eccw-tabs-wrapper">
                                     <button class="eccw-tab-btn active" data-tab="eccw_general_tab">General</button>
                                     <button class="eccw-tab-btn" data-tab="eccw_display_option_tab">Display Option</button>
+                                    <button class="eccw-tab-btn" data-tab="eccw_display_custom_css">Custom Css</button>
                                 </div>
 
                                 <div class="eccw-style-modal-switcher-form" data-eccwtab="">

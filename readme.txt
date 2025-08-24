@@ -21,12 +21,6 @@ Easy Currency is a lightweight and easy-to-use plugin for WooCommerce that allow
 
 == External services ==
 
-FlagCDN
-
-This plugin utilizes a third-party service, FlagCDN (https://flagcdn.com/), to display country flags. When the plugin needs to display a flag, it retrieves the image from FlagCDN's servers based on the country code. For example, a flag for the United States (US) would be fetched from: https://flagcdn.com/24x18/us.png
-
-Privacy Policy link: https://flagpedia.net/privacy-policy
-Terms of Use link: https://flagpedia.net/terms
 
 No account is required to access this service, and no user data is transmitted to FlagCDN except for the necessary request to retrieve the image file.
 

@@ -284,7 +284,8 @@
 
 .eccw-style-modal-switcher-form,
 #tab_currency_switcher_sticky {
-  margin-top: 60px;
+  margin-top: 50px;
+  margin-bottom: 30px;
 }
 .eccw-style-modal-switcher-form h2,
 #tab_currency_switcher_sticky h2 {
@@ -681,4 +682,48 @@
 
 #menu-item-html-wrap {
   width: 100%;
+}
+
+.eccw-pro-required-msg {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 2px dashed #f5f5f5;
+  background: #f5f5f5;
+  border-radius: 12px;
+  margin: 20px 0 40px 0;
+  width: 50%;
+  max-width: 320px;
+  padding: 20px;
+}
+
+.eccw-pro-icon {
+  font-size: 40px;
+}
+
+.eccw-pro-content h3 {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+  color: #e65100;
+}
+
+.eccw-pro-content p {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.eccw-pro-btn {
+  display: inline-block;
+  background: #ff9800;
+  color: #fff !important;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.eccw-pro-btn:hover {
+  background: #e68900;
 }/*# sourceMappingURL=admin.css.map */

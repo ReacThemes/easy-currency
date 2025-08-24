@@ -260,6 +260,12 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
                 );
             }
 
+            elseif ($tab_key === 'eccw_display_custom_css') { 
+                woocommerce_admin_fields(
+                    $admin_settings->get_eccw_settings_modal_custom_css_func($shortcode_id)
+                );
+            }
+
             $html = ob_get_clean();
             wp_send_json_success(['html' => $html]);
         }
