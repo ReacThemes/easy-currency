@@ -6,7 +6,7 @@ Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-The Easy Currency Pluign for WordPress menu icon plugin where can decoration your menu item with different types icon.
+The Easy Currency Plugin for WordPress menu icon plugin where can decoration your menu item with different types icon.
 
 == Description ==
 <a href="https://easy-currency.themewant.com/" target="_blank">Live Demo</a> | <a href="https://easy-currency.themewant.com/product/family-suite/" target="_blank">Single Demo</a>
@@ -77,7 +77,7 @@ Privacy Policy link: https://www.ideracorp.com/legal/APILayer
 Terms of Use link: https://www.ideracorp.com/Legal/Terms-of-Use
 
 
-= 1.0.2 =
+= 1.0.1 =
 * Added: Sticky Side currency added.
 * Added: Sticky side 3 layout style added.
 * Added: Dropdown view 2 layout style added.
