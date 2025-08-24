@@ -1,6 +1,6 @@
-=== Easy Currency ===
+=== Easy Currency - Currency Switcher for WooCommerce ===
 Contributors: themewant
-Tags: easy currency, currency converter, currency
+Tags: easy currency, currency converter, switcher, woocommerce
 Tested up to: 6.8
 Stable tag: 1.0.1
 License: GPLv2 or later
@@ -11,7 +11,7 @@ The Easy Currency Plugin for WordPress menu icon plugin where can decoration you
 == Description ==
 <a href="https://easy-currency.themewant.com/" target="_blank">Live Demo</a> | <a href="https://easy-currency.themewant.com/product/family-suite/" target="_blank">Single Demo</a>
 
-Easy Currency Switcher is a free WooCommerce multi-currency switcher for WordPress websites.
+Easy Currency Switcher is a **free WooCommerce multi-currency switcher for WordPress** websites.
 With this plugin, you can create multiple custom currencies using flags, country codes, currency symbols, currency names, currency position, and more.
 
 Easy Currency comes with one of the most powerful currency switcher customizers available on the market, allowing you to design modern and unlimited switchers for your site.
@@ -35,7 +35,7 @@ You can display the WooCommerce multi-currency switcher dropdown on your product
 
 **Switcher Dropdown**
 
-Customize the currency switcher dropdown with flags, currency symbols, country codes, and currency names. Easily display it anywhere on your site using the [eccw_currency_switcher id=x] shortcode.
+Customize the currency switcher dropdown with flags, currency symbols, country codes, and currency names. Easily display it anywhere on your site using the **[eccw_currency_switcher id=x]** shortcode.
 
 You can also format product prices by setting the  Decimal Separator, and Thousand Separator to match your preferred style.
 
@@ -44,18 +44,23 @@ You can also format product prices by setting the  Decimal Separator, and Thousa
 You can customize our sticky templates and display them anywhere on your screen, including the left or right corners. We provide three ready-made sticky templates for you to use. You can choose any page to display the sticky switchers according to your preference.
 
 **Shortcode generator**
+
 A shortcode generator that allows you to easily create, edit, and delete shortcodes. You can also edit shortcodes to customize our pre-designed templates.
 
 **Design** 
+
 Fully customize the design with options for background, color, font, border, padding, and margin.
 
 **Shortcode In Menus**
+
 You can add Easy Currency shortcodes directly into WordPress navigation menus, allowing you to display currency switchers dynamically wherever needed. This feature also supports adding full HTML sections to menus, giving you complete flexibility to customize your navigation with advanced content and functionality.
 
 **Currency Rates**
+
 Supports more than 7 currency aggregators for automatic exchange rate updates, with the option for the admin to manually adjust rates when necessary.
 
 **Checkout**
+
 Enable this option to allow customers to pay in their chosen currency.
 
 
