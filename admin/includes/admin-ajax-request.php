@@ -104,14 +104,14 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
                 $table_name,
                 [
                     'switcher_name' => $switcher_name,
-                    'shortcode'     => '[eccw_currency_switcher id=1]',
+                    'shortcode'     => '[easy_currency_switcher id=1]',
                     'template'      => $template,
                 ],
                 ['%s', '%s', '%s']
             );
 
             $id = $wpdb->insert_id;
-            $new_shortcode = "[eccw_currency_switcher id=$id]";
+            $new_shortcode = "[easy_currency_switcher id=$id]";
 
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $wpdb->update(

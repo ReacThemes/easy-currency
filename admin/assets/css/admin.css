@@ -64,7 +64,7 @@
 }
 .tabs.eccw-settings-tabs .tab-contents-wrapper {
   padding: 30px 30px;
-  height: 500px;
+  max-height: 500px;
   overflow: auto;
 }
 .tabs.eccw-settings-tabs .tab-contents-wrapper .tab-content .content-header {

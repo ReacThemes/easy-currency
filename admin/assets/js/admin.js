@@ -359,6 +359,8 @@
             '][symbol_position]">' +
             '<option value="left">Left</option>' +
             '<option value="right">Right</option>' +
+            '<option value="left_space">Left with space</option>' +
+            '<option value="right_space">Right with space</option>' +
             "</select></td>" +
             '<td><select name="eccw_currency_table[' +
             rowCount +
@@ -380,7 +382,7 @@
             '][thousand_separator]" value="" /></td>' +
             '<td><input type="text" name="eccw_currency_table[' +
             rowCount +
-            '][description]" value="" class="widefat"/></td>' +
+            '][custom_symbol]" value="" placeholder="e.g. $" /></td>' +
             '<td><button type="button" class="button remove-row">Remove</button></td>' +
             "</tr>";
 

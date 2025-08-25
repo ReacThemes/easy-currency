@@ -35,7 +35,7 @@ You can display the WooCommerce multi-currency switcher dropdown on your product
 
 **Switcher Dropdown**
 
-Customize the currency switcher dropdown with flags, currency symbols, country codes, and currency names. Easily display it anywhere on your site using the **[eccw_currency_switcher id=x]** shortcode.
+Customize the currency switcher dropdown with flags, currency symbols, country codes, and currency names. Easily display it anywhere on your site using the **[easy_currency_switcher id=x]** shortcode.
 
 You can also format product prices by setting the  Decimal Separator, and Thousand Separator to match your preferred style.
 

@@ -29,7 +29,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
 
         add_action( 'init', [$this, 'eccw_add_currency_nonce'] );
         add_action( 'init', [$this, 'ecccw_update_currency'] );
-        add_shortcode( 'eccw_currency_switcher', [$this, 'eccw_get_currency_switcher'] );
+        add_shortcode( 'easy_currency_switcher', [$this, 'eccw_get_currency_switcher'] );
 
     }
 
@@ -242,7 +242,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
 
         if( $this->single_shortcode_onoff == '1' ) {
             // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-            echo eccw_do_shortcode('eccw_currency_switcher', [ 'id' => $this->shortcode_id_proudct_page ]);
+            echo eccw_do_shortcode('easy_currency_switcher', [ 'id' => $this->shortcode_id_proudct_page ]);
         }
     }
 }

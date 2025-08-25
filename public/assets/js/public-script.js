@@ -26,32 +26,6 @@
                 }
             });
         },
-        // updateSwitcher: function (e) {
-        //     let selectedCurrency = $(e.target).data('value');
-        //     let $form = $('.easy_currency_switcher_form');
-
-        //     $form.find('input[name="easy_currency"]').val(selectedCurrency);
-
-        //     console.log(selectedCurrency)
-
-        //     let formData = new FormData($form[0]);
-
-        //     let baseUrl = window.location.href.split('?')[0];
-        //     let redirectUrl = baseUrl + '?easy_currency=' + selectedCurrency;
-
-        //     fetch(redirectUrl, {
-        //         method: 'POST',
-        //         body: formData,
-        //         credentials: 'same-origin'
-        //     })
-        //     .then(response => {
-        //         if (response.redirected) {
-        //             window.location.href = response.url; 
-        //         } else {
-        //             window.location.href = redirectUrl;
-        //         }
-        //     });
-        // }
 
         updateSwitcher: function (e) {
             e.preventDefault();
@@ -87,10 +61,9 @@
 
     }
 
+
     ECCWPublic.init();
 
-
-   
 
 
 })(jQuery);

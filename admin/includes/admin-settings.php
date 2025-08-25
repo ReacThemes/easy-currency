@@ -36,7 +36,7 @@ class ECCW_admin_settings
         $ECCW_CURRENCY_SERVER = new ECCW_CURRENCY_SERVER();
         $aggregators = $ECCW_CURRENCY_SERVER->eccw_get_currency_rate_live_aggregators();
 
-        $settings = array(
+        $eccw_global_options_settings = array(
             'section_title' => array(
                 'name' => __('Change currency options from here.', 'easy-currency'),
                 'type' => 'title',
@@ -74,6 +74,7 @@ class ECCW_admin_settings
             )
         );
 
+        $eccw_global_options_settings = apply_filters('eccw_global_options_settings_array', $eccw_global_options_settings);
 
         $switcher_location_start = array(
             array(
@@ -132,7 +133,7 @@ class ECCW_admin_settings
             )
         );
 
-        $all_settings = array_merge($settings, $switcher_location_start, $single_settings,$switcher_location_end );
+        $all_settings = array_merge($eccw_global_options_settings, $switcher_location_start, $single_settings,$switcher_location_end );
 
 
         return $all_settings;
@@ -1194,7 +1195,7 @@ class ECCW_admin_settings
                                     <th>Decimal</th>
                                     <th>Decimal Separator</th>
                                     <th>Thousand Separator</th>
-                                    <th>Description</th>
+                                    <th>Custom Symbol</th>
                                     <th>Remove</th>
                                 </tr>
                             </thead>
@@ -1211,7 +1212,7 @@ class ECCW_admin_settings
                                         $decimal = isset($currency_data['decimal']) ? $currency_data['decimal'] : '2';
                                         $decimal_separator = isset($currency_data['decimal_separator']) ? $currency_data['decimal_separator'] : '.';
                                         $thousand_separator = isset($currency_data['thousand_separator']) ? $currency_data['thousand_separator'] : ',';
-                                        $description = isset($currency_data['description']) ? $currency_data['description'] : '';
+                                        $custom_symbol = isset($currency_data['custom_symbol']) ? $currency_data['custom_symbol'] : '';
 
                                         echo '<tr>';
                                         echo '<td><input type="radio" name="eccw_currency_table[default]" value="' . esc_attr($currency_code) . '"' . checked($currency_code, $default_currency, false) . ' /></td>';
@@ -1226,6 +1227,8 @@ class ECCW_admin_settings
                                         echo '<td><select name="eccw_currency_table[' . esc_attr($index) . '][symbol_position]">
                                             <option value="left"' . selected($symbol_position, 'left', false) . '>Left</option>
                                             <option value="right"' . selected($symbol_position, 'right', false) . '>Right</option>
+                                            <option value="left_space"' . selected($symbol_position, 'left_space', false) . '>Left with space</option>
+                                            <option value="right_space"' . selected($symbol_position, 'right_space', false) . '>Right with space</option>
                                         </select></td>';
                                         echo '<td><select name="eccw_currency_table[' . esc_attr($index) . '][decimal]">
                                             <option value="1"' . selected($decimal, '1', false) . '>1</option>
@@ -1239,7 +1242,7 @@ class ECCW_admin_settings
                                         </select></td>';
                                         echo '<td><input type="text" name="eccw_currency_table[' . esc_attr($index) . '][decimal_separator]" value="' . esc_attr($decimal_separator) . '" /></td>';
                                         echo '<td><input type="text" name="eccw_currency_table[' . esc_attr($index) . '][thousand_separator]" value="' . esc_attr($thousand_separator) . '" /></td>';
-                                        echo '<td><input type="text" name="eccw_currency_table[' . esc_attr($index) . '][description]" value="' . esc_attr($description) . '" class="widefat"/></td>';
+                                        echo '<td><input type="text" name="eccw_currency_table[' . esc_attr($index) . '][custom_symbol]" value="' . esc_attr($custom_symbol) . '" placeholder="e.g. $"/></td>';
                                         echo '<td><button type="button" class="button remove-row">Remove</button></td>';
                                         echo '</tr>';
                                     }
@@ -1269,7 +1272,7 @@ class ECCW_admin_settings
                                         </select></td>';
                                     echo '<td><input type="text" name="eccw_currency_table[0][decimal_separator]" value="" /></td>';
                                     echo '<td><input type="text" name="eccw_currency_table[0][thousand_separator]" value="" /></td>';
-                                    echo '<td><input type="text" name="eccw_currency_table[0][description]" value="" class="widefat"/></td>';
+                                    echo '<td><input type="text" name="eccw_currency_table[0][custom_symbol]" value="" placeholder="e.g. $"/></td>';
                                     echo '<td><button type="button" class="button remove-row">Remove</button></td>';
                                     echo '</tr>';
                                 }
@@ -1289,7 +1292,7 @@ class ECCW_admin_settings
                             <p class="eccw-err-msg"></p>
                         </div>
                         <h2><?php echo esc_html__('How to use this converter?', 'easy-currency') ?></h2>
-                        <p><label><?php echo esc_html__('Shortcode :', 'easy-currency') ?> </label> [eccw_currency_switcher id=1]</p>
+                        <p><label><?php echo esc_html__('Shortcode :', 'easy-currency') ?> </label> echo do_shortcode('[easy_currency_switcher id="1"]');</p>
                         <p><label><?php echo esc_html__('Elementor widget :', 'easy-currency') ?> </label> Easy Currency Switcher</p>
                     </div>
                     <div id="tab_currency_switcher_shortcode" class="tab-content">

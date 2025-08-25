@@ -35,9 +35,40 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
             
             add_filter('wc_price_args', array($this, 'eccw_wc_price_format'));
            // return;
-            add_filter('woocommerce_product_get_price_html', array($this, 'eccw_change_currency_symbol_position'), 10, 2);
+
+            add_filter('woocommerce_price_format', array($this,'eccw_dynamic_currency_position'), 9999999, 2 );
+          
         }
 
+    }
+
+
+    function eccw_dynamic_currency_position($format, $currency) {
+
+        $plugin_settings = $this->plugin_settings;
+        $allow_payment_with_selected_currency = isset($plugin_settings['options']['allow_payment_with_selected_currency']) && !empty($plugin_settings['options']['allow_payment_with_selected_currency']) ? $plugin_settings['options']['allow_payment_with_selected_currency'] : 'no';
+
+        if( $this->eccw_should_skip_currency_conversion() ) {
+            return $format;
+        }
+
+       
+        $eccw_get_user_preferred_currency_data = $this->currency_server->eccw_get_user_preferred_currency_data();
+        if (!empty($eccw_get_user_preferred_currency_data['symbol_position'])) {
+            $symbol_position = $eccw_get_user_preferred_currency_data['symbol_position'];
+
+            if ($symbol_position === 'right') {
+                $format = '%2$s%1$s'; 
+            } elseif ($symbol_position === 'right_space') {
+                $format = '%2$s %1$s'; 
+            } elseif ($symbol_position === 'left_space') {
+                $format = '%1$s %2$s'; 
+            } else {
+                $format = '%1$s%2$s'; 
+            }
+        }
+
+        return $format;
     }
 
     public function apply_custom_currency_rate_order($price, $item) {
@@ -141,61 +172,27 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
     }
 
     public function change_currency_symbol($currency_symbol, $currency) {
-       
-        $plugin_settings = $this->plugin_settings;
-        $allow_payment_with_selected_currency = isset($plugin_settings['options']['allow_payment_with_selected_currency']) && !empty($plugin_settings['options']['allow_payment_with_selected_currency']) ? $plugin_settings['options']['allow_payment_with_selected_currency'] : 'no';
 
-
-        if( $this->eccw_should_skip_currency_conversion() ) {
+        if ( $this->eccw_should_skip_currency_conversion() ) {
             return $currency_symbol;
         }
-    
-        $currency_code = $this->currency_server->eccw_get_user_preferred_currency();
 
-        if(!empty($currency_code)){
-           
-            if ($currency_code !== $currency) {
-               
-                $new_currency_symbol = get_woocommerce_currency_symbol($currency_code);
+        $preferred_currency_data = $this->currency_server->eccw_get_user_preferred_currency_data();
+        
+        if ( ! empty($preferred_currency_data['custom_symbol']) ) {
+            return $preferred_currency_data['custom_symbol'];
+        }
 
-                if ($new_currency_symbol) {
-                    return $new_currency_symbol;
-                }
+        if ( ! empty($preferred_currency_data['code']) ) {
+            $all_symbols = get_woocommerce_currency_symbols(); 
+            if ( isset($all_symbols[ $preferred_currency_data['code'] ]) ) {
+                return $all_symbols[ $preferred_currency_data['code'] ];
             }
         }
-        
+
         return $currency_symbol;
     }
 
-
-    public function eccw_change_currency_symbol_position($price, $product) {
-
-        $plugin_settings = $this->plugin_settings;
-        $allow_payment_with_selected_currency = isset($plugin_settings['options']['allow_payment_with_selected_currency']) && !empty($plugin_settings['options']['allow_payment_with_selected_currency']) ? $plugin_settings['options']['allow_payment_with_selected_currency'] : 'no';
-
-        if( $this->eccw_should_skip_currency_conversion() ) {
-            return $price;
-        }
-
-        if(! $price > 0) return;
-       
-        $eccw_get_user_preferred_currency_data = $this->currency_server->eccw_get_user_preferred_currency_data();
-        $symbol_position = $eccw_get_user_preferred_currency_data['symbol_position'];
-
-    
-        if($symbol_position == 'right'){
-            $currency_code = $eccw_get_user_preferred_currency_data['code'];
-            $currency_symbol = get_woocommerce_currency_symbol($currency_code);
-           
-            $price_without_symbol = str_replace($currency_symbol, '', $price);
-            $custom_price = trim($price_without_symbol) . ' ' . $currency_symbol;
-            return $custom_price;
-        }
-
-        return $price;
-    }
-
-   
     /**
      * Check if currency conversion should be skipped for current request.
      *
