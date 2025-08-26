@@ -1171,6 +1171,7 @@ class ECCW_admin_settings
                     <li><a href="#tab_currency_options">Options</a></li>
                     <li><a href="#tab_currency_switcher_shortcode">Shortcode</a></li>
                     <li><a href="#tab_currency_switcher_sticky">Sticky Side</a></li>
+                    <?php do_action("after_eccw_tabs_navs"); ?>
                     <li><a href="#tab_currency_usage">Usage</a></li>
                     
 
@@ -1385,6 +1386,7 @@ class ECCW_admin_settings
                         <?php woocommerce_admin_fields($this->eccw_switcher_sticky_field()); ?>
 
                     </div>
+                    <?php do_action("after_eccw_tabs_panels"); ?>
                 </div>
             </div>
         </div>

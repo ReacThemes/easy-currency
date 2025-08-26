@@ -83,12 +83,21 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
 
     // Helper function for HTTP requests
     public function eccw_make_request($url, $args = []) {
+        $args = wp_parse_args($args, [
+            'timeout' => 3, 
+        ]);
+
         if (function_exists('wp_remote_get')) {
             $response = wp_remote_get($url, $args);
+
+            if (is_wp_error($response)) {
+                return false; 
+            }
+
             return wp_remote_retrieve_body($response);
-        } else {
-            return @wp_remote_get($url);
         }
+
+        return false; 
     }
 
     public function eccw_get_currency_rate_live($from_currency, $to_currency){
@@ -109,7 +118,7 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
             'error' => false,
         ];
     
-        
+        $rate = 0;
     
         switch ($selected_server) {
             case 'yahoo':
@@ -122,12 +131,16 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
                 );
                 $response = $this->eccw_make_request($query_url);
                 $data = json_decode($response, true);
-    
-                $result = $data['chart']['result'][0]['indicators']['quote'][0]['open'] ?? 
-                            [$data['chart']['result'][0]['meta']['previousClose']] ?? [];
-                if (is_array($result) && count($result)) {
-                    $rate = end($result);
+
+                $result = [];
+                if (!empty($data['chart']['result'][0]['indicators']['quote'][0]['open'])) {
+                    $result = $data['chart']['result'][0]['indicators']['quote'][0]['open'];
+                } elseif (!empty($data['chart']['result'][0]['meta']['previousClose'])) {
+                    $result = [$data['chart']['result'][0]['meta']['previousClose']];
                 }
+                $rate = is_array($result) && count($result) ? end($result) : 1;
+
+               
                 break;
     
             case 'cryptocompare':
@@ -135,6 +148,7 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
                 $response = $this->eccw_make_request($query_url);
                 $data = json_decode($response, true);
                 $rate = $data[$to_currency] ?? $rate;
+
                 break;
     
             case 'ecb':
@@ -150,18 +164,35 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
     
             case 'apilayer':
                 if (!empty($api_key)) {
-                    $query_url = sprintf("https://api.apilayer.com/exchangerates_data/latest?symbols=%s&base=%s", $to_currency, $from_currency);
-                    $response = $this->eccw_make_request($query_url, ['headers' => ['apikey' => $api_key]]);
+                   
+                    $api_base = 'USD';
+
+                    $query_url = sprintf(
+                        "https://api.apilayer.com/exchangerates_data/latest?symbols=%s,%s&base=%s",
+                        $from_currency,
+                        $to_currency,
+                        $api_base
+                    );
+
+                    $response = $this->eccw_make_request($query_url, [
+                        'headers' => ['apikey' => $api_key]
+                    ]);
+
                     $data = json_decode($response, true);
-                    if (isset($data['rates'][$to_currency])) {
-                        $rate = $data['rates'][$to_currency];
+
+                    if (
+                        isset($data['rates'][$from_currency]) &&
+                        isset($data['rates'][$to_currency])
+                    ) {
+                       
+                        $rate = $data['rates'][$to_currency] / $data['rates'][$from_currency];
                     } elseif (isset($data['message'])) {
                         $response_data['success'] = false;
                         $response_data['error'] = $data['message'];
                     }
                 }
                 break;
-    
+
             case 'privatbank':
                 $response = $this->eccw_make_request('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5');
                 $data = json_decode($response, true);
@@ -199,13 +230,21 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
                 break;
     
             case 'openexchangerates':
-                if (!empty($api_key)) {
-                    $query_url = sprintf("https://openexchangerates.org/api/latest.json?base=%s&symbols=%s&app_id=%s", $from_currency, $to_currency, $api_key);
+
+               if (!empty($api_key)) {
+                    $query_url = sprintf("https://openexchangerates.org/api/latest.json?app_id=%s&symbols=%s,%s", 
+                        $api_key, $from_currency, $to_currency);
+
                     $response = $this->eccw_make_request($query_url);
                     $data = json_decode($response, true);
-                    $response_data['error'] = isset($data['error']) && $data['error'] == true ? $data['description'] : false;
-                    $rate = $data['rates'][$to_currency] ?? $rate;
-                }else{
+
+                    if (isset($data['rates'][$from_currency]) && isset($data['rates'][$to_currency])) {
+                        $rate = $data['rates'][$to_currency] / $data['rates'][$from_currency];
+                    } else {
+                        $response_data['success'] = false;
+                        $response_data['error'] = 'Currency not available in OXR response';
+                    }
+                } else {
                     $response_data['success'] = false;
                     $response_data['error'] = $invalid_api_msg;
                 }
@@ -218,14 +257,28 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
         }
         
         $response_data['rate'] = $rate;
+
+        if (empty($rate) || $rate == 1) {
+            $usd = 'USD';
+
+            if ($from_currency !== $usd && $to_currency !== $usd) {
+               
+                $from_to_usd = $this->eccw_get_currency_rate_live($from_currency, $usd);
+                $from_usd_rate = $from_to_usd['rate'] ?? 0;
+
+                $to_to_usd = $this->eccw_get_currency_rate_live($to_currency, $usd);
+                $to_usd_rate = $to_to_usd['rate'] ?? 0;
+
+                if ($from_usd_rate && $to_usd_rate) {
+                    $rate = $from_usd_rate / $to_usd_rate;
+                    $response_data['rate'] = $rate;
+                }
+            }
+        }
+
         return $response_data;
     
-    
-
     }
-
-
-   
 }
 
 

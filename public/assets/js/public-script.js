@@ -31,7 +31,6 @@
             e.preventDefault();
             e.stopPropagation();
 
-            // Always get the parent <li> regardless of where user clicks
             let $li = $(e.target).closest('li'); 
             let selectedCurrency = $li.data('value');
 
