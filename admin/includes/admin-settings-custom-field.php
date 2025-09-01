@@ -120,7 +120,6 @@ class ECCW_admin_settings_Customfields
                     <select class="eccw-searchable-country-select eccw-pro-lock-tooltip"
                             multiple="multiple"
                             disabled
-                           
                             style="width: 100%;">
                         <?php 
                         $countries = WC()->countries->get_countries();

@@ -1160,8 +1160,10 @@ class ECCW_admin_settings
 
         $eccw_currency_settings = get_option('eccw_currency_settings', []);
         $pro_class = 'easy-currency-pro-feature';
+        $pro_enabled = false;
         if( class_exists( 'ECCW_CURRENCY_SWITCHER_PRO' ) ) {
             $pro_class = '';
+            $pro_enabled = true;
         }
        
         if (!empty($eccw_currency_settings) && isset($eccw_currency_settings['eccw_currency_table']) && count($eccw_currency_settings['eccw_currency_table']) > 0) {
@@ -1182,7 +1184,6 @@ class ECCW_admin_settings
                     <?php 
                     foreach ($eccw_currency_table as $index => $currency_data ): 
 
-                        error_log( "currency data here". print_r( $currency_data, true ) );
                         $currency_code   = isset($currency_data['code']) ? $currency_data['code'] : '';
                         $currency_symbol = isset($currency_data['symbol']) ? $currency_data['symbol'] : '';
                         $currencies      = get_woocommerce_currencies(); 
@@ -1205,7 +1206,7 @@ class ECCW_admin_settings
                             </td>
                             <td>
                                 <select name="eccw_currency_table_geo[<?php echo $index; ?>][countries][<?php echo $currency_code; ?>][]"
-                                        class="eccw-searchable-country-select"
+                                        class="eccw-searchable-country-select <?php echo !$pro_enabled ? 'pro-disabled' : ''; ?>"
                                         multiple="multiple"
                                         data-placeholder="<?php esc_attr_e('Please Select countries...', 'easy-currency'); ?>"
                                         style="width:100%;" data-eccwgeo_deault_country_code="<?php echo esc_attr( $country_shortcode); ?>" data-eccwgeo_deault_country_name="<?php echo esc_attr( $country_shortname); ?>">
@@ -1223,6 +1224,9 @@ class ECCW_admin_settings
                                     }
                                     ?>
                                 </select>
+                                <?php if (!$pro_enabled): ?>
+                                   
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <button type="button" class="button select-all-countries"><?php esc_html_e('Select all', 'easy-currency'); ?></button>

@@ -883,4 +883,10 @@
 
 .eccw-geo-country-table-list .select2-container .select2-selection--multiple {
   border-color: #ccd0d4 !important;
+}
+
+.eccw-searchable-country-select.pro-disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  position: relative;
 }/*# sourceMappingURL=admin.css.map */

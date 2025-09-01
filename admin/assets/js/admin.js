@@ -1,6 +1,4 @@
 (function ($) {
-
-
   var ECCWAdmin = {
     init: function () {
       this.currencyFieldsRepeater();
@@ -16,6 +14,7 @@
       this.eccwTabSwitch();
       this.initSwitcherToggle();
       this.eccwSearchableShortcode();
+      this.eccwGeobyCountry();
 
       $(document)
         .on(
@@ -701,31 +700,30 @@
             $("#" + escapedId + "_value").val($(this).val());
           });
 
-       $(".eccw-slider-range-value")
-  .off("input change")
-  .on("input change", function () {
-    let numberInputId = $(this).attr("id");
-    let sliderId = numberInputId.replace(/_value$/, "");
-    let escapedSliderId = sliderId.replace(/([\[\]])/g, "\\$1");
+        $(".eccw-slider-range-value")
+          .off("input change")
+          .on("input change", function () {
+            let numberInputId = $(this).attr("id");
+            let sliderId = numberInputId.replace(/_value$/, "");
+            let escapedSliderId = sliderId.replace(/([\[\]])/g, "\\$1");
 
-    let newVal = $(this).val();
+            let newVal = $(this).val();
 
-    // jei khetre user empty kore, tokhon empty e thakuk
-    if (newVal === "") {
-      $("#" + escapedSliderId).val("");
-      return;
-    }
+            // jei khetre user empty kore, tokhon empty e thakuk
+            if (newVal === "") {
+              $("#" + escapedSliderId).val("");
+              return;
+            }
 
-    let $slider = $("#" + escapedSliderId);
-    let min = parseInt($slider.attr("min"), 10);
-    let max = parseInt($slider.attr("max"), 10);
+            let $slider = $("#" + escapedSliderId);
+            let min = parseInt($slider.attr("min"), 10);
+            let max = parseInt($slider.attr("max"), 10);
 
-    newVal = Math.min(Math.max(parseInt(newVal, 10), min), max);
+            newVal = Math.min(Math.max(parseInt(newVal, 10), min), max);
 
-    $(this).val(newVal);
-    $slider.val(newVal);
- });
-
+            $(this).val(newVal);
+            $slider.val(newVal);
+          });
       }
 
       initializeSliders();
@@ -759,7 +757,9 @@
         var $targets = $panel.find(
           ".eccw-switcher-ui-control, .eccw-position-settings, .eccw-sticky-elements-display, .eccw-sticky-color-style-display"
         );
-         const $targetFields = $('.eccw-searchable-select-dropdown, .eccw-switcher-single-product-hook').closest('tr');
+        const $targetFields = $(
+          ".eccw-searchable-select-dropdown, .eccw-switcher-single-product-hook"
+        ).closest("tr");
 
         if (isChecked) {
           $targets.slideDown();
@@ -798,82 +798,118 @@
       );
     },
 
-    eccwSearchableShortcode: function() {
-      $('#options\\[eccw_shortcode_show_on_product_pages\\]').select2({
-          ajax: {
-              url: eccw_vars.ajaxurl,
-              dataType: 'json',
-              delay: 250,
-              data: function(params) {
-                  return {
-                      action: 'eccw_search_shortcode',
-                      q: params.term,
-                      nonce: eccw_vars.nonce
-                  };
-              },
-              processResults: function(data) {
-                  return {
-                      results: data.items
-                  };
-              },
-              cache: true
+    eccwSearchableShortcode: function () {
+      $("#options\\[eccw_shortcode_show_on_product_pages\\]").select2({
+        ajax: {
+          url: eccw_vars.ajaxurl,
+          dataType: "json",
+          delay: 250,
+          data: function (params) {
+            return {
+              action: "eccw_search_shortcode",
+              q: params.term,
+              nonce: eccw_vars.nonce,
+            };
           },
-          placeholder: "Search Shortcode...",
-          minimumInputLength: 3,
-          allowClear: true,
-          width: '400px',
-          templateResult: function(data) {
-              return data.text;
+          processResults: function (data) {
+            return {
+              results: data.items,
+            };
           },
-          language: {
-              inputTooShort: function() {
-                  return "Please enter 3 or more character";
-              },
-              noResults: function() {
-                  return "No matches found";
-              }
-          }
+          cache: true,
+        },
+        placeholder: "Search Shortcode...",
+        minimumInputLength: 3,
+        allowClear: true,
+        width: "400px",
+        templateResult: function (data) {
+          return data.text;
+        },
+        language: {
+          inputTooShort: function () {
+            return "Please enter 3 or more character";
+          },
+          noResults: function () {
+            return "No matches found";
+          },
+        },
       });
 
-       $('#eccw-menu-shortcode-id').select2({
-          ajax: {
-              url: eccw_vars.ajaxurl,
-              dataType: 'json',
-              delay: 250,
-              data: function(params) {
-                  return {
-                      action: 'eccw_search_shortcode',
-                      q: params.term,
-                      nonce: eccw_vars.nonce
-                  };
-              },
-              processResults: function(data) {
-                  return {
-                      results: data.items
-                  };
-              },
-              cache: true
+      $("#eccw-menu-shortcode-id").select2({
+        ajax: {
+          url: eccw_vars.ajaxurl,
+          dataType: "json",
+          delay: 250,
+          data: function (params) {
+            return {
+              action: "eccw_search_shortcode",
+              q: params.term,
+              nonce: eccw_vars.nonce,
+            };
           },
-          placeholder: "Search Shortcode...",
-          minimumInputLength: 3,
-          allowClear: true,
-          width: '300px',
-          templateResult: function(data) {
-              return data.text;
+          processResults: function (data) {
+            return {
+              results: data.items,
+            };
           },
-          language: {
-              inputTooShort: function() {
-                  return "Please enter 3 or more character";
-              },
-              noResults: function() {
-                  return "No matches found";
-              }
-          }
+          cache: true,
+        },
+        placeholder: "Search Shortcode...",
+        minimumInputLength: 3,
+        allowClear: true,
+        width: "300px",
+        templateResult: function (data) {
+          return data.text;
+        },
+        language: {
+          inputTooShort: function () {
+            return "Please enter 3 or more character";
+          },
+          noResults: function () {
+            return "No matches found";
+          },
+        },
       });
+    },
 
+    eccwGeobyCountry: function() {
+      $(".eccw-geo-country-table .eccw-searchable-country-select.pro-disabled").hover(
+        function () {
+          var $select = $(this);
+          var $tooltip = $(
+            '<div class="eccw-pro-tooltip">This feature is available in Pro version</div>'
+          );
 
+          $("body").append($tooltip);
+
+          var offset = $select.offset();
+          $tooltip
+            .css({
+              top: offset.top - $tooltip.outerHeight() - 8,
+              left: offset.left,
+              position: "absolute",
+              background: "#333",
+              color: "#fff",
+              padding: "5px 10px",
+              "border-radius": "4px",
+              "font-size": "12px",
+              "z-index": 999,
+              display: "none",
+            })
+            .fadeIn(200);
+
+          $select.data("proTooltip", $tooltip);
+        },
+        function () {
+          var $tooltip = $(this).data("proTooltip");
+          if ($tooltip) {
+            $tooltip.fadeOut(200, function () {
+              $(this).remove();
+            });
+          }
+        }
+      );
     }
-
   };
 
   ECCWAdmin.init();
@@ -903,8 +939,6 @@
     allowClear: true,
   });
 
-
-
   ECCWAdmin.initSwitcherToggle(
     "#tab_currency_switcher_sticky",
     "design[eccw_show_hide_side_currency]"
@@ -917,14 +951,24 @@
 
   $(document).ready(function ($) {
     if ($(".easy-currency-pro-feature").length > 0) {
-      $(".easy-currency-pro-feature .eccw-searchable-country-select").prop("disabled", true);
+      $(".easy-currency-pro-feature .eccw-searchable-country-select").prop(
+        "disabled",
+        true
+      );
 
-      $(".easy-currency-pro-feature .select-all-countries").prop("disabled", true);
-      $(".easy-currency-pro-feature .remove-all-countries").prop("disabled", true);
-      $(".easy-currency-pro-feature .apply-default-countries").prop("disabled", true);
+      $(".easy-currency-pro-feature .select-all-countries").prop(
+        "disabled",
+        true
+      );
+      $(".easy-currency-pro-feature .remove-all-countries").prop(
+        "disabled",
+        true
+      );
+      $(".easy-currency-pro-feature .apply-default-countries").prop(
+        "disabled",
+        true
+      );
     }
   });
-
-
 
 })(jQuery);
