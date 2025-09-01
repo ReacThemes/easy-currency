@@ -4,6 +4,8 @@ if (! defined('ABSPATH')) exit; // Exit if accessed directly.
     extract($common_settings);
     extract($this->settings);
 
+   error_log( "default curency sticky" . print_r( $common_settings, true ));
+
     $sticky_position = "eccw-position-$sticky_position";
 
     $classes = [
@@ -23,6 +25,8 @@ if (! defined('ABSPATH')) exit; // Exit if accessed directly.
     $wrapper_class = ' ' . implode(' ', $classes);
 
     ob_start();
+
+     
 ?>
 
 <div class="easy-currency-switcher-auto-select <?php echo esc_attr($wrapper_class); ?>">
@@ -50,6 +54,8 @@ if (! defined('ABSPATH')) exit; // Exit if accessed directly.
                     $flag_url      = ECCW_PL_URL . 'public/assets/images/flags/' . strtolower($country) . '.png';
 
                     $is_selected = ($default_currency === $currency_code) ? 'selected' : '';
+
+                    
                     ?>
                     <li data-value="<?php echo esc_attr($currency_code); ?>" class="option <?php echo esc_attr($is_selected); ?>">
                         

@@ -915,5 +915,16 @@
     "options[eccw_show_hide_single_product_location]"
   );
 
+  $(document).ready(function ($) {
+    if ($(".easy-currency-pro-feature").length > 0) {
+      $(".easy-currency-pro-feature .eccw-searchable-country-select").prop("disabled", true);
+
+      $(".easy-currency-pro-feature .select-all-countries").prop("disabled", true);
+      $(".easy-currency-pro-feature .remove-all-countries").prop("disabled", true);
+      $(".easy-currency-pro-feature .apply-default-countries").prop("disabled", true);
+    }
+  });
+
+
 
 })(jQuery);

@@ -9,6 +9,8 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
     public function __construct(){
        
 
+        
+
         $this->currency_server = new ECCW_CURRENCY_SERVER();
         $this->ecccw_get_plugin_settings = new ECCW_Plugin_Settings();
         $this->plugin_settings = $this->ecccw_get_plugin_settings->ecccw_get_plugin_settings();
@@ -105,7 +107,10 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
             return $price;
         }
 
+        $map = get_option('eccw_user_currency_map', []);
+
         $default_currency = $this->currency_server->eccw_get_user_preferred_currency();
+    
         if (!empty($default_currency) || !empty($_REQUEST['easy_currency'])) {
             $currency_rate = $this->currency_server->eccw_get_currency_rate();
             if ($price > 0 && $currency_rate > 1) {
