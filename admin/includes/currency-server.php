@@ -74,31 +74,16 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
 
         if (class_exists('EASY_GEOIP_Currency_Detection')) {
             $geo_data = EASY_GEOIP_Currency_Detection::get_instance()->eccw_set_currency_by_geoip();
-            // error_log("Geo Data: " . print_r($geo_data, true));
 
             $geo = new WC_Geolocation();
             $geo_data_ip = $geo->geolocate_ip();
             $visitor_country = $geo_data_ip['country'] ?? '';
 
-            $ECCW_CURRENCY_SERVER = new ECCW_CURRENCY_SERVER();
-            $currency_countries = $ECCW_CURRENCY_SERVER->eccw_get_currency_countries();
-
-            $countriearr = [];
-            foreach ($geo_data as $currency_code => $countries) {
-
-                foreach ($countries as $country_code) {
-
-                    if (isset($currency_countries->$country_code)) {
-                        $countriearr[$currency_code][] = $currency_countries->$country_code->countries;
-                    }
-                }
-            }
-
-            foreach ($countriearr as $currency_code => $countries) {
-
-                foreach ($countries as $countryArr) {
-                    if (in_array($visitor_country, $countryArr, true)) {
-                        return $currency_code;
+            if (is_array($geo_data) && !empty($visitor_country)) {
+                foreach ($geo_data as $currency_code => $countries) {
+                   
+                    if (in_array($visitor_country, $countries, true)) {
+                        return $currency_code; 
                     }
                 }
             }
@@ -133,61 +118,23 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
             ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
             : (isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD');
 
-        // if (class_exists('EASY_GEOIP_Currency_Detection')) {
-        //     $geo_data = EASY_GEOIP_Currency_Detection::get_instance()->eccw_set_currency_by_geoip();
-
-
-
-        //     $geo = new WC_Geolocation();
-        //     $geo_data_ip = $geo->geolocate_ip();
-        //     $visitor_country = $geo_data_ip['country'] ?? '';
-
-        //     error_log("visitor country" . print_r($visitor_country, true));
-
-        //     foreach ($geo_data as $currency_code => $countries) {
-        //         if (is_array($countries) && in_array($visitor_country, $countries, true)) {
-        //             $default_currency = $currency_code;
-        //             break;
-        //         }
-        //     }
-        // }
-
         if (class_exists('EASY_GEOIP_Currency_Detection')) {
             $geo_data = EASY_GEOIP_Currency_Detection::get_instance()->eccw_set_currency_by_geoip();
-            // error_log("Geo Data: " . print_r($geo_data, true));
 
             $geo = new WC_Geolocation();
             $geo_data_ip = $geo->geolocate_ip();
             $visitor_country = $geo_data_ip['country'] ?? '';
 
-            $ECCW_CURRENCY_SERVER = new ECCW_CURRENCY_SERVER();
-            $currency_countries = $ECCW_CURRENCY_SERVER->eccw_get_currency_countries();
-
-            $countriearr = [];
-            foreach ($geo_data as $currency_code => $countries) {
-
-                foreach ($countries as $country_code) {
-
-                    if (isset($currency_countries->$country_code)) {
-                        $countriearr[$currency_code][] = $currency_countries->$country_code->countries;
-                    }
-                }
-            }
-
-            foreach ($countriearr as $currency_code => $countries) {
-
-                foreach ($countries as $countryArr) {
-                    if (in_array($visitor_country, $countryArr, true)) {
+           if (is_array($geo_data) && !empty($visitor_country)) {
+                foreach ( $geo_data as $currency_code => $countries ) {
+                    
+                    if (in_array($visitor_country, $countries, true)) {
                         $default_currency = $currency_code;
                         break;
                     }
                 }
             }
         }
-
-        //$default_currency = 'AFN'; // testing
-
-        // error_log(print_r($default_currency, true));
 
         $result = array_filter($eccw_currency_table, function ($item) use ($default_currency) {
             return $item["code"] === $default_currency;
@@ -207,7 +154,6 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
         return 1;
     }
 
-    // Helper function for HTTP requests
     public function eccw_make_request($url, $args = [])
     {
         $args = wp_parse_args($args, [

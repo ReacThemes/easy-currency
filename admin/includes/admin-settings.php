@@ -1154,6 +1154,10 @@ class ECCW_admin_settings
         $currency_countries = wp_remote_get(ECCW_DIR_URL . '/admin/assets/json/currency-countries.json', []);
         $currency_countries_json = json_decode($currency_countries['body'] ?? '', true) ?? [];
 
+        //error_log( print_r( $currency_countries_json, true ) );
+
+        $all_countries = WC()->countries->get_countries(); 
+
         $eccw_currency_settings = get_option('eccw_currency_settings', []);
         $pro_class = 'easy-currency-pro-feature';
         if( class_exists( 'ECCW_CURRENCY_SWITCHER_PRO' ) ) {
@@ -1176,9 +1180,9 @@ class ECCW_admin_settings
                     </thead>
                     <tbody>
                     <?php 
-                    foreach ($eccw_currency_table as $index => $currency_data): 
+                    foreach ($eccw_currency_table as $index => $currency_data ): 
 
-                     
+                        error_log( "currency data here". print_r( $currency_data, true ) );
                         $currency_code   = isset($currency_data['code']) ? $currency_data['code'] : '';
                         $currency_symbol = isset($currency_data['symbol']) ? $currency_data['symbol'] : '';
                         $currencies      = get_woocommerce_currencies(); 
@@ -1189,7 +1193,10 @@ class ECCW_admin_settings
 
                         $selected_countries = isset($geo_array['countries'][$currency_code]) ? $geo_array['countries'][$currency_code] : [];
 
-                        
+                        $country_shortcode =  isset( $currency_countries_json[$currency_code]['countries'][0] ) ? $currency_countries_json[$currency_code]['countries'][0] : '';
+
+                        $country_shortname = isset( $all_countries[$country_shortcode] ) ? $all_countries[$country_shortcode] : '';
+
                         ?>
                         <tr>
                             <td>
@@ -1201,21 +1208,16 @@ class ECCW_admin_settings
                                         class="eccw-searchable-country-select"
                                         multiple="multiple"
                                         data-placeholder="<?php esc_attr_e('Please Select countries...', 'easy-currency'); ?>"
-                                        style="width:100%;" data-eccwgeo_deault_country_code="<?php echo esc_attr( $currency_code); ?>" data-eccwgeo_deault_country_name="<?php echo esc_attr( $currency_name); ?>">
+                                        style="width:100%;" data-eccwgeo_deault_country_code="<?php echo esc_attr( $country_shortcode); ?>" data-eccwgeo_deault_country_name="<?php echo esc_attr( $country_shortname); ?>">
                                     <?php 
 
                                     $countries = WC()->countries->get_countries();
 
-                                    foreach ($currency_countries_json as $currency_codeparent => $currency_data) {
-                                        $short_name = $currency_data["countries"][0];
-                                       
-                                        $currency_name = $currency_data['name']; 
-                                        $countries = $currency_data['countries']; 
-
+                                    foreach ( $all_countries as $currency_codeparent => $currency_data) {
                                         ?>
                                         <option value="<?php echo esc_attr($currency_codeparent); ?>" 
                                             <?php selected(in_array($currency_codeparent, (array)$selected_countries)); ?>>
-                                            <?php echo esc_html($currency_name); ?>
+                                            <?php echo esc_html($currency_data); ?>
                                         </option>
                                         <?php
                                     }
@@ -1249,9 +1251,6 @@ class ECCW_admin_settings
     {
 
         $saved_settings = get_option('eccw_currency_settings');
-
-        $eccw_currency_settings = get_option('eccw_currency_settings', []);
-        
 
         $advanced_settings = isset($saved_settings['advanced_settings']) ? $saved_settings['advanced_settings'] : [];
 
