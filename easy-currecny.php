@@ -50,6 +50,3 @@
 
     ECCW_CURRENCY_SWITCHER::instance();
 
-
-
-								

@@ -950,3 +950,60 @@ $white-color: #ffffff;
   opacity: 0.6;
   position: relative;
 }
+
+.eccw-pro-badge-shortcode {
+    background: #e67e22;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+
+#tab_currency_options tr td .description  {
+    width: 300px;
+}
+
+
+#tab_converter_widgets .eccw-dimension-field-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+.eccw-pro-badge {
+    background: #e67e22;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    text-transform: uppercase;
+}
+
+#tab_converter_widgets.eccw-ccpro-missing input:disabled,
+#tab_converter_widgets.eccw-ccpro-missing select:disabled,
+#tab_converter_widgets.eccw-ccpro-missing textarea:disabled {
+    background-color: #f5f5f5; 
+    color: #777; 
+    cursor: not-allowed;
+}
+
+#tab_converter_widgets.eccw-ccpro-missing input:disabled,
+#tab_converter_widgets.eccw-ccpro-missing select:disabled {
+    border-color: #ddd;
+}
+
+.eccw-ccpro-missing > h2 {
+  display: inline-block;
+}
+
+.easy-currency-table tr.easy-base-currency .easy-currency-dropdowneccw,
+.easy-currency-table tr.easy-base-currency input.currency-rate,
+.easy-currency-table tr.easy-base-currency button.remove-row {
+    pointer-events: none; 
+    background-color: #f5f5f5; 
+    color: #777; 
+    cursor: not-allowed; 
+}

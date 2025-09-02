@@ -50,18 +50,7 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
         $default_currency = $currency_settings['default_currency'];
 
         return $default_currency;
-        // return 'AFN';
     }
-
-    // public function eccw_get_user_preferred_currency(){
-    //     $plugin_settings = $this->plugin_settings;
-    //     $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : []; 
-    //     $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
-    // ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
-    // : ( isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD' ); 
-
-    //     return $default_currency;
-    // }
 
     public function eccw_get_user_preferred_currency()
     {
@@ -90,23 +79,7 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
         }
 
         return $default_currency;
-        //return 'AFN';
     }
-
-    // public function eccw_get_user_preferred_currency_data(){
-    //     $plugin_settings = $this->plugin_settings;
-    //     $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : []; 
-    //     $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
-    // ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
-    // : ( isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD' ); // fallback
-
-
-    //     $result = array_filter($eccw_currency_table, function($item) use ($default_currency) {
-    //         return $item["code"] === $default_currency;
-    //     });
-    //     $result = reset($result);
-    //     return $result;
-    // }
 
     public function eccw_get_user_preferred_currency_data()
     {

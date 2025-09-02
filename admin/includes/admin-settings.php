@@ -1154,7 +1154,6 @@ class ECCW_admin_settings
         $currency_countries = wp_remote_get(ECCW_DIR_URL . '/admin/assets/json/currency-countries.json', []);
         $currency_countries_json = json_decode($currency_countries['body'] ?? '', true) ?? [];
 
-        //error_log( print_r( $currency_countries_json, true ) );
 
         $all_countries = WC()->countries->get_countries(); 
 
@@ -1194,9 +1193,9 @@ class ECCW_admin_settings
 
                         $selected_countries = isset($geo_array['countries'][$currency_code]) ? $geo_array['countries'][$currency_code] : [];
 
-                        $country_shortcode =  isset( $currency_countries_json[$currency_code]['countries'][0] ) ? $currency_countries_json[$currency_code]['countries'][0] : '';
+                        $countrycode =  isset( $currency_countries_json[$currency_code]['countries'][0] ) ? $currency_countries_json[$currency_code]['countries'][0] : '';
 
-                        $country_shortname = isset( $all_countries[$country_shortcode] ) ? $all_countries[$country_shortcode] : '';
+                        $country_shortname = isset( $all_countries[$countrycode] ) ? $all_countries[$countrycode] : '';
 
                         ?>
                         <tr>
@@ -1209,7 +1208,7 @@ class ECCW_admin_settings
                                         class="eccw-searchable-country-select <?php echo !$pro_enabled ? 'pro-disabled' : ''; ?>"
                                         multiple="multiple"
                                         data-placeholder="<?php esc_attr_e('Please Select countries...', 'easy-currency'); ?>"
-                                        style="width:100%;" data-eccwgeo_deault_country_code="<?php echo esc_attr( $country_shortcode); ?>" data-eccwgeo_deault_country_name="<?php echo esc_attr( $country_shortname); ?>">
+                                        style="width:100%;" data-eccwgeo_deault_country_code="<?php echo esc_attr( $countrycode); ?>" data-eccwgeo_deault_country_name="<?php echo esc_attr( $country_shortname); ?>">
                                     <?php 
 
                                     $countries = WC()->countries->get_countries();
@@ -1224,9 +1223,6 @@ class ECCW_admin_settings
                                     }
                                     ?>
                                 </select>
-                                <?php if (!$pro_enabled): ?>
-                                   
-                                <?php endif; ?>
                             </td>
                             <td>
                                 <button type="button" class="button select-all-countries"><?php esc_html_e('Select all', 'easy-currency'); ?></button>
@@ -1321,7 +1317,6 @@ class ECCW_admin_settings
                 'desc' => '',
                 'id' => 'eccw_advanced_settings_title_country'
             ),
-          
             'eccw_advanced_curr_settings_section_end' => array(
                 'type' => 'sectionend',
                 'id' => 'eccw_advanced_settings_custom_section_end',
@@ -1341,6 +1336,76 @@ class ECCW_admin_settings
 
        return $all_settings;
 
+    }
+
+    public function eccw_get_settings_converter_widgets_tab_fields() {
+        // Retrieve saved settings
+        $saved_settings = get_option('eccw_currency_settings');
+        $options = isset($saved_settings['options']) ? $saved_settings['options'] : [];
+        $design = isset($saved_settings['design']) ? $saved_settings['design'] : [];
+        $pro_active = class_exists('ECCW_CURRENCY_SWITCHER_PRO');
+        $settings = array(
+            'section_title' => array(
+                'name' => __('Basic Settings', 'easy-currency') ,
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_settings_tab_section_titles',
+                'classes' => 'section-title'
+            ),
+                    'converter_widget_style' => array(
+                'name'      => __('Layout Style', 'easy-currency'),
+                'type'      => 'select',
+                'options'   => ['one' => 'Style One'],
+                'desc_tip'  => $pro_active ? '' : __('Available in PRO', 'easy-currency'), // show only if PRO missing
+                'desc'      => __('Widget position where you want to show this.', 'easy-currency'),
+                'id'        => 'options[converter_widget_style]',
+                'default'   => isset($options['converter_widget_style']) ? $options['converter_widget_style'] : 'one',
+                'class'     => 'easy-converter-pro'
+            ),
+            'converter_currency_button_border_color' => array(
+                'name'      => __('Border Color', 'easy-currency'),
+                'type'      => 'text',
+                'id'        => 'design[converter_currency_button][border-color]',
+                'default'   => isset($design['converter_currency_button']['border-color']) ? $design['converter_currency_button']['border-color'] : '',
+                'class'     => 'eccw-color-input',
+                'desc_tip'  => $pro_active ? '' : __('Available in PRO', 'easy-currency')
+            ),
+            'converter_currency_button_border' => array(
+                'name'      => __('Border Width', 'easy-currency'),
+                'type'      => 'text',
+                'desc'      => 'enter number with px. ex: 2px 2px 2px 2px',
+                'default'   => isset($design['converter_currency_button']['null']) ? $design['converter_currency_button']['null'] : '',
+                'class'     => 'eccw-currency-side-widget-bg eccw-dimension-input',
+                'custom_attributes' => array(
+                    'unit'   => 'px',
+                    'fields' => wp_json_encode(array(
+                        array('type'=>'text','name'=>'design[converter_currency_button][border-top-width]','value'=>isset($design['converter_currency_button']['border-top-width']) ? $design['converter_currency_button']['border-top-width'] : '', 'placeholder'=>'top'),
+                        array('type'=>'text','name'=>'design[converter_currency_button][border-left-width]','value'=>isset($design['converter_currency_button']['border-left-width']) ? $design['converter_currency_button']['border-left-width'] : '', 'placeholder'=>'left'),
+                        array('type'=>'text','name'=>'design[converter_currency_button][border-bottom-width]','value'=>isset($design['converter_currency_button']['border-bottom-width']) ? $design['converter_currency_button']['border-bottom-width'] : '', 'placeholder'=>'bottom'),
+                        array('type'=>'text','name'=>'design[converter_currency_button][border-right-width]','value'=>isset($design['converter_currency_button']['border-right-width']) ? $design['converter_currency_button']['border-right-width'] : '', 'placeholder'=>'right'),
+                    ))
+                ),
+                'desc_tip' => $pro_active ? '' : __('Available in PRO', 'easy-currency')
+            ),
+            'converter_currency_button_flag_size' => array(
+                'name'        => __('Flag Size (Width)', 'easy-currency'),
+                'type'        => 'text',
+                'desc'        => 'enter number with px. ex: 15px',
+                'id'          => 'design[converter_currency_button_flag][width]',
+                'default'     => isset($design['converter_currency_button_flag']['width']) ? $design['converter_currency_button_flag']['width'] : '',
+                'placeholder' => '15px',
+                'class'       => 'eccw-input',
+                'desc_tip'    => $pro_active ? '' : __('Available in PRO', 'easy-currency')
+            ),
+            'section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_settings_tab_section_end'
+            )
+        );
+
+        $all_settings = array_merge($settings);
+    
+        return $all_settings;
     }
 
     public function eccw_settings_tab_settings()
@@ -1366,7 +1431,7 @@ class ECCW_admin_settings
                     <li><a href="#tab_currency_switcher_shortcode">Shortcode</a></li>
                     <li><a href="#tab_currency_switcher_sticky">Sticky Side</a></li>
                     <li><a href="#tab_currency_advanced_settings">Advanced Settings</a></li>
-                    <?php do_action("after_eccw_tabs_navs"); ?>
+                    <li><a href="#tab_converter_widgets">Currency Converter</a></li>
                     <li><a href="#tab_currency_usage">Usage</a></li>
                     
 
@@ -1381,7 +1446,7 @@ class ECCW_admin_settings
                             <button type="button" class="button button-primary update-currency-rates">Update Rates</button>
                         </div>
 
-                        <table id="eccw-repeatable-fields-table" class="widefat">
+                        <table id="eccw-repeatable-fields-table" class="widefat easy-currency-table">
                             <thead>
                                 <tr>
                                     <th>Default</th>
@@ -1398,9 +1463,27 @@ class ECCW_admin_settings
                             <tbody>
                                 <?php
 
+                                $default_country = get_option('woocommerce_default_country', '');
+                                $country_code    = explode(':', $default_country)[0];
+
+                                // object → array convert
+                                $currency_countries = json_decode(json_encode($currency_countries), true);
+
+                                $matched_currency = '';
+
+                                foreach ( $currency_countries as $currency_code => $data ) {
+                                    if ( in_array( $country_code, $data['countries'], true ) ) {
+                                        $matched_currency = $currency_code;
+                                        break;
+                                    }
+                                }
+
                                 if (!empty($eccw_currency_settings) && isset($eccw_currency_settings['eccw_currency_table']) && count($eccw_currency_settings['eccw_currency_table']) > 0) {
                                     $eccw_currency_table = $eccw_currency_settings['eccw_currency_table'];
-                                    foreach ($eccw_currency_table as $index => $currency_data) {
+
+                                   error_log(print_r( $eccw_currency_table, true  ) );
+
+                                    foreach ( $eccw_currency_table as $index => $currency_data ) {
                                         $default = isset($currency_data['default']) ? $currency_data['default'] : '';
                                         $currency_code = isset($currency_data['code']) ? $currency_data['code'] : '';
                                         $rate = isset($currency_data['rate']) ? $currency_data['rate'] : '';
@@ -1409,16 +1492,17 @@ class ECCW_admin_settings
                                         $decimal_separator = isset($currency_data['decimal_separator']) ? $currency_data['decimal_separator'] : '.';
                                         $thousand_separator = isset($currency_data['thousand_separator']) ? $currency_data['thousand_separator'] : ',';
                                         $custom_symbol = isset($currency_data['custom_symbol']) ? $currency_data['custom_symbol'] : '';
-
-                                        echo '<tr>';
+                                        $tr_class = ($currency_code === $default_currency) ? 'easy-base-currency' : '';
+                                        echo '<tr class="' . esc_attr($tr_class) . '">';
                                         echo '<td><input type="radio" name="eccw_currency_table[default]" value="' . esc_attr($currency_code) . '"' . checked($currency_code, $default_currency, false) . ' /></td>';
-                                        echo '<td><select name="eccw_currency_table[' . esc_attr($index) . '][code]">';
+                                        echo '<td><select name="eccw_currency_table[' . esc_attr($index) . '][code]" class="easy-currency-dropdowneccw">';
 
                                         foreach ($currency_countries as $key => $value) {
                                             echo '<option value="' . esc_attr($key) . '"' . selected($currency_code ?? '', $key, false) . '>' . esc_attr($key) . '</option>';
                                         }
 
                                         echo '</select></td>';
+                                       echo '<input type="hidden" name="eccw_currency_table[' . esc_attr($index) . '][base_currency]" value="' . esc_attr($default_currency) . '" />';
                                         echo '<td><input type="text" name="eccw_currency_table[' . esc_attr($index) . '][rate]" value="' . esc_attr($rate) . '" class="currency-rate"/></td>';
                                         echo '<td><select name="eccw_currency_table[' . esc_attr($index) . '][symbol_position]">
                                             <option value="left"' . selected($symbol_position, 'left', false) . '>Left</option>
@@ -1443,21 +1527,26 @@ class ECCW_admin_settings
                                         echo '</tr>';
                                     }
                                 } else {
-                                    echo '<tr>';
-                                    echo '<td><input type="radio" name="eccw_currency_table[default]" value="" /></td>';
-                                    echo '<td><select name="eccw_currency_table[0][code]">
-                                            <option value="usd">USD</option>
-                                            <option value="euro">EURO</option>
-                                            <option value="bdt">BDT</option>
-                                        </select></td>';
-                                    echo '<td><input type="text" name="eccw_currency_table[0][rate]" value="" class="currency-rate" /></td>';
+
+                                   
+
+                                    echo '<tr class="easy-base-currency">';
+                                    echo '<td><input type="radio" name="eccw_currency_table[default]" value="'.esc_attr($matched_currency).'" checked /></td>';
+
+                                    echo '<td><select name="eccw_currency_table[0][code]" class="easy-currency-dropdowneccw">';
+                                    foreach ( $currency_countries as $currency_code => $data ) {
+                                        echo '<option value="'.esc_attr($currency_code).'" '.selected($matched_currency, $currency_code, false).'>'.esc_html($currency_code).'</option>';
+                                    }
+                                    echo '<input type="hidden" name="eccw_currency_table[0][base_currency]" value="'.esc_attr($default_currency).'" />';
+                                    echo '</select></td>';
+                                    echo '<td><input type="text" name="eccw_currency_table[0][rate]" value="1" class="currency-rate" /></td>';
                                     echo '<td><select name="eccw_currency_table[0][symbol_position]">
                                                 <option value="left">Left</option>
                                                 <option value="right">Right</option>
                                             </select></td>';
                                     echo '<td><select name="eccw_currency_table[0][decimal]">
                                             <option value="1">1</option>
-                                            <option value="2">2</option>
+                                            <option value="2" selected>2</option>
                                             <option value="3">3</option>
                                             <option value="4">4</option>
                                             <option value="5">5</option>
@@ -1466,8 +1555,8 @@ class ECCW_admin_settings
                                             <option value="7">7</option>
                                             <option value="8">8</option>
                                         </select></td>';
-                                    echo '<td><input type="text" name="eccw_currency_table[0][decimal_separator]" value="" /></td>';
-                                    echo '<td><input type="text" name="eccw_currency_table[0][thousand_separator]" value="" /></td>';
+                                    echo '<td><input type="text" name="eccw_currency_table[0][decimal_separator]" value="." /></td>';
+                                    echo '<td><input type="text" name="eccw_currency_table[0][thousand_separator]" value="," /></td>';
                                     echo '<td><input type="text" name="eccw_currency_table[0][custom_symbol]" value="" placeholder="e.g. $"/></td>';
                                     echo '<td><button type="button" class="button remove-row">Remove</button></td>';
                                     echo '</tr>';
@@ -1488,7 +1577,27 @@ class ECCW_admin_settings
                             <p class="eccw-err-msg"></p>
                         </div>
                         <h2><?php echo esc_html__('How to use this converter?', 'easy-currency') ?></h2>
-                        <p><label><?php echo esc_html__('Shortcode :', 'easy-currency') ?> </label> echo do_shortcode('[easy_currency_switcher id="1"]');</p>
+                        <p>
+                            <label><?php echo esc_html__('Shortcode :', 'easy-currency'); ?></label>
+                            <code>[easy_currency_switcher id="1"]</code>
+                        </p>
+
+                        <p>
+                            <label>
+                                <?php echo esc_html__('Pro Shortcode :', 'easy-currency'); ?>
+                                <span class="eccw-pro-badge-shortcode">PRO</span>
+                            </label>
+                            <code>[easy_currency_converter]</code>
+                        </p>
+
+                        <p>
+                            <label>
+                                <?php echo esc_html__('Pro Shortcode :', 'easy-currency'); ?>
+                                <span class="eccw-pro-badge-shortcode">PRO</span>
+                            </label>
+                            <code>[easy_currency_rates_table]</code>
+                        </p>
+
                         <p><label><?php echo esc_html__('Elementor widget :', 'easy-currency') ?> </label> Easy Currency Switcher</p>
                     </div>
                     <div id="tab_currency_switcher_shortcode" class="tab-content">
@@ -1583,11 +1692,11 @@ class ECCW_admin_settings
                     </div>
                     <div id="tab_currency_advanced_settings" class="tab-content">
                         <?php woocommerce_admin_fields($this->eccw_advanced_settings_field()); ?>
-
                     </div>
 
-                    <?php do_action("after_eccw_tabs_panels"); ?>
-
+                    <div id="tab_converter_widgets" class="tab-content easy-tab-converter-widget <?php echo class_exists('ECCW_CURRENCY_SWITCHER_PRO') ? '' : 'eccw-ccpro-missing'; ?>">
+                        <?php woocommerce_admin_fields($this->eccw_get_settings_converter_widgets_tab_fields()); ?>
+                    </div>
                 </div>
             </div>
         </div>

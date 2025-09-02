@@ -4,8 +4,6 @@ if (! defined('ABSPATH')) exit; // Exit if accessed directly.
     extract($common_settings);
     extract($this->settings);
 
-   error_log( "default curency sticky" . print_r( $common_settings, true ));
-
     $sticky_position = "eccw-position-$sticky_position";
 
     $classes = [

@@ -14,7 +14,8 @@
       this.eccwTabSwitch();
       this.initSwitcherToggle();
       this.eccwSearchableShortcode();
-      this.eccwGeobyCountry();
+      this.baseCurrencyChangeOption();
+      this.removeTableRow();
 
       $(document)
         .on(
@@ -37,11 +38,6 @@
           ".eccw-settings-tabs .add-currency",
           this.addCurrencyRow
         )
-        .on(
-          "click.ECCWAdmin",
-          ".eccw-settings-tabs .remove-row",
-          this.removeCurrencyRow
-        );
     },
 
     initializeEccwModalFormInputs: function (context = document) {
@@ -244,6 +240,8 @@
       let aggregator = $(".eccw-currency-aggregator-input").val();
       let premiumAggregators = ["apilayer", "openexchangerates"];
       let apiKey = $(".eccw-currency-aggregator-api-key-input").val();
+      let baseCurrency = $('input[name$="[base_currency]"]').val();
+
       let error = false;
 
       if (premiumAggregators.includes(aggregator)) {
@@ -267,6 +265,7 @@
           data: {
             action: "eccw_update_currency_rates",
             requestedCurrencies: requestedCurrencies,
+            baseCurrency: baseCurrency,
             nonce: eccw_vars.nonce,
           },
           cache: false,
@@ -341,11 +340,10 @@
 
       if (rowCount < 2) {
         ECCWAdmin.loadCurrencyOptions().then(function (currencyOptions) {
-          // Build a new row with the correct index and currency options
           var row =
             "<tr>" +
             '<td><input type="radio" name="eccw_currency_table[default]" value="" /></td>' +
-            '<td><select name="eccw_currency_table[' +
+            '<td><select class="easy-currency-dropdowneccw" name="eccw_currency_table[' +
             rowCount +
             '][code]">' +
             currencyOptions +
@@ -364,6 +362,7 @@
             '<td><select name="eccw_currency_table[' +
             rowCount +
             '][decimal]">' +
+            '<option value="0">0</option>' +
             '<option value="1">1</option>' +
             '<option value="2">2</option>' +
             '<option value="3">3</option>' +
@@ -375,20 +374,36 @@
             "</select></td>" +
             '<td><input type="text" name="eccw_currency_table[' +
             rowCount +
-            '][decimal_separator]" value="" /></td>' +
+            '][decimal_separator]" value="." /></td>' +
             '<td><input type="text" name="eccw_currency_table[' +
             rowCount +
-            '][thousand_separator]" value="" /></td>' +
+            '][thousand_separator]" value="," /></td>' +
             '<td><input type="text" name="eccw_currency_table[' +
             rowCount +
             '][custom_symbol]" value="" placeholder="e.g. $" /></td>' +
+            '<input type="hidden" name="eccw_currency_table[' +
+            rowCount +
+            '][base_currency]" value="' +
+            window.eccwBaseCurrency +
+            '" />' +
             '<td><button type="button" class="button remove-row">Remove</button></td>' +
             "</tr>";
 
-          // Append the new row
-          $("#eccw-repeatable-fields-table tbody").append(row);
+          var $row = $(row);
+          $("#eccw-repeatable-fields-table tbody").append($row);
 
-          // Re-index all rows after adding the new one
+          var firstCurrency = $row.find("select").val();
+          $row.find("input[type=radio]").val(firstCurrency);
+
+          $row.find("select").on("change", function () {
+            var selectedCurrency = $(this).val();
+            $row.find("input[type=radio]").val(selectedCurrency);
+          });
+
+          if (firstCurrency === window.eccwBaseCurrency) {
+            $row.find("select").prop("disabled", true);
+          }
+
           ECCWAdmin.reindexRows();
         });
       } else {
@@ -398,9 +413,16 @@
       }
     },
     removeCurrencyRow: function (that) {
-      $(this).closest("tr").remove();
-      // Re-index all rows after removal
-      ECCWAdmin.reindexRows();
+      var $tr = $(that).closest("tr");        
+      var $tbody = $tr.closest("tbody");  
+      var rowCount = $tbody.find("tr").length;
+
+      if (rowCount > 1) {
+          $tr.remove();
+          ECCWAdmin.reindexRows();
+      } else {
+          alert("Cannot remove the last remaining currency row.");
+      }
     },
 
     // shortcode generator js
@@ -872,44 +894,43 @@
       });
     },
 
-    eccwGeobyCountry: function() {
-      $(".eccw-geo-country-table .eccw-searchable-country-select.pro-disabled").hover(
+    baseCurrencyChangeOption: function () {
+      $(".easy-currency-table").on(
+        "change",
+        'select[name^="eccw_currency_table"][name$="[code]"]',
         function () {
-          var $select = $(this);
-          var $tooltip = $(
-            '<div class="eccw-pro-tooltip">This feature is available in Pro version</div>'
+          var $tr = $(this).closest("tr"); 
+          var $radio = $tr.find(
+            'input[type="radio"][name^="eccw_currency_table[default]"]'
           );
 
-          $("body").append($tooltip);
-
-          var offset = $select.offset();
-          $tooltip
-            .css({
-              top: offset.top - $tooltip.outerHeight() - 8,
-              left: offset.left,
-              position: "absolute",
-              background: "#333",
-              color: "#fff",
-              padding: "5px 10px",
-              "border-radius": "4px",
-              "font-size": "12px",
-              "z-index": 999,
-              display: "none",
-            })
-            .fadeIn(200);
-
-          $select.data("proTooltip", $tooltip);
-        },
-        function () {
-          var $tooltip = $(this).data("proTooltip");
-          if ($tooltip) {
-            $tooltip.fadeOut(200, function () {
-              $(this).remove();
-            });
-          }
+          $radio.val($(this).val());
         }
       );
-    }
+    },
+
+    removeTableRow: function() {
+
+      function removeCurrencyRow(event) {
+          event.preventDefault(); 
+
+          var $tr = $(this).closest("tr"); 
+          var $tbody = $tr.closest("tbody");
+          var rowCount = $tbody.find("tr").length;
+
+          if ($tr.hasClass("easy-base-currency")) {
+              alert("Cannot remove the base currency row.");
+          } else if (rowCount > 1) {
+              $tr.remove();
+              ECCWAdmin.reindexRows(); 
+          } else {
+              alert("Cannot remove the last remaining currency row.");
+          }
+      }
+
+      $(document).on("click", ".eccw-settings-tabs .remove-row", removeCurrencyRow);
+    },
+
   };
 
   ECCWAdmin.init();
@@ -949,26 +970,5 @@
     "options[eccw_show_hide_single_product_location]"
   );
 
-  $(document).ready(function ($) {
-    if ($(".easy-currency-pro-feature").length > 0) {
-      $(".easy-currency-pro-feature .eccw-searchable-country-select").prop(
-        "disabled",
-        true
-      );
-
-      $(".easy-currency-pro-feature .select-all-countries").prop(
-        "disabled",
-        true
-      );
-      $(".easy-currency-pro-feature .remove-all-countries").prop(
-        "disabled",
-        true
-      );
-      $(".easy-currency-pro-feature .apply-default-countries").prop(
-        "disabled",
-        true
-      );
-    }
-  });
 
 })(jQuery);
