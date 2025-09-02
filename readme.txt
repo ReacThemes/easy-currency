@@ -6,7 +6,7 @@ Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-The Easy Currency Plugin for WordPress menu icon plugin where can decoration your menu item with different types icon.
+The Easy Currency Switcher Plugin for WooCommerce lets your customers view and switch product prices in multiple currencies, enhancing their shopping experience.
 
 == Description ==
 <a href="https://easy-currency.themewant.com/" target="_blank">Live Demo</a> | <a href="https://easy-currency.themewant.com/product/family-suite/" target="_blank">Single Demo</a>
