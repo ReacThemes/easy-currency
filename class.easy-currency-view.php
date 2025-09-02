@@ -57,8 +57,10 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
             // Nonce verification failed
            return;
         }
+
+        $curr_req = $_REQUEST['easy_currency'];
         
-        if(isset($_REQUEST['easy_currency']) && !empty($_REQUEST['easy_currency'])){
+        if(isset( $curr_req ) && !empty( $curr_req )){
 
             $default_currency = sanitize_text_field( wp_unslash( $_REQUEST['easy_currency'] ) );
 
@@ -92,6 +94,8 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
     ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
     : ( isset($currency_settings['default_currency']) ? $currency_settings['default_currency'] : 'USD' ); 
+
+    
 
         $options = isset($currency_settings['options']) ? $currency_settings['options'] : [];
         $flag_visibility = isset($options['flag_visibility']) && !empty($options['flag_visibility']) ? $options['flag_visibility'] : 'no';

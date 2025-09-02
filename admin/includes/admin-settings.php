@@ -20,6 +20,7 @@ class ECCW_admin_settings
         add_action('woocommerce_settings_eccw_settings_tab', array($this, 'eccw_settings_tab_settings'));
         add_action('woocommerce_update_options_eccw_settings_tab', array($this, 'save_eccw_settings_tab_settings'));
         add_action('admin_menu', array($this, 'eccw_add_easy_currency_menu'));
+					
     }
 
     public function eccw_settings_tab($tabs)
@@ -807,9 +808,6 @@ class ECCW_admin_settings
         return $settings;
     }
 
-
-
-
     public function eccw_switcher_sticky_field()
     {
 
@@ -1149,6 +1147,202 @@ class ECCW_admin_settings
         return $all_settings;
     }
 
+    function eccw_pro_multi_get_country_by_currency() {
+
+        $settings = get_option('eccw_currency_settings', []);
+
+        $currency_countries = wp_remote_get(ECCW_DIR_URL . '/admin/assets/json/currency-countries.json', []);
+        $currency_countries_json = json_decode($currency_countries['body'] ?? '', true) ?? [];
+
+        //error_log( print_r( $currency_countries_json, true ) );
+
+        $all_countries = WC()->countries->get_countries(); 
+
+        $eccw_currency_settings = get_option('eccw_currency_settings', []);
+        $pro_class = 'easy-currency-pro-feature';
+        $pro_enabled = false;
+        if( class_exists( 'ECCW_CURRENCY_SWITCHER_PRO' ) ) {
+            $pro_class = '';
+            $pro_enabled = true;
+        }
+       
+        if (!empty($eccw_currency_settings) && isset($eccw_currency_settings['eccw_currency_table']) && count($eccw_currency_settings['eccw_currency_table']) > 0) {
+            $eccw_currency_table = $eccw_currency_settings['eccw_currency_table'];
+
+            ?>
+            <div class="eccw-geo-country-table-list <?php echo esc_attr( $pro_class ); ?>">
+                
+                <table class="widefat striped eccw-geo-country-table">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e('Currency', 'easy-currency'); ?></th>
+                            <th><?php esc_html_e('Countries', 'easy-currency'); ?></th>
+                            <th><?php esc_html_e('Actions', 'easy-currency'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php 
+                    foreach ($eccw_currency_table as $index => $currency_data ): 
+
+                        $currency_code   = isset($currency_data['code']) ? $currency_data['code'] : '';
+                        $currency_symbol = isset($currency_data['symbol']) ? $currency_data['symbol'] : '';
+                        $currencies      = get_woocommerce_currencies(); 
+                        $currency_name   = isset($currencies[$currency_code]) ? $currencies[$currency_code] : $currency_code;
+
+                        $geo_data = get_option('eccw_currency_table_geo', []); 
+                        $geo_array = isset($geo_data[$index]) ? $geo_data[$index] : [];
+
+                        $selected_countries = isset($geo_array['countries'][$currency_code]) ? $geo_array['countries'][$currency_code] : [];
+
+                        $country_shortcode =  isset( $currency_countries_json[$currency_code]['countries'][0] ) ? $currency_countries_json[$currency_code]['countries'][0] : '';
+
+                        $country_shortname = isset( $all_countries[$country_shortcode] ) ? $all_countries[$country_shortcode] : '';
+
+                        ?>
+                        <tr>
+                            <td>
+                                <?php echo esc_html($currency_code); ?> - 
+                                <?php echo esc_html($currency_name); ?>
+                            </td>
+                            <td>
+                                <select name="eccw_currency_table_geo[<?php echo $index; ?>][countries][<?php echo $currency_code; ?>][]"
+                                        class="eccw-searchable-country-select <?php echo !$pro_enabled ? 'pro-disabled' : ''; ?>"
+                                        multiple="multiple"
+                                        data-placeholder="<?php esc_attr_e('Please Select countries...', 'easy-currency'); ?>"
+                                        style="width:100%;" data-eccwgeo_deault_country_code="<?php echo esc_attr( $country_shortcode); ?>" data-eccwgeo_deault_country_name="<?php echo esc_attr( $country_shortname); ?>">
+                                    <?php 
+
+                                    $countries = WC()->countries->get_countries();
+
+                                    foreach ( $all_countries as $currency_codeparent => $currency_data) {
+                                        ?>
+                                        <option value="<?php echo esc_attr($currency_codeparent); ?>" 
+                                            <?php selected(in_array($currency_codeparent, (array)$selected_countries)); ?>>
+                                            <?php echo esc_html($currency_data); ?>
+                                        </option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                                <?php if (!$pro_enabled): ?>
+                                   
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <button type="button" class="button select-all-countries"><?php esc_html_e('Select all', 'easy-currency'); ?></button>
+                                <button type="button" class="button button-danger remove-all-countries"><?php esc_html_e('Remove All', 'easy-currency'); ?></button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    
+                    </tbody>
+                   
+                </table>
+                <div class="eccw-table-footer-actions-geo-country">
+                    <button type="button" class="button button-primary apply-default-countries">
+                        <?php esc_html_e('Apply Default Country', 'easy-currency'); ?>
+                    </button>
+                </div>
+
+            </div>
+            <?php
+            
+        }
+    }
+
+
+    public function eccw_advanced_settings_field()
+    {
+
+        $saved_settings = get_option('eccw_currency_settings');
+
+        $advanced_settings = isset($saved_settings['advanced_settings']) ? $saved_settings['advanced_settings'] : [];
+
+        $advanced_settings_field_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-advanced-settings">'
+            )
+        );
+
+        $advanced_settings_fields = array(
+            'eccw_advanced_section_title' => array(
+                'name' => __('', 'easy-currency'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_advanced_settings_title'
+            ),
+            'eccw_indivisual_geo_ip_rule' => array(
+                'title' => __('Geo Ip rule for each product', 'easy-currency'),
+                'id'    => 'advanced_settings[eccw_geo_ip_rule_each_product]',
+                'type'  => 'switcher',
+                'default' => isset($advanced_settings['eccw_geo_ip_rule_each_product']) ? $advanced_settings['eccw_geo_ip_rule_each_product'] : 'no',
+                'class' => 'eccw-switcher-ui-control-show-hide',
+                'eccw_pro' => true,
+                'desc_tip' => true,
+                'description' => __('Enable this option geo ip rule for each product', 'easy-currency'),
+            ),
+           
+            'eccw_autodetect_currency_geo' => array(
+                'title' => __('Auto select currency by countries', 'easy-currency'),
+                'id'    => 'advanced_settings[eccw_auto_select_currency_by_country]',
+                'type'  => 'switcher',
+                'default' => isset($advanced_settings['eccw_auto_select_currency_by_country']) ? $advanced_settings['eccw_auto_select_currency_by_country'] : 'no',
+                'class' => 'eccw-switcher-ui-control-show-hide',
+                'eccw_pro' => true,
+                'desc_tip' => true,
+                'description' => __('Enable this to automatically select the currency based on customer’s country (GeoIP).', 'easy-currency'),
+            ),
+           
+            'eccw_advanced_settings_section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_advanced_settings_section_end'
+            )
+        );
+       
+        $advanced_settings_field_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+        $custom_advanced_settings_field_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-custom-advanced-settings">'
+            )
+        );
+
+        $custom_advanced_settings_fields = array(
+            'eccw_custom_advanced_section_title' => array(
+                'name' => __('Custom Currency Settings', 'easy-currency'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_advanced_settings_title_country'
+            ),
+          
+            'eccw_advanced_curr_settings_section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_advanced_settings_custom_section_end',
+                'html' => $this->eccw_pro_multi_get_country_by_currency(),
+            )
+        );
+       
+        $advanced_custom_curr_settings_field_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+        $all_settings = array_merge( $advanced_settings_field_start, $advanced_settings_fields, $advanced_settings_field_end,  $custom_advanced_settings_field_start, $custom_advanced_settings_fields, $advanced_custom_curr_settings_field_end );
+
+
+       return $all_settings;
+
+    }
+
     public function eccw_settings_tab_settings()
     {
 
@@ -1171,6 +1365,8 @@ class ECCW_admin_settings
                     <li><a href="#tab_currency_options">Options</a></li>
                     <li><a href="#tab_currency_switcher_shortcode">Shortcode</a></li>
                     <li><a href="#tab_currency_switcher_sticky">Sticky Side</a></li>
+                    <li><a href="#tab_currency_advanced_settings">Advanced Settings</a></li>
+                    <?php do_action("after_eccw_tabs_navs"); ?>
                     <li><a href="#tab_currency_usage">Usage</a></li>
                     
 
@@ -1385,6 +1581,13 @@ class ECCW_admin_settings
                         <?php woocommerce_admin_fields($this->eccw_switcher_sticky_field()); ?>
 
                     </div>
+                    <div id="tab_currency_advanced_settings" class="tab-content">
+                        <?php woocommerce_admin_fields($this->eccw_advanced_settings_field()); ?>
+
+                    </div>
+
+                    <?php do_action("after_eccw_tabs_panels"); ?>
+
                 </div>
             </div>
         </div>
@@ -1417,9 +1620,23 @@ class ECCW_admin_settings
                 $currency_settings['design'] = $design;
             }
 
+            if (isset($_POST['advanced_settings'])) {
+                $design = map_deep(wp_unslash($_POST['advanced_settings']), 'sanitize_text_field') ?? [];
+                $currency_settings['advanced_settings'] = $design;
+            }
+
             $filtered_data = array_filter($data, function ($row) {
                 return !empty($row['code']) || !empty($row['rate']) || !empty($row['symbol_position']) || !empty($row['decimal']) || !empty($row['separator']) || !empty($row['description']);
             });
+
+
+            if (isset($_POST['eccw_currency_table_geo'])) {
+                $geo_data = map_deep(wp_unslash($_POST['eccw_currency_table_geo']), 'sanitize_text_field') ?? [];
+
+                update_option('eccw_currency_table_geo', $geo_data);
+            }
+
+
 
             // Re-index array to ensure sequential keys
             $filtered_data = array_values($filtered_data);

@@ -9,6 +9,8 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
     public function __construct(){
        
 
+        
+
         $this->currency_server = new ECCW_CURRENCY_SERVER();
         $this->ecccw_get_plugin_settings = new ECCW_Plugin_Settings();
         $this->plugin_settings = $this->ecccw_get_plugin_settings->ecccw_get_plugin_settings();
@@ -37,7 +39,6 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
            // return;
 
             add_filter('woocommerce_price_format', array($this,'eccw_dynamic_currency_position'), 9999999, 2 );
-          
         }
 
     }
@@ -98,24 +99,49 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
 
 
     public function apply_custom_currency_rate($price, $product) {
-        $plugin_settings = $this->plugin_settings;
-        $allow_payment_with_selected_currency = $plugin_settings['options']['allow_payment_with_selected_currency'] ?? 'no';
 
-        if( $this->eccw_should_skip_currency_conversion() ) {
-            return $price;
+        if (!$product instanceof WC_Product) {
+            $product = wc_get_product($product);
+            if (!$product) return $price;
         }
 
-        $default_currency = $this->currency_server->eccw_get_user_preferred_currency();
-        if (!empty($default_currency) || !empty($_REQUEST['easy_currency'])) {
-            $currency_rate = $this->currency_server->eccw_get_currency_rate();
-            if ($price > 0 && $currency_rate > 1) {
-                return (float)$price * $currency_rate;
-            }
+        $currency_rate = $this->currency_server->eccw_get_currency_rate() ?: 1;
+
+        $geo_prices = apply_filters('eccw_pricing_geo_rules', [], $product);
+
+        $geo_regular_price = isset($geo_prices['easy_geo_regular_price']) 
+            ? (float) $geo_prices['easy_geo_regular_price'] 
+            : (float) get_post_meta($product->get_id(), '_regular_price', true);
+
+        $geo_sale_price = isset($geo_prices['easy_geo_sale_price']) 
+            ? (float) $geo_prices['easy_geo_sale_price'] 
+            : (float) get_post_meta($product->get_id(), '_sale_price', true);
+
+
+        $current_filter = current_filter();
+
+        if ($current_filter === 'woocommerce_product_get_regular_price') {
+            $final_price = $geo_regular_price;
+        } elseif ($current_filter === 'woocommerce_product_get_sale_price') {
+          
+            $final_price = !empty($geo_sale_price) && $geo_sale_price > 0 
+                ? $geo_sale_price 
+                : $geo_regular_price;
+        } elseif ($current_filter === 'woocommerce_product_get_price') {
+           
+            $final_price = !empty($geo_sale_price) && $geo_sale_price > 0
+                ? $geo_sale_price
+                : $geo_regular_price;
+        } else {
+            $final_price = $price;
         }
 
-        return $price;
+        if (!$this->eccw_should_skip_currency_conversion()) {
+            $final_price = (float) $final_price * $currency_rate;
+        }
+
+        return $final_price;
     }
-
 
     public function eccw_convert_variable_price_html($price_html, $product) {
 

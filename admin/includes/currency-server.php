@@ -1,16 +1,19 @@
 <?php
 if (!defined('ABSPATH')) die('No direct access allowed');
-class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
+class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
+{
 
     protected $ecccw_get_plugin_settings;
     protected $plugin_settings;
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->ecccw_get_plugin_settings = new ECCW_Plugin_Settings();
         $this->plugin_settings = $this->ecccw_get_plugin_settings->ecccw_get_plugin_settings();
     }
 
-    public function eccw_get_currency_rate_live_aggregators(){
+    public function eccw_get_currency_rate_live_aggregators()
+    {
 
         $aggregators = array(
             'yahoo' => 'www.finance.yahoo.com',
@@ -21,122 +24,210 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
             'privatbank' => 'Ukrainian Privatbank [api.privatbank.ua]',
             'mnb' => 'Magyar Nemzeti Bank',
         );
-        
+
         $aggregators = apply_filters('eccw_aggregator', $aggregators);
         return $aggregators;
-    
     }
 
-    public function eccw_get_currency_countries() {
+    public function eccw_get_currency_countries()
+    {
 
-		$currency_countries = array();
+        $currency_countries = array();
         $json_data = wp_remote_get(ECCW_DIR_URL . '/admin/assets/json/currency-countries.json', []);
 
-        if ( ( !is_wp_error($json_data)) && (200 === wp_remote_retrieve_response_code( $json_data ) ) ) {
-            $currency_countries = json_decode( $json_data['body'] );
-        }else{
+        if ((!is_wp_error($json_data)) && (200 === wp_remote_retrieve_response_code($json_data))) {
+            $currency_countries = json_decode($json_data['body']);
+        } else {
             $currency_countries = [];
         }
 
         return $currency_countries;
+    }
 
-	}
-
-    public function get_default_currency(){
+    public function get_default_currency()
+    {
         $currency_settings = get_option('eccw_currency_settings');
         $default_currency = $currency_settings['default_currency'];
-        return $default_currency;
-    }
-
-    public function eccw_get_user_preferred_currency(){
-        $plugin_settings = $this->plugin_settings;
-        $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : []; 
-        $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
-    ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
-    : ( isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD' ); 
 
         return $default_currency;
+        // return 'AFN';
     }
 
-    public function eccw_get_user_preferred_currency_data(){
+    // public function eccw_get_user_preferred_currency(){
+    //     $plugin_settings = $this->plugin_settings;
+    //     $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : []; 
+    //     $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
+    // ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
+    // : ( isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD' ); 
+
+    //     return $default_currency;
+    // }
+
+    public function eccw_get_user_preferred_currency()
+    {
         $plugin_settings = $this->plugin_settings;
-        $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : []; 
+        $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : [];
+
         $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
-    ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
-    : ( isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD' ); // fallback
+            ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
+            : (isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD');
+
+        if (class_exists('EASY_GEOIP_Currency_Detection')) {
+            $geo_data = EASY_GEOIP_Currency_Detection::get_instance()->eccw_set_currency_by_geoip();
+
+            $geo = new WC_Geolocation();
+            $geo_data_ip = $geo->geolocate_ip();
+            $visitor_country = $geo_data_ip['country'] ?? '';
+
+            if (is_array($geo_data) && !empty($visitor_country)) {
+                foreach ($geo_data as $currency_code => $countries) {
+                   
+                    if (in_array($visitor_country, $countries, true)) {
+                        return $currency_code; 
+                    }
+                }
+            }
+        }
+
+        return $default_currency;
+        //return 'AFN';
+    }
+
+    // public function eccw_get_user_preferred_currency_data(){
+    //     $plugin_settings = $this->plugin_settings;
+    //     $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : []; 
+    //     $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
+    // ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
+    // : ( isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD' ); // fallback
 
 
-        $result = array_filter($eccw_currency_table, function($item) use ($default_currency) {
+    //     $result = array_filter($eccw_currency_table, function($item) use ($default_currency) {
+    //         return $item["code"] === $default_currency;
+    //     });
+    //     $result = reset($result);
+    //     return $result;
+    // }
+
+    public function eccw_get_user_preferred_currency_data()
+    {
+        $plugin_settings = $this->plugin_settings;
+        $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : [];
+
+
+        $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
+            ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
+            : (isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD');
+
+        if (class_exists('EASY_GEOIP_Currency_Detection')) {
+            $geo_data = EASY_GEOIP_Currency_Detection::get_instance()->eccw_set_currency_by_geoip();
+
+            $geo = new WC_Geolocation();
+            $geo_data_ip = $geo->geolocate_ip();
+            $visitor_country = $geo_data_ip['country'] ?? '';
+
+           if (is_array($geo_data) && !empty($visitor_country)) {
+                foreach ( $geo_data as $currency_code => $countries ) {
+                    
+                    if (in_array($visitor_country, $countries, true)) {
+                        $default_currency = $currency_code;
+                        break;
+                    }
+                }
+            }
+        }
+
+        $result = array_filter($eccw_currency_table, function ($item) use ($default_currency) {
             return $item["code"] === $default_currency;
         });
+
         $result = reset($result);
         return $result;
     }
-    
-    public function eccw_get_currency_rate(){
+
+
+    public function eccw_get_currency_rate()
+    {
         $eccw_get_user_preferred_currency_data = $this->eccw_get_user_preferred_currency_data();
-        if(isset($eccw_get_user_preferred_currency_data['rate'])) {
+        if (isset($eccw_get_user_preferred_currency_data['rate'])) {
             return $eccw_get_user_preferred_currency_data['rate'];
         }
         return 1;
     }
 
-    // Helper function for HTTP requests
-    public function eccw_make_request($url, $args = []) {
+    public function eccw_make_request($url, $args = [])
+    {
+        $args = wp_parse_args($args, [
+            'timeout' => 3,
+        ]);
+
         if (function_exists('wp_remote_get')) {
             $response = wp_remote_get($url, $args);
+
+            if (is_wp_error($response)) {
+                return false;
+            }
+
             return wp_remote_retrieve_body($response);
-        } else {
-            return @wp_remote_get($url);
         }
+
+        return false;
     }
 
-    public function eccw_get_currency_rate_live($from_currency, $to_currency){
+    public function eccw_get_currency_rate_live($from_currency, $to_currency)
+    {
 
-    
+
         $currency_settings = get_option('eccw_currency_settings');
-        $selected_server = isset($currency_settings['options']['currency_aggregator']) ? $currency_settings['options']['currency_aggregator'] : 'apilayer'; 
+        $selected_server = isset($currency_settings['options']['currency_aggregator']) ? $currency_settings['options']['currency_aggregator'] : 'apilayer';
         $api_key = $currency_settings['options']['currency_aggregator_api_key'] ?? '';
-        
+
         $from_currency = urlencode($from_currency);
         $to_currency = urlencode($to_currency);
 
         $invalid_api_msg = 'Invalid API Credentials. Update Valid API Credentials and try again';
-    
+
         $rate = 1;
         $response_data = [
             'success' => true,
             'error' => false,
         ];
-    
-        
-    
+
+        $rate = 0;
+
         switch ($selected_server) {
             case 'yahoo':
                 $current_time = current_time('timestamp', true);
                 $query_url = sprintf(
                     'https://query1.finance.yahoo.com/v8/finance/chart/%s%s=X?symbol=%s%s=X&period1=%d&period2=%d&interval=1d&includePrePost=false&lang=en-US&region=US',
-                    $from_currency, $to_currency,
-                    $from_currency, $to_currency,
-                    $current_time - 60 * 86400, $current_time
+                    $from_currency,
+                    $to_currency,
+                    $from_currency,
+                    $to_currency,
+                    $current_time - 60 * 86400,
+                    $current_time
                 );
                 $response = $this->eccw_make_request($query_url);
                 $data = json_decode($response, true);
-    
-                $result = $data['chart']['result'][0]['indicators']['quote'][0]['open'] ?? 
-                            [$data['chart']['result'][0]['meta']['previousClose']] ?? [];
-                if (is_array($result) && count($result)) {
-                    $rate = end($result);
+
+                $result = [];
+                if (!empty($data['chart']['result'][0]['indicators']['quote'][0]['open'])) {
+                    $result = $data['chart']['result'][0]['indicators']['quote'][0]['open'];
+                } elseif (!empty($data['chart']['result'][0]['meta']['previousClose'])) {
+                    $result = [$data['chart']['result'][0]['meta']['previousClose']];
                 }
+                $rate = is_array($result) && count($result) ? end($result) : 1;
+
+
                 break;
-    
+
             case 'cryptocompare':
                 $query_url = sprintf("https://min-api.cryptocompare.com/data/price?fsym=%s&tsyms=%s", $from_currency, $to_currency);
                 $response = $this->eccw_make_request($query_url);
                 $data = json_decode($response, true);
                 $rate = $data[$to_currency] ?? $rate;
+
                 break;
-    
+
             case 'ecb':
                 $response = $this->eccw_make_request('http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml');
                 $data = simplexml_load_string($response);
@@ -147,21 +238,38 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
                 }
                 $rate = $rates[$to_currency] ?? $rate;
                 break;
-    
+
             case 'apilayer':
                 if (!empty($api_key)) {
-                    $query_url = sprintf("https://api.apilayer.com/exchangerates_data/latest?symbols=%s&base=%s", $to_currency, $from_currency);
-                    $response = $this->eccw_make_request($query_url, ['headers' => ['apikey' => $api_key]]);
+
+                    $api_base = 'USD';
+
+                    $query_url = sprintf(
+                        "https://api.apilayer.com/exchangerates_data/latest?symbols=%s,%s&base=%s",
+                        $from_currency,
+                        $to_currency,
+                        $api_base
+                    );
+
+                    $response = $this->eccw_make_request($query_url, [
+                        'headers' => ['apikey' => $api_key]
+                    ]);
+
                     $data = json_decode($response, true);
-                    if (isset($data['rates'][$to_currency])) {
-                        $rate = $data['rates'][$to_currency];
+
+                    if (
+                        isset($data['rates'][$from_currency]) &&
+                        isset($data['rates'][$to_currency])
+                    ) {
+
+                        $rate = $data['rates'][$to_currency] / $data['rates'][$from_currency];
                     } elseif (isset($data['message'])) {
                         $response_data['success'] = false;
                         $response_data['error'] = $data['message'];
                     }
                 }
                 break;
-    
+
             case 'privatbank':
                 $response = $this->eccw_make_request('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5');
                 $data = json_decode($response, true);
@@ -179,13 +287,13 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
                     $rate = 1 / $rates[$to_currency] ?? $rate;
                 }
                 break;
-    
+
             case 'mnb':
                 $soap_client = new SoapClient('http://www.mnb.hu/arfolyamok.asmx?wsdl');
                 $response = $soap_client->GetCurrentExchangeRates(null)->GetCurrentExchangeRatesResult;
                 $data = simplexml_load_string($response);
                 $rate_base = $rate_current = 0;
-    
+
                 foreach ($data->Day->Rate ?? [] as $rate_xml) {
                     $attributes = $rate_xml->attributes();
                     if ((string)$attributes->curr === $from_currency && $from_currency !== 'HUF') {
@@ -197,39 +305,58 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings {
                 }
                 $rate = $from_currency === 'HUF' ? $rate_current : (($rate_current / $rate_base) ?: $rate);
                 break;
-    
+
             case 'openexchangerates':
+
                 if (!empty($api_key)) {
-                    $query_url = sprintf("https://openexchangerates.org/api/latest.json?base=%s&symbols=%s&app_id=%s", $from_currency, $to_currency, $api_key);
+                    $query_url = sprintf(
+                        "https://openexchangerates.org/api/latest.json?app_id=%s&symbols=%s,%s",
+                        $api_key,
+                        $from_currency,
+                        $to_currency
+                    );
+
                     $response = $this->eccw_make_request($query_url);
                     $data = json_decode($response, true);
-                    $response_data['error'] = isset($data['error']) && $data['error'] == true ? $data['description'] : false;
-                    $rate = $data['rates'][$to_currency] ?? $rate;
-                }else{
+
+                    if (isset($data['rates'][$from_currency]) && isset($data['rates'][$to_currency])) {
+                        $rate = $data['rates'][$to_currency] / $data['rates'][$from_currency];
+                    } else {
+                        $response_data['success'] = false;
+                        $response_data['error'] = 'Currency not available in OXR response';
+                    }
+                } else {
                     $response_data['success'] = false;
                     $response_data['error'] = $invalid_api_msg;
                 }
                 break;
-    
+
             default:
                 $response_data['error'] = 'Invalid currency server selected';
                 $response_data['success'] = false;
                 break;
         }
-        
+
         $response_data['rate'] = $rate;
+
+        if (empty($rate) || $rate == 1) {
+            $usd = 'USD';
+
+            if ($from_currency !== $usd && $to_currency !== $usd) {
+
+                $from_to_usd = $this->eccw_get_currency_rate_live($from_currency, $usd);
+                $from_usd_rate = $from_to_usd['rate'] ?? 0;
+
+                $to_to_usd = $this->eccw_get_currency_rate_live($to_currency, $usd);
+                $to_usd_rate = $to_to_usd['rate'] ?? 0;
+
+                if ($from_usd_rate && $to_usd_rate) {
+                    $rate = $from_usd_rate / $to_usd_rate;
+                    $response_data['rate'] = $rate;
+                }
+            }
+        }
+
         return $response_data;
-    
-    
-
     }
-
-
-   
 }
-
-
-
-
-
-

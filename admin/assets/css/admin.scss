@@ -724,7 +724,6 @@ $white-color: #ffffff;
    width: 100%;
 }
 
-
 .eccw-pro-required-msg {
     display: flex;
     align-items: center;
@@ -737,12 +736,15 @@ $white-color: #ffffff;
     max-width: 320px;
     padding: 20px;
 }
+
+
 .eccw-pro-icon {
     font-size: 40px;
 }
 .eccw-pro-content h3 {
     margin: 0 0 5px 0;
     font-size: 18px;
+
     color: #e65100;
 }
 .eccw-pro-content p {
@@ -762,4 +764,189 @@ $white-color: #ffffff;
 }
 .eccw-pro-btn:hover {
     background: #e68900;
+}
+
+/* pro lock css*/
+
+.eccw-pro-lock-tooltip {
+  position: relative;
+  cursor: not-allowed;
+}
+
+.eccw-pro-lock-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.eccw-pro-lock-tooltip:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+#tab_currency_advanced_settings {
+  display: flex;
+  flex-direction: column;
+}
+
+.eccw-advanced-settings {
+    order: 1;
+}
+
+.eccw-geo-country-table-list {
+    order: 2;
+}
+
+#tab_currency_advanced_settings .submit {
+  order: 3;
+}
+
+.eccw-custom-advanced-settings > h2 {
+  margin-top: 20px !important;
+  margin-bottom: 20px !important;
+}
+
+/*geo country table list*/
+
+.eccw-geo-country-table-list {
+  margin-top: 20px;
+
+  .eccw-geo-country-table {
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+
+    thead {
+      background: #f6f7f7;
+
+      th {
+        padding: 12px 15px;
+        font-weight: 600;
+        font-size: 14px;
+        text-align: left;
+        color: #1d2327;
+        border-bottom: 1px solid #dcdcde;
+      }
+    }
+
+    tbody {
+      tr {
+        &:nth-child(even) {
+          background: #fbfbfb;
+        }
+
+        &:hover {
+          background: #f0f6fc;
+        }
+
+        td {
+          padding: 10px 15px;
+          font-size: 13px;
+          color: #2c3338;
+          vertical-align: middle;
+          border-bottom: 1px solid #eee;
+
+          &:first-child {
+            font-weight: 500;
+            color: #1d2327;
+            white-space: nowrap;
+          }
+
+          select.eccw-searchable-country-select {
+            width: 100%;
+            min-width: 250px;
+            border-radius: 6px;
+            border: 1px solid #ccd0d4;
+            font-size: 13px;
+            padding: 6px 8px;
+            background: #fff;
+            transition: border 0.2s ease-in-out;
+
+            &:focus {
+              border-color: #2271b1;
+              box-shadow: 0 0 0 1px #2271b1;
+              outline: none;
+            }
+          }
+
+          .button {
+            font-size: 12px;
+            padding: 4px 10px;
+            margin-right: 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &.select-all-countries {
+              
+                background: #2271b1;
+                color: #fff;
+                border-color: #2271b1;
+              
+            }
+
+            &.remove-all-countries {
+              border: 1px solid #d63638;
+              background: #d63638;
+              color: #fff;
+              
+            }
+          }
+        }
+      }
+    }
+  }
+
+}
+
+.eccw-geo-country-table-list .select2-container--default .select2-selection--multiple {
+    max-width: 800px;  
+    min-width: 500px;  
+    max-height: 120px;  
+    overflow-y: auto;  
+    overflow-x: hidden;
+    border-radius: 6px;
+    border: 1px solid #ccd0d4;
+    padding: 4px;
+}
+
+.eccw-geo-country-table-list .select2-selection--multiple .select2-selection__choice {
+    background: #f6f7f7;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin: 3px 4px 0 0;
+    font-size: 12px;
+    color: #2c3338;
+    white-space: nowrap;
+}
+
+.eccw-table-footer-actions-geo-country {
+  margin-top: 15px;
+  text-align: left;
+}
+.eccw-geo-country-table-list .select2-container .select2-selection--multiple {
+    border-color: #ccd0d4 !important;
+}
+
+
+.eccw-searchable-country-select.pro-disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  position: relative;
 }
