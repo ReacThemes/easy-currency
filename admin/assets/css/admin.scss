@@ -1014,3 +1014,15 @@ $white-color: #ffffff;
     padding: 20px;
   }
 }
+
+.easy-currency-pro-feature {
+  .apply-default-countries,
+  .select-all-countries,
+  .remove-all-countries {
+    opacity: 0.55;             
+    cursor: not-allowed;     
+    filter: grayscale(20%);   
+    pointer-events: none; 
+    box-shadow: none;
+  }
+}

@@ -17,6 +17,7 @@
       this.baseCurrencyChangeOption();
       this.removeTableRow();
       this.easyAutoUpdateExchangeRate();
+      this.eccwGeobyCountry();
 
       $(document)
         .on(
@@ -732,7 +733,6 @@
 
             let newVal = $(this).val();
 
-            // jei khetre user empty kore, tokhon empty e thakuk
             if (newVal === "") {
               $("#" + escapedSliderId).val("");
               return;
@@ -896,16 +896,32 @@
     },
 
     baseCurrencyChangeOption: function () {
+     
       $(".easy-currency-table").on(
         "change",
         'select[name^="eccw_currency_table"][name$="[code]"]',
         function () {
-          var $tr = $(this).closest("tr"); 
+          var $tr = $(this).closest("tr");
           var $radio = $tr.find(
             'input[type="radio"][name^="eccw_currency_table[default]"]'
           );
 
           $radio.val($(this).val());
+        }
+      );
+
+      $(".easy-currency-table").on(
+        "click",
+        'input[type="radio"][name^="eccw_currency_table[default]"]',
+        function () {
+          var $tr = $(this).closest("tr");
+          var selectedCurrency = $tr.find(
+            'select[name^="eccw_currency_table"][name$="[code]"]'
+          ).val();
+
+          $tr.find(".easy-base-currency-hidden-field").val(selectedCurrency);
+
+          console.log("Base currency changed to:", selectedCurrency);
         }
       );
     },
@@ -934,20 +950,61 @@
 
     easyAutoUpdateExchangeRate: function() {
       function toggleAutoUpdateInterval() {
-        if ($('input[name="advanced_settings[eccw_enable_auto_update]"]').is(':checked')) {
-            $('#options\\[eccw_auto_update_exchange_rate\\]').closest('tr').show();
+       
+        let isEnabled = $('input[name="advanced_settings[eccw_enable_auto_update]"]:checked').length > 0;
+
+        if (isEnabled) {
+          $('#advanced_settings\\[eccw_auto_update_exchange_rate\\]').closest('tr').show();
         } else {
-            $('#options\\[eccw_auto_update_exchange_rate\\]').closest('tr').hide();
+          $('#advanced_settings\\[eccw_auto_update_exchange_rate\\]').closest('tr').hide();
         }
       }
 
       toggleAutoUpdateInterval();
 
-      $('input[name="advanced_settings[eccw_enable_auto_update]"]').on('change', function() {
-          toggleAutoUpdateInterval();
+      $(document).on('change', 'input[name="advanced_settings[eccw_enable_auto_update]"]', function() {
+        toggleAutoUpdateInterval();
       });
     },
 
+    eccwGeobyCountry: function() {
+      $(".eccw-geo-country-table .eccw-searchable-country-select.pro-disabled").hover(
+        function () {
+          var $select = $(this);
+          var $tooltip = $(
+            '<div class="eccw-pro-tooltip">This feature is available in Pro version</div>'
+          );
+
+          $("body").append($tooltip);
+
+          var offset = $select.offset();
+          $tooltip
+            .css({
+              top: offset.top - $tooltip.outerHeight() - 8,
+              left: offset.left,
+              position: "absolute",
+              background: "#333",
+              color: "#fff",
+              padding: "5px 10px",
+              "border-radius": "4px",
+              "font-size": "12px",
+              "z-index": 999,
+              display: "none",
+            })
+            .fadeIn(200);
+
+          $select.data("proTooltip", $tooltip);
+        },
+        function () {
+          var $tooltip = $(this).data("proTooltip");
+          if ($tooltip) {
+            $tooltip.fadeOut(200, function () {
+              $(this).remove();
+            });
+          }
+        }
+      );
+    },
   };
 
   ECCWAdmin.init();
@@ -986,6 +1043,29 @@
     "#tab_currency_options",
     "options[eccw_show_hide_single_product_location]"
   );
+
+
+  $(document).ready(function ($) {
+    if ($(".easy-currency-pro-feature").length > 0) {
+      $(".easy-currency-pro-feature .eccw-searchable-country-select").prop(
+        "disabled",
+        true
+      );
+
+      $(".easy-currency-pro-feature .select-all-countries").prop(
+        "disabled",
+        true
+      );
+      $(".easy-currency-pro-feature .remove-all-countries").prop(
+        "disabled",
+        true
+      );
+      $(".easy-currency-pro-feature .apply-default-countries").prop(
+        "disabled",
+        true
+      );
+    }
+  });
 
 
 })(jQuery);

@@ -21,11 +21,12 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             $eccw_currency_table = isset($_POST['requestedCurrencies']) ? map_deep( wp_unslash($_POST['requestedCurrencies']), 'sanitize_text_field' ) : [];
             $baseCurrency = isset($_POST['baseCurrency']) ? map_deep( wp_unslash($_POST['baseCurrency']), 'sanitize_text_field' ) : 'USD';
 
-            error_log( print_r( $baseCurrency , true ) );
             if (!is_array($eccw_currency_table) || empty($eccw_currency_table)) {
                 wp_send_json_error(__('Invalid or empty currency data.', 'easy-currency'));
                 return;
             }
+
+           // error_log("request currency". print_r( $eccw_currency_table, true ) );
 
             $ECCW_CURRENCY_SERVER = new ECCW_CURRENCY_SERVER();
            
@@ -33,6 +34,8 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             $currency_rate = 1;
            
             foreach($eccw_currency_table as $key => $currency) {
+
+               // error_log("currency here". print_r( $currency, true ) );
 
                 $currency_rate = $ECCW_CURRENCY_SERVER->eccw_get_currency_rate_live($baseCurrency, $currency);
 

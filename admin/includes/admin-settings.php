@@ -1293,8 +1293,8 @@ class ECCW_admin_settings
                     '1_week' => 'Every 1 Week'
                 ],
                 'desc' => __('This sets the interval of update exchange rate automation', 'easy-currency'),
-                'id' => 'options[eccw_auto_update_exchange_rate]',
-                'default' => isset($options['eccw_auto_update_exchange_rate']) ? $options['eccw_auto_update_exchange_rate'] : '',
+                'id' => 'advanced_settings[eccw_auto_update_exchange_rate]',
+                'default' => isset($advanced_settings['eccw_auto_update_exchange_rate']) ? $advanced_settings['eccw_auto_update_exchange_rate'] : '',
             ),
            
             'eccw_update_settings_section_end' => array(
@@ -1470,7 +1470,8 @@ class ECCW_admin_settings
         $ECCW_CURRENCY_SERVER = new ECCW_CURRENCY_SERVER();
         $currency_countries = $ECCW_CURRENCY_SERVER->eccw_get_currency_countries();
         $eccw_currency_settings = get_option('eccw_currency_settings', []);
-        $default_currency = isset($eccw_currency_settings['default_currency']) && !empty($eccw_currency_settings['default_currency']) ? $eccw_currency_settings['default_currency'] : 'usd';
+
+        $default_currency = isset($eccw_currency_settings['default_currency']) && !empty($eccw_currency_settings['default_currency']) ? $eccw_currency_settings['default_currency'] : 'USD';
 
         wp_nonce_field('eccw_update_settings', 'eccw_nonce');
 
@@ -1537,8 +1538,6 @@ class ECCW_admin_settings
                                 if (!empty($eccw_currency_settings) && isset($eccw_currency_settings['eccw_currency_table']) && count($eccw_currency_settings['eccw_currency_table']) > 0) {
                                     $eccw_currency_table = $eccw_currency_settings['eccw_currency_table'];
 
-                                   error_log(print_r( $eccw_currency_table, true  ) );
-
                                     foreach ( $eccw_currency_table as $index => $currency_data ) {
                                         $default = isset($currency_data['default']) ? $currency_data['default'] : '';
                                         $currency_code = isset($currency_data['code']) ? $currency_data['code'] : '';
@@ -1558,7 +1557,7 @@ class ECCW_admin_settings
                                         }
 
                                         echo '</select></td>';
-                                       echo '<input type="hidden" name="eccw_currency_table[' . esc_attr($index) . '][base_currency]" value="' . esc_attr($default_currency) . '" />';
+                                       echo '<input class="easy-base-currency-hidden-field" type="hidden" name="eccw_currency_table[' . esc_attr($index) . '][base_currency]" value="' . esc_attr($default_currency) . '" />';
                                         echo '<td><input type="text" name="eccw_currency_table[' . esc_attr($index) . '][rate]" value="' . esc_attr($rate) . '" class="currency-rate"/></td>';
                                         echo '<td><select name="eccw_currency_table[' . esc_attr($index) . '][symbol_position]">
                                             <option value="left"' . selected($symbol_position, 'left', false) . '>Left</option>
@@ -1584,8 +1583,6 @@ class ECCW_admin_settings
                                     }
                                 } else {
 
-                                   
-
                                     echo '<tr class="easy-base-currency">';
                                     echo '<td><input type="radio" name="eccw_currency_table[default]" value="'.esc_attr($matched_currency).'" checked /></td>';
 
@@ -1593,7 +1590,7 @@ class ECCW_admin_settings
                                     foreach ( $currency_countries as $currency_code => $data ) {
                                         echo '<option value="'.esc_attr($currency_code).'" '.selected($matched_currency, $currency_code, false).'>'.esc_html($currency_code).'</option>';
                                     }
-                                    echo '<input type="hidden" name="eccw_currency_table[0][base_currency]" value="'.esc_attr($default_currency).'" />';
+                                    echo '<input type="hidden" class="easy-base-currency-hidden-field" name="eccw_currency_table[0][base_currency]" value="'.esc_attr($default_currency).'" />';
                                     echo '</select></td>';
                                     echo '<td><input type="text" name="eccw_currency_table[0][rate]" value="1" class="currency-rate" /></td>';
                                     echo '<td><select name="eccw_currency_table[0][symbol_position]">

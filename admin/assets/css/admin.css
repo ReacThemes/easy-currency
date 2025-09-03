@@ -950,4 +950,14 @@
 .eccw-custom-advanced-settings h2 {
   background: #f4f4f4;
   padding: 20px;
+}
+
+.easy-currency-pro-feature .apply-default-countries,
+.easy-currency-pro-feature .select-all-countries,
+.easy-currency-pro-feature .remove-all-countries {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(20%);
+  pointer-events: none;
+  box-shadow: none;
 }/*# sourceMappingURL=admin.css.map */
