@@ -8,9 +8,6 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
 
     public function __construct(){
        
-
-        
-
         $this->currency_server = new ECCW_CURRENCY_SERVER();
         $this->ecccw_get_plugin_settings = new ECCW_Plugin_Settings();
         $this->plugin_settings = $this->ecccw_get_plugin_settings->ecccw_get_plugin_settings();
@@ -36,13 +33,11 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
             add_filter('woocommerce_currency_symbol', array($this, 'change_currency_symbol'), 10, 2);
             
             add_filter('wc_price_args', array($this, 'eccw_wc_price_format'));
-           // return;
 
             add_filter('woocommerce_price_format', array($this,'eccw_dynamic_currency_position'), 9999999, 2 );
         }
 
     }
-
 
     function eccw_dynamic_currency_position($format, $currency) {
 

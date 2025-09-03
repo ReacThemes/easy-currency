@@ -1,18 +1,20 @@
 === Easy Currency - Currency Switcher for WooCommerce ===
 Contributors: themewant
-Tags: easy currency, currency converter, switcher, woocommerce
+Tags: currency switcher, woocommerce currency, multi-currency, currency converter, woocommerce
+Requires at least: 5.8
 Tested up to: 6.8
+Requires PHP: 7.4
 Stable tag: 1.0.2
 License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-The Easy Currency Switcher Plugin for WooCommerce lets your customers view and switch product prices in multiple currencies, enhancing their shopping experience.
+Let shoppers view and switch WooCommerce product prices in multiple currencies, with automatic rates and checkout in the selected currency.
 
 == Description ==
-<a href="https://easy-currency.themewant.com/" target="_blank">Live Demo</a> | <a href="https://easy-currency.themewant.com/product/family-suite/" target="_blank">Single Demo</a>
 
-Easy Currency Switcher is a **free WooCommerce multi-currency switcher for WordPress** websites.
-With this plugin, you can create multiple custom currencies using flags, country codes, currency symbols, currency names, currency position, and more.
+Easy Currency Switcher is a **free WooCommerce multi-currency plugin**. Create multiple currencies, set custom rates or auto rates, format symbols/positions, and let shoppers view and pay in their preferred currency.
+
+<a href="https://easy-currency.themewant.com/" target="_blank">Live Demo</a> | <a href="https://easy-currency.themewant.com/product/family-suite/" target="_blank">Single Demo</a>
 
 Easy Currency comes with one of the most powerful currency switcher customizers available on the market, allowing you to design modern and unlimited switchers for your site.
 

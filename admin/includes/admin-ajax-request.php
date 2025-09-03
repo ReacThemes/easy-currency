@@ -14,7 +14,6 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
 
         }
 
-
         public function eccw_update_currency_rates(){
 
             check_ajax_referer('eccw_nonce', 'nonce');

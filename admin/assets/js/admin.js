@@ -16,6 +16,7 @@
       this.eccwSearchableShortcode();
       this.baseCurrencyChangeOption();
       this.removeTableRow();
+      this.easyAutoUpdateExchangeRate();
 
       $(document)
         .on(
@@ -929,6 +930,22 @@
       }
 
       $(document).on("click", ".eccw-settings-tabs .remove-row", removeCurrencyRow);
+    },
+
+    easyAutoUpdateExchangeRate: function() {
+      function toggleAutoUpdateInterval() {
+        if ($('input[name="advanced_settings[eccw_enable_auto_update]"]').is(':checked')) {
+            $('#options\\[eccw_auto_update_exchange_rate\\]').closest('tr').show();
+        } else {
+            $('#options\\[eccw_auto_update_exchange_rate\\]').closest('tr').hide();
+        }
+      }
+
+      toggleAutoUpdateInterval();
+
+      $('input[name="advanced_settings[eccw_enable_auto_update]"]').on('change', function() {
+          toggleAutoUpdateInterval();
+      });
     },
 
   };
