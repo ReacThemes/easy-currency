@@ -1254,6 +1254,62 @@ class ECCW_admin_settings
 
         $advanced_settings = isset($saved_settings['advanced_settings']) ? $saved_settings['advanced_settings'] : [];
 
+        $update_settings_field_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-autu-update-settings">'
+            )
+        );
+
+        $update_settings_fields = array(
+            'eccw_update_section_title' => array(
+                'name' => __('', 'easy-currency'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_advancedupdate_settings_title'
+            ),
+            'eccw_enable_auto_update_exchange_rate' => array(
+                'title' => __('Enable Auto Update', 'easy-currency'),
+                'id'    => 'advanced_settings[eccw_enable_auto_update]',
+                'type'  => 'switcher',
+                'default' => isset($advanced_settings['eccw_enable_auto_update']) ? $advanced_settings['eccw_enable_auto_update'] : '',
+                'class' => 'eccw-switcher-ui-control-show-hide',
+                'eccw_pro' => true,
+                'desc_tip' => true,
+                'description' => __('Enable this option auto update exchange rate', 'easy-currency'),
+            ),
+            'eccw_auto_update_interval' => array(
+                'name' => __('Auto Update Interval', 'easy-currency'),
+                'type' => 'select',
+                'options' => [
+                    '5_min' => 'Every 5 Minutes', 
+                    '30_min' => 'Every 30 Minutes', 
+                    '1_hour' => 'Every 1 hour', 
+                    '1_day' => 'Every 1 Day', 
+                    '2_day' => 'Every 2 Day', 
+                    '3_days' => 'Every 3 Days', 
+                    '4_days' => 'Every 4 Days', 
+                    '5_days' => 'Every 5 Days', 
+                    '1_week' => 'Every 1 Week'
+                ],
+                'desc' => __('This sets the interval of update exchange rate automation', 'easy-currency'),
+                'id' => 'options[eccw_auto_update_exchange_rate]',
+                'default' => isset($options['eccw_auto_update_exchange_rate']) ? $options['eccw_auto_update_exchange_rate'] : '',
+            ),
+           
+            'eccw_update_settings_section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_update_settings_advanced_section_end'
+            )
+        );
+
+        $advanced_settings_field_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
         $advanced_settings_field_start = array(
             array(
                 'type' => 'html',
@@ -1292,7 +1348,7 @@ class ECCW_admin_settings
            
             'eccw_advanced_settings_section_end' => array(
                 'type' => 'sectionend',
-                'id' => 'eccw_advanced_settings_section_end'
+                'id' => 'eccw_advanced_settings_section_ends'
             )
         );
        
@@ -1331,7 +1387,7 @@ class ECCW_admin_settings
             )
         );
 
-        $all_settings = array_merge( $advanced_settings_field_start, $advanced_settings_fields, $advanced_settings_field_end,  $custom_advanced_settings_field_start, $custom_advanced_settings_fields, $advanced_custom_curr_settings_field_end );
+        $all_settings = array_merge(  $update_settings_field_start, $update_settings_fields, $advanced_settings_field_end, $advanced_settings_field_start, $advanced_settings_fields, $advanced_settings_field_end,  $custom_advanced_settings_field_start, $custom_advanced_settings_fields, $advanced_custom_curr_settings_field_end );
 
 
        return $all_settings;

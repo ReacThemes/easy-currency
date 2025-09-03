@@ -157,7 +157,7 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
         $currency_symbol = get_woocommerce_currency_symbol();
         $decimals = wc_get_price_decimals();
 
-        if ($currency_rate && $currency_rate > 1) {
+        if ($currency_rate ) {
             $min_price = (float) $product->get_variation_price('min', true);
             $max_price = (float) $product->get_variation_price('max', true);
 
@@ -190,7 +190,7 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
         
         // Get currency rate and convert
         $currency_rate = $this->currency_server->eccw_get_currency_rate();
-        if ($currency_rate && $currency_rate > 1 && $price > 0) {
+        if ($currency_rate && $price > 0) {
             return (float)$price * $currency_rate;
         }
         

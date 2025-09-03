@@ -945,4 +945,9 @@
   background-color: #f5f5f5;
   color: #777;
   cursor: not-allowed;
+}
+
+.eccw-custom-advanced-settings h2 {
+  background: #f4f4f4;
+  padding: 20px;
 }/*# sourceMappingURL=admin.css.map */
