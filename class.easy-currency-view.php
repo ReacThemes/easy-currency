@@ -95,8 +95,6 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
     ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
     : ( isset($currency_settings['default_currency']) ? $currency_settings['default_currency'] : 'USD' ); 
 
-    
-
         $options = isset($currency_settings['options']) ? $currency_settings['options'] : [];
         $flag_visibility = isset($options['flag_visibility']) && !empty($options['flag_visibility']) ? $options['flag_visibility'] : 'no';
 

@@ -4,7 +4,7 @@ Tags: currency switcher, woocommerce currency, multi-currency, currency converte
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -82,6 +82,10 @@ This plugin utilizes a third-party service, APILayer (https://apilayer.com/), to
 
 Privacy Policy link: https://www.ideracorp.com/legal/APILayer
 Terms of Use link: https://www.ideracorp.com/Legal/Terms-of-Use
+
+= 1.0.3 =
+* Fixed: Base Currency Converter issue
+* Fixed: Default Currency Select issue
 
 = 1.0.2 =
 * Added: Custom currency symbol support.

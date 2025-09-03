@@ -960,4 +960,8 @@
   filter: grayscale(20%);
   pointer-events: none;
   box-shadow: none;
+}
+
+.eccw-ccpro-missing .titledesc label {
+  display: inline-block !important;
 }/*# sourceMappingURL=admin.css.map */

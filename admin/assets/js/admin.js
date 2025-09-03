@@ -1065,7 +1065,13 @@
         true
       );
     }
-  });
 
+    if ($(".eccw-ccpro-missing").length > 0) {
+        $(".eccw-ccpro-missing")
+          .find("input, select, textarea, button")
+          .prop("disabled", true);
+    }
+
+  });
 
 })(jQuery);

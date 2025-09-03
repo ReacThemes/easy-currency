@@ -1409,7 +1409,10 @@ class ECCW_admin_settings
                 'classes' => 'section-title'
             ),
                     'converter_widget_style' => array(
-                'name'      => __('Layout Style', 'easy-currency'),
+                'name' => $pro_active 
+                    ? __('Layout Style', 'easy-currency') 
+                    : __('Layout Style (PRO)', 'easy-currency'),
+
                 'type'      => 'select',
                 'options'   => ['one' => 'Style One'],
                 'desc_tip'  => $pro_active ? '' : __('Available in PRO', 'easy-currency'), // show only if PRO missing
@@ -1419,7 +1422,9 @@ class ECCW_admin_settings
                 'class'     => 'easy-converter-pro'
             ),
             'converter_currency_button_border_color' => array(
-                'name'      => __('Border Color', 'easy-currency'),
+                'name'      => $pro_active 
+                    ? __('Border Color', 'easy-currency') 
+                    : __('Border Color (PRO)', 'easy-currency'),
                 'type'      => 'text',
                 'id'        => 'design[converter_currency_button][border-color]',
                 'default'   => isset($design['converter_currency_button']['border-color']) ? $design['converter_currency_button']['border-color'] : '',
@@ -1427,7 +1432,9 @@ class ECCW_admin_settings
                 'desc_tip'  => $pro_active ? '' : __('Available in PRO', 'easy-currency')
             ),
             'converter_currency_button_border' => array(
-                'name'      => __('Border Width', 'easy-currency'),
+                'name'      => $pro_active 
+                    ? __('Border width', 'easy-currency') 
+                    : __('Border width (PRO)', 'easy-currency'),
                 'type'      => 'text',
                 'desc'      => 'enter number with px. ex: 2px 2px 2px 2px',
                 'default'   => isset($design['converter_currency_button']['null']) ? $design['converter_currency_button']['null'] : '',
@@ -1444,7 +1451,9 @@ class ECCW_admin_settings
                 'desc_tip' => $pro_active ? '' : __('Available in PRO', 'easy-currency')
             ),
             'converter_currency_button_flag_size' => array(
-                'name'        => __('Flag Size (Width)', 'easy-currency'),
+                'name'        =>  $pro_active 
+                    ? __('Flag Size (Width)', 'easy-currency') 
+                    : __('Flag Size (Width) (PRO)', 'easy-currency'), 
                 'type'        => 'text',
                 'desc'        => 'enter number with px. ex: 15px',
                 'id'          => 'design[converter_currency_button_flag][width]',
