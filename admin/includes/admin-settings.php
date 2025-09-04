@@ -1246,6 +1246,91 @@ class ECCW_admin_settings
         }
     }
 
+    function eccw_currency_select_in_different_payment() {
+
+        $settings = get_option('eccw_currency_settings', []);
+
+        $eccw_currency_settings = get_option('eccw_currency_settings', []);
+        $pro_class = 'easy-currency-pro-feature';
+        $pro_enabled = false;
+        if( class_exists( 'ECCW_CURRENCY_SWITCHER_PRO' ) ) {
+            $pro_class = '';
+            $pro_enabled = true;
+        }
+
+        if (!empty($eccw_currency_settings) && isset($eccw_currency_settings['eccw_currency_table']) && count($eccw_currency_settings['eccw_currency_table']) > 0) {
+            $eccw_currency_table = $eccw_currency_settings['eccw_currency_table'];
+
+            // Get saved payment methods & status
+            $payment_data = get_option('eccw_currency_payment_select', []);
+            $payment_status_data = get_option('eccw_currency_payment_status', []);
+
+            ?>
+            <div class="eccw-currency-payment-table-list <?php echo esc_attr( $pro_class ); ?>">
+                <table class="widefat striped eccw-currency-payment-table">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e('Currency', 'easy-currency'); ?></th>
+                            <th><?php esc_html_e('Payment Methods', 'easy-currency'); ?></th>
+                            <th><?php esc_html_e('Status', 'easy-currency'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php 
+                    foreach ($eccw_currency_table as $index => $currency_data ): 
+
+                        $currency_code = isset($currency_data['code']) ? $currency_data['code'] : '';
+                        $currencies = get_woocommerce_currencies(); 
+                        $currency_name = isset($currencies[$currency_code]) ? $currencies[$currency_code] : $currency_code;
+
+                        $selected_methods = isset($payment_data[$index]['payment'][$currency_code]) ? (array)$payment_data[$index]['payment'][$currency_code] : [];
+
+                        $checked_status = isset($payment_status_data[$index][$currency_code]) && $payment_status_data[$index][$currency_code] ? 1 : 0;
+
+                        ?>
+                        <tr>
+                            <td>
+                                <?php echo esc_html($currency_code); ?> - 
+                                <?php echo esc_html($currency_name); ?>
+                            </td>
+                            <td>
+                                <select name="eccw_currency_payment_select[<?php echo $index; ?>][payment][<?php echo $currency_code; ?>][]"
+                                        class="eccw-payment-method-select <?php echo !$pro_enabled ? 'pro-disabled' : ''; ?>"
+                                        multiple="multiple"
+                                        data-placeholder="<?php esc_attr_e('Please select payment methods...', 'easy-currency'); ?>"
+                                        style="width:100%;">
+                                    <?php 
+                                    $all_gateways = WC()->payment_gateways()->payment_gateways();
+                                    foreach ($all_gateways as $gateway_id => $gateway_obj) {
+                                        ?>
+                                        <option value="<?php echo esc_attr($gateway_id); ?>" 
+                                            <?php selected( in_array($gateway_id, $selected_methods) ); ?>>
+                                            <?php echo esc_html($gateway_obj->get_title()); ?>
+                                        </option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </td>
+                            <td>
+                                <label class="eccw-toggle-switch">
+                                    <input type="checkbox" 
+                                        name="eccw_currency_payment_status[<?php echo $index; ?>][<?php echo $currency_code; ?>]" 
+                                        value="1" <?php checked($checked_status); ?> />
+                                    <span class="eccw-payment-toggle"></span>
+                                </label>
+                            </td>
+
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php
+        }
+    }
+
+
 
     public function eccw_advanced_settings_field()
     {
@@ -1394,6 +1479,84 @@ class ECCW_admin_settings
 
     }
 
+    public function eccw_checkout_settings_field() {
+
+        $saved_settings = get_option('eccw_currency_settings');
+
+        $checkout_settings = isset($saved_settings['checkout_settings']) ? $saved_settings['checkout_settings'] : [];
+
+       // error_log( "checkout settings" . print_r( $checkout_settings, true ));
+
+        $checkout_currency_enable_field_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-checkout-enable-settings">'
+            )
+        );
+        $checkout_enable_settings_fields = array(
+            'eccw_custom_advanced_en_section_title' => array(
+                'name' => __('', 'easy-currency'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_advanced_en_settings_title_country'
+            ),
+            'eccw_checkout_in_different_payment_method' => array(
+                'title' => __('Enable Currency Checkout', 'easy-currency'),
+                'id'    => 'checkout_settings[eccw_checkout_currency]',
+                'type'  => 'switcher',
+                'default' => isset($checkout_settings['eccw_checkout_currency']) ? $checkout_settings['eccw_checkout_currency'] : '',
+                'class' => 'eccw-switcher-ui-control-show-hide',
+                'eccw_pro' => true,
+                'desc_tip' => true,
+                'description' => __('Enable this option Select in different payment method in currency', 'easy-currency'),
+            ),
+            'eccw_curr_payment_en_section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_currency_en_section_end',
+            )
+        );
+
+        $checkout_currency_enable_field_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+        $checkout_currency_field_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-checkout-settings">'
+            )
+        );
+
+        $checkout_settings_fields = array(
+            'eccw_custom_advanced_section_title' => array(
+                'name' => __('', 'easy-currency'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_advanced_settings_title_country'
+            ),
+            'eccw_curr_payment_section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_currency_payment_section_end',
+                'html' => $this->eccw_currency_select_in_different_payment(),
+            )
+        );
+       
+        $checkout_currency_field_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+        $all_settings = array_merge( $checkout_currency_enable_field_start, $checkout_enable_settings_fields,$checkout_currency_enable_field_end, $checkout_currency_field_start,  $checkout_settings_fields, $checkout_currency_field_end );
+        
+
+       return $all_settings;
+    }
+
     public function eccw_get_settings_converter_widgets_tab_fields() {
         // Retrieve saved settings
         $saved_settings = get_option('eccw_currency_settings');
@@ -1495,9 +1658,10 @@ class ECCW_admin_settings
                     <li><a href="#tab_currency">Currencies</a></li>
                     <li><a href="#tab_currency_options">Options</a></li>
                     <li><a href="#tab_currency_switcher_shortcode">Shortcode</a></li>
-                    <li><a href="#tab_currency_switcher_sticky">Sticky Side</a></li>
-                    <li><a href="#tab_currency_advanced_settings">Advanced Settings</a></li>
-                    <li><a href="#tab_converter_widgets">Currency Converter</a></li>
+                    <li><a href="#tab_currency_switcher_sticky">Side</a></li>
+                    <li><a href="#tab_currency_advanced_settings">Advanced</a></li>
+                    <li><a href="#tab_currency_checkout_settings">Checkout</a></li>
+                    <li><a href="#tab_converter_widgets">Converter</a></li>
                     <li><a href="#tab_currency_usage">Usage</a></li>
                     
 
@@ -1756,6 +1920,10 @@ class ECCW_admin_settings
                         <?php woocommerce_admin_fields($this->eccw_advanced_settings_field()); ?>
                     </div>
 
+                    <div id="tab_currency_checkout_settings" class="tab-content">
+                        <?php woocommerce_admin_fields($this->eccw_checkout_settings_field()); ?>
+                    </div>
+
                     <div id="tab_converter_widgets" class="tab-content easy-tab-converter-widget <?php echo class_exists('ECCW_CURRENCY_SWITCHER_PRO') ? '' : 'eccw-ccpro-missing'; ?>">
                         <?php woocommerce_admin_fields($this->eccw_get_settings_converter_widgets_tab_fields()); ?>
                     </div>
@@ -1796,6 +1964,12 @@ class ECCW_admin_settings
                 $currency_settings['advanced_settings'] = $design;
             }
 
+            if (isset($_POST['checkout_settings'])) {
+                $design = map_deep(wp_unslash($_POST['checkout_settings']), 'sanitize_text_field') ?? [];
+                $currency_settings['checkout_settings'] = $design;
+            }
+
+
             $filtered_data = array_filter($data, function ($row) {
                 return !empty($row['code']) || !empty($row['rate']) || !empty($row['symbol_position']) || !empty($row['decimal']) || !empty($row['separator']) || !empty($row['description']);
             });
@@ -1807,13 +1981,35 @@ class ECCW_admin_settings
                 update_option('eccw_currency_table_geo', $geo_data);
             }
 
+            if (isset($_POST['eccw_currency_payment_select'])) {
+                $currency_country_data = map_deep(wp_unslash($_POST['eccw_currency_payment_select']), 'sanitize_text_field') ?? [];
 
+                update_option('eccw_currency_payment_select', $currency_country_data );
+            }
 
-            // Re-index array to ensure sequential keys
+           
+             $payment_status_data = isset($_POST['eccw_currency_payment_status']) 
+                ? map_deep(wp_unslash($_POST['eccw_currency_payment_status']), 'sanitize_text_field') 
+                : [];
+            
+            $eccw_currency_settings = get_option('eccw_currency_settings', []);
+            $eccw_currency_table = $eccw_currency_settings['eccw_currency_table'] ?? [];
+
+           
+            foreach( $eccw_currency_table as $index => $currency_row ) {
+                $currency_code = $currency_row['code'] ?? '';
+                if (!isset($payment_status_data[$index][$currency_code])) {
+                    $payment_status_data[$index][$currency_code] = 0;
+                } else {
+                    $payment_status_data[$index][$currency_code] = ($payment_status_data[$index][$currency_code] == '1') ? 1 : 0;
+                }
+            }
+
+            update_option('eccw_currency_payment_status', $payment_status_data);
+
             $filtered_data = array_values($filtered_data);
             $currency_settings['eccw_currency_table'] = $filtered_data;
 
-            // Update the option with filtered data
             update_option('eccw_currency_settings', $currency_settings);
         }
     }

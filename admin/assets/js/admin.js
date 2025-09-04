@@ -18,6 +18,7 @@
       this.removeTableRow();
       this.easyAutoUpdateExchangeRate();
       this.eccwGeobyCountry();
+      this.currencyPaymentMethodTable();
 
       $(document)
         .on(
@@ -1005,6 +1006,27 @@
         }
       );
     },
+
+    currencyPaymentMethodTable: function() {
+        $(document).ready(function($){
+         
+           if( $('input[name="checkout_settings[eccw_checkout_currency]"]').is(':checked') ) {
+                $('.eccw-currency-payment-table-list').show();
+            } else {
+                $('.eccw-currency-payment-table-list').hide();
+            }
+
+            // Checkbox toggle
+            $('input[name="checkout_settings[eccw_checkout_currency]"]').on('change', function(){
+                if( $(this).is(':checked') ) {
+                    $('.eccw-currency-payment-table-list').slideDown();
+                } else {
+                    $('.eccw-currency-payment-table-list').slideUp();
+                }
+            });
+      });
+
+    }
   };
 
   ECCWAdmin.init();
@@ -1073,5 +1095,17 @@
     }
 
   });
+
+  $(document).ready(function($){
+      $('.eccw-payment-method-select').select2({
+          width: '60%',
+          placeholder: function(){
+              return $(this).data('placeholder');
+          },
+          allowClear: true
+      });
+  });
+
+
 
 })(jQuery);

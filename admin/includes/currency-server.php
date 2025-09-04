@@ -86,7 +86,6 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
         $plugin_settings = $this->plugin_settings;
         $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : [];
 
-
         $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
             ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
             : (isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD');
