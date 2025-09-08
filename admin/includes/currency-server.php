@@ -86,23 +86,54 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
         $plugin_settings = $this->plugin_settings;
         $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : [];
 
-        $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
-            ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
-            : (isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD');
+        // $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
+        //     ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
+        //     : (isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD');
 
-        if (class_exists('EASY_GEOIP_Currency_Detection')) {
-            $geo_data = EASY_GEOIP_Currency_Detection::get_instance()->eccw_set_currency_by_geoip();
 
-            $geo = new WC_Geolocation();
-            $geo_data_ip = $geo->geolocate_ip();
-            $visitor_country = $geo_data_ip['country'] ?? '';
+        
 
-           if (is_array($geo_data) && !empty($visitor_country)) {
-                foreach ( $geo_data as $currency_code => $countries ) {
-                    
-                    if (in_array($visitor_country, $countries, true)) {
-                        $default_currency = $currency_code;
-                        break;
+        $saved_settings = get_option('eccw_currency_settings');
+
+        $is_checkout_context = (
+            is_checkout() 
+            || is_order_received_page() 
+            || (defined('DOING_AJAX') && DOING_AJAX && isset($_REQUEST['wc-ajax']))
+        );
+
+        $checkout_currency_payenable = isset($saved_settings['checkout_settings']['eccw_checkout_currency']) 
+        ? $saved_settings['checkout_settings']['eccw_checkout_currency'] 
+        : '';
+
+        if ($is_checkout_context && WC()->session && WC()->session->get('eccw_checkout_currency') && in_array(  $checkout_currency_payenable, [ 1,'yes'] ) ) {
+            $default_currency = sanitize_text_field(WC()->session->get('eccw_checkout_currency'));
+        } else {
+            
+            if (isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])) {
+                $default_currency = sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']));
+            } elseif (isset($plugin_settings['default_currency'])) {
+                $default_currency = $plugin_settings['default_currency'];
+            }
+        }
+
+        if ($is_checkout_context && WC()->session && WC()->session->get('eccw_checkout_currency') && in_array(  $checkout_currency_payenable, [ 1,'yes'] ) ) {
+            $default_currency = sanitize_text_field(WC()->session->get('eccw_checkout_currency'));
+        } else {
+
+            if (class_exists('EASY_GEOIP_Currency_Detection')) {
+
+                $geo_data = EASY_GEOIP_Currency_Detection::get_instance()->eccw_set_currency_by_geoip();
+                $geo = new WC_Geolocation();
+                $geo_data_ip = $geo->geolocate_ip();
+                $visitor_country = $geo_data_ip['country'] ?? '';
+
+            if (is_array($geo_data) && !empty($visitor_country)) {
+                    foreach ( $geo_data as $currency_code => $countries ) {
+                        
+                        if (in_array($visitor_country, $countries, true)) {
+                            $default_currency = $currency_code;
+                            break;
+                        }
                     }
                 }
             }
@@ -147,7 +178,6 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
 
     public function eccw_get_currency_rate_live($from_currency, $to_currency)
     {
-
 
         $currency_settings = get_option('eccw_currency_settings');
         $selected_server = isset($currency_settings['options']['currency_aggregator']) ? $currency_settings['options']['currency_aggregator'] : 'apilayer';

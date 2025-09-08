@@ -35,8 +35,6 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
            
             foreach($eccw_currency_table as $key => $currency) {
 
-               // error_log("currency here". print_r( $currency, true ) );
-
                 $currency_rate = $ECCW_CURRENCY_SERVER->eccw_get_currency_rate_live($baseCurrency, $currency);
 
                 if (!empty($currency_rate['error'])) {
@@ -126,7 +124,6 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
                 ['%d']
             );
 
-
             // Clear transient & object cache
             delete_transient('eccw_shortcode_list');
             wp_cache_delete('eccw_shortcode_list', 'options');
@@ -140,7 +137,6 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             ]);
 
         }
-
 
         public function eccw_get_all_shortcodes_cached() {
 
@@ -166,6 +162,7 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
 
 
         public function eccw_delete_shortcode_callback() {
+
             check_ajax_referer('eccw_nonce', 'nonce');
 
             if (empty($_POST['id'])) {
@@ -195,6 +192,7 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
         }
 
         function eccw_eccw_shortcode_save_style_callback() {
+
             check_ajax_referer('eccw_nonce', 'nonce');
 
             if( !isset( $_POST['sd_id'] ) || empty( $_POST['sd_id'] )) {
@@ -235,8 +233,6 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
 
             wp_send_json_success();
         }
-
-
 
         // shortcode Dynamic load modal content
 

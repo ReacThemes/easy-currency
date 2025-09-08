@@ -1239,6 +1239,10 @@ class ECCW_admin_settings
                         <?php esc_html_e('Apply Default Country', 'easy-currency'); ?>
                     </button>
                 </div>
+                <p class="eccw-currecny-wise-payment-desc">
+                    Note: Based on Geo IP rules, the currency will automatically convert according to the visitor’s country.  Make sure WooCommerce and Auto select currency are enabled for this feature to work properly.a
+                </p>
+
 
             </div>
             <?php
@@ -1300,7 +1304,7 @@ class ECCW_admin_settings
                                         data-placeholder="<?php esc_attr_e('Please select payment methods...', 'easy-currency'); ?>"
                                         style="width:100%;">
                                     <?php 
-                                    $all_gateways = WC()->payment_gateways()->payment_gateways();
+                                    $all_gateways = WC()->payment_gateways()->get_available_payment_gateways();
                                     foreach ($all_gateways as $gateway_id => $gateway_obj) {
                                         ?>
                                         <option value="<?php echo esc_attr($gateway_id); ?>" 
@@ -1325,12 +1329,101 @@ class ECCW_admin_settings
                     <?php endforeach; ?>
                     </tbody>
                 </table>
+                <p class="eccw-currecny-wise-payment-desc">Note: All enabled payment methods will appear in the dropdown, but only those supported in the customer’s country will be shown on the frontend.</p>
             </div>
             <?php
         }
     }
 
+    function eccw_payment_gateway_rule_currency() {
 
+        $settings = get_option('eccw_currency_settings', []);
+
+        $eccw_currency_settings = get_option('eccw_currency_settings', []);
+        $pro_class = 'easy-currency-pro-feature';
+        $pro_enabled = false;
+        if( class_exists( 'ECCW_CURRENCY_SWITCHER_PRO' ) ) {
+            $pro_class = '';
+            $pro_enabled = true;
+        }
+
+        if (!empty($eccw_currency_settings) && isset($eccw_currency_settings['eccw_currency_table']) && count($eccw_currency_settings['eccw_currency_table']) > 0) {
+            $eccw_currency_table = $eccw_currency_settings['eccw_currency_table'];
+
+            $code_currency_arr = [];
+            foreach ($eccw_currency_table as $currency_data) {
+                if (!empty($currency_data['code'])) {
+                    $code_currency_arr[] = $currency_data['code'];
+                }
+            }
+       
+            // Get saved payment methods & status
+            $payment_data = get_option('eccw_payment_gateway_select', []);
+
+            $saved_gateways_currency = get_option('eccw_gateway_currency_set', []);
+
+            $payment_status_data = get_option('eccw_currency_payment_status', []);
+
+
+            ?>
+            <div class="eccw-payment-rule-bycurrency-table-list <?php echo esc_attr( $pro_class ); ?>">
+                <table class="widefat striped eccw-currency--set-payment-rule-table">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e('Payment Methods', 'easy-currency'); ?></th>
+                            <th><?php esc_html_e('Set Currency', 'easy-currency'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php 
+                    
+                        $all_gateways = WC()->payment_gateways()->get_available_payment_gateways();
+                        foreach ($all_gateways as $gateway_id => $gateway_obj) {
+
+                        ?>
+                        <tr>
+                            <td>
+                                <?php echo esc_html($gateway_obj->get_title()); ?>
+                            </td>
+                           
+                            <td>
+                                <select name="eccw_gateway_currency_set[<?php echo $gateway_id; ?>][]"
+                                        class="eccw-payment-wise-currency-set-currency <?php echo !$pro_enabled ? 'pro-disabled' : ''; ?>"
+                                        data-placeholder="<?php esc_attr_e('Please select currency...', 'easy-currency'); ?>">
+                                        <?php 
+                                         $saved_currencies = isset($saved_gateways_currency[$gateway_id]) 
+                                            ? (array) $saved_gateways_currency[$gateway_id] 
+                                            : [];
+                                        ?>
+                                       <option value="not_set" <?php echo empty($saved_currencies) ? 'selected' : ''; ?>>
+                                            <?php echo esc_html__('Not Select', 'easy-currency'); ?>
+                                        </option>
+                                    <?php 
+                                  
+                                    foreach ( $code_currency_arr as $index => $currency_code ) {
+                                       
+                                        ?>
+                                        <option value="<?php echo esc_attr($currency_code); ?>" 
+                                            <?php selected( in_array($currency_code, $saved_currencies ) ); ?>>
+                                            <?php echo esc_html( $currency_code ); ?>
+                                        </option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                    </tbody>
+                </table>
+                <p>
+                    <strong>Notice:</strong> When using the <em>WooCommerce Cart & Checkout Block</em>, 
+                    the <span style="color: red;">payment method rules are not working</span>.
+                </p>
+            </div>
+            <?php
+        }
+    }
 
     public function eccw_advanced_settings_field()
     {
@@ -1421,7 +1514,7 @@ class ECCW_admin_settings
             ),
            
             'eccw_autodetect_currency_geo' => array(
-                'title' => __('Auto select currency by countries', 'easy-currency'),
+                'title' => __('Auto select currency by countries Geo rule', 'easy-currency'),
                 'id'    => 'advanced_settings[eccw_auto_select_currency_by_country]',
                 'type'  => 'switcher',
                 'default' => isset($advanced_settings['eccw_auto_select_currency_by_country']) ? $advanced_settings['eccw_auto_select_currency_by_country'] : 'no',
@@ -1485,7 +1578,9 @@ class ECCW_admin_settings
 
         $checkout_settings = isset($saved_settings['checkout_settings']) ? $saved_settings['checkout_settings'] : [];
 
-       // error_log( "checkout settings" . print_r( $checkout_settings, true ));
+        $pro_active = class_exists('ECCW_CURRENCY_SWITCHER_PRO');
+
+        $pro_missing_class = $pro_active ? '' : __('easy-currency-pro-feature', 'easy-currency');
 
         $checkout_currency_enable_field_start = array(
             array(
@@ -1551,7 +1646,87 @@ class ECCW_admin_settings
             )
         );
 
-        $all_settings = array_merge( $checkout_currency_enable_field_start, $checkout_enable_settings_fields,$checkout_currency_enable_field_end, $checkout_currency_field_start,  $checkout_settings_fields, $checkout_currency_field_end );
+        $payment_rule_currency_field_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-currency-by-payment-rule ' . $pro_missing_class . '">'
+            )
+        );
+
+        $protext = $pro_active ? '' : __('PRO', 'easy-currency');
+
+        $payment_gateway_rule_settings_fields = array(
+            'eccw_custom_payment_gateway_section_title' => array(
+                'name' => __('Currency change by payment gateway rule', 'easy-currency'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'eccw_advanced_payment_gateway_title_country'
+            ),
+           'eccw_currency_change_mode_payment_gateway' => array(
+                'name'    => __("Currency Change Mode ({$protext})", 'easy-currency'),
+                'type'    => 'select',
+                'options' => [
+                    'place_order'          => 'On Place Order',       
+                    'instant'              => 'Instant Change',     
+                ],
+                'desc'    => __("Choose how currency updates at checkout. 'Instant Change' updates immediately when a payment method is selected, while 'On Place Order' updates only when the order is placed.", 'easy-currency'),
+                'id'      => 'checkout_settings[eccw_currency_change_mode]',
+                'default' => isset($checkout_settings['eccw_currency_change_mode']) ? $checkout_settings['eccw_currency_change_mode'] : 'place_order',
+            ),
+
+
+            'eccw_curr_payment_gateway_section_end' => array(
+                'type' => 'sectionend',
+                'id' => 'eccw_currency_payment_gateway_section_end',
+                'html' => $this->eccw_payment_gateway_rule_currency(),
+            )
+        );
+       
+        $payment_rule_currency_field_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+        $shipping_billing_field_start = array(
+            array(
+                'type' => 'html',
+                'html' => '<div class="eccw-currency-shipping-billing-rule ' . $pro_missing_class . '">'
+            )
+        );
+
+        $shipping_billing_settings_fields = array(
+            'eccw_shipping_billing_section_title' => array(
+                'name' => __("Shipping & Billing Currency Settings ({$protext})", 'easy-currency'),
+                'type' => 'title',
+                'desc' => __('Select how the currency changes based on customer billing or shipping address.', 'easy-currency'),
+                'id'   => 'eccw_shipping_billing_title'
+            ),
+            'eccw_shipping_billing_select_option' => array(
+                'title'   => __('Currency on Billing', 'eccw'),
+                'type'    => 'eccw_currency_on_billing',
+                'id'      => 'checkout_settings[eccw_currency_on_billing]',
+                'desc'    => '',
+                'desc_tip' => 'Note: On the checkout page, the currency will automatically switch when the customer changes their billing country or selects a shipping country (if Ship to a different address is enabled). This will only work if the chosen country’s currency exists in your Currency Exchange Rate Table.', 
+                'default' => isset($checkout_settings['eccw_currency_on_billing']) ? $checkout_settings['eccw_currency_on_billing'] : 'none',
+            ),
+            'eccw_shipping_billing_section_end' => array(
+                'type' => 'sectionend',
+                'id'   => 'eccw_currency_shipping_billing_section_end',
+            )
+        );
+
+       
+        $shipping_billing_field_end = array(
+            array(
+                'type' => 'html',
+                'html' => '</div>'
+            )
+        );
+
+
+        $all_settings = array_merge( $checkout_currency_enable_field_start, $checkout_enable_settings_fields,$checkout_currency_enable_field_end, $checkout_currency_field_start,  $checkout_settings_fields, $checkout_currency_field_end ,$payment_rule_currency_field_start, $payment_gateway_rule_settings_fields, $payment_rule_currency_field_end , $shipping_billing_field_start, $shipping_billing_settings_fields, $shipping_billing_field_end );
         
 
        return $all_settings;
@@ -1987,13 +2162,25 @@ class ECCW_admin_settings
                 update_option('eccw_currency_payment_select', $currency_country_data );
             }
 
-           
-             $payment_status_data = isset($_POST['eccw_currency_payment_status']) 
+            if (isset($_POST['eccw_gateway_currency_set'])) {
+                $payment_method_curcy_data = map_deep(wp_unslash($_POST['eccw_gateway_currency_set']), 'sanitize_text_field') ?? [];
+
+                update_option('eccw_gateway_currency_set', $payment_method_curcy_data );
+            }
+              
+            $payment_status_data = isset($_POST['eccw_currency_payment_status']) 
                 ? map_deep(wp_unslash($_POST['eccw_currency_payment_status']), 'sanitize_text_field') 
                 : [];
             
             $eccw_currency_settings = get_option('eccw_currency_settings', []);
             $eccw_currency_table = $eccw_currency_settings['eccw_currency_table'] ?? [];
+
+            $checkout_settings = map_deep($_POST['checkout_settings'] ?? [], 'sanitize_text_field');
+            $val = $checkout_settings['eccw_currency_on_billing'] ?? 'none';
+            $val = in_array($val, ['none','billing','shipping'], true) ? $val : 'none';
+            $currency_settings['checkout_settings']['eccw_currency_on_billing'] = $val;
+            update_option('eccw_currency_on_billing', $val);
+
 
            
             foreach( $eccw_currency_table as $index => $currency_row ) {

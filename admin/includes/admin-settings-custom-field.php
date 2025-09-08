@@ -25,9 +25,63 @@ class ECCW_admin_settings_Customfields
         add_action('woocommerce_admin_field_select2', array($this, 'eccw_admin_field_eccw_select2'));
         add_action('woocommerce_admin_field_eccw_searchable_select', array($this, 'eccw_searchable_select_field') );
         add_action('woocommerce_admin_field_eccw_searchable_country', array($this, 'eccw_searchable_country_select_field') );
+
+        add_action('woocommerce_admin_field_eccw_currency_on_billing',array( $this, 'eccw_admin_field_eccw_currency_on_billing' ) );
     }
 
-   
+    public function eccw_admin_field_eccw_currency_on_billing($field) {
+        $value = $field['value'] ?? $field['default'] ?? '';
+        $option_id = $field['field_name'] ?? $field['id'];
+        ?>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                <label for="<?php echo esc_attr($option_id); ?>">
+                    <?php echo esc_html($field['title'] ?? __('Currency on Billing', 'eccw')); ?>
+                </label>
+            </th>
+            <td class="forminp forminp-radio">
+                <fieldset>
+                    <legend class="screen-reader-text">
+                        <span><?php echo esc_html($field['title'] ?? ''); ?></span>
+                    </legend>
+
+                    <label>
+                        <input type="radio" name="<?php echo esc_attr($option_id); ?>" value="none"
+                            <?php checked($value, 'none'); ?> />
+                        <?php esc_html_e('None', 'eccw'); ?>
+                    </label><br/>
+
+                    <label>
+                        <input type="radio" name="<?php echo esc_attr($option_id); ?>" value="billing"
+                            <?php checked($value, 'billing'); ?> />
+                        <?php esc_html_e('Change currency by billing country on checkout', 'eccw'); ?>
+                    </label><br/>
+
+                    <label>
+                        <input type="radio" name="<?php echo esc_attr($option_id); ?>" value="shipping"
+                            <?php checked($value, 'shipping'); ?> />
+                        <?php esc_html_e('Change currency by shipping country on checkout', 'eccw'); ?>
+                    </label>
+
+                    <?php if (!empty($field['desc'])): ?>
+                        <p class="description"><?php echo wp_kses_post($field['desc']); ?></p>
+                    <?php endif; ?>
+                </fieldset>
+            </td>
+        </tr>
+        
+        <?php
+    }
+
+    // 2.b) Saver: saves the chosen value on "Save changes"
+    // add_action('woocommerce_update_option_eccw_currency_on_billing', function ($field) {
+    //     $option_id = $field['id'] ?? 'eccw_currency_on_billing';
+    //     $val = isset($_POST[$option_id]) ? sanitize_text_field($_POST[$option_id]) : 'none';
+    //     update_option($option_id, in_array($val, ['none','billing','shipping'], true) ? $val : 'none');
+    // });
+
+
+
 
     public function eccw_searchable_select_field( $value ) {
 

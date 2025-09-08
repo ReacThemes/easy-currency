@@ -1010,18 +1010,12 @@
     currencyPaymentMethodTable: function() {
         $(document).ready(function($){
          
-           if( $('input[name="checkout_settings[eccw_checkout_currency]"]').is(':checked') ) {
-                $('.eccw-currency-payment-table-list').show();
-            } else {
-                $('.eccw-currency-payment-table-list').hide();
-            }
-
             // Checkbox toggle
             $('input[name="checkout_settings[eccw_checkout_currency]"]').on('change', function(){
                 if( $(this).is(':checked') ) {
-                    $('.eccw-currency-payment-table-list').slideDown();
+                    $('.eccw-payment-rule-bycurrency-table-list,.eccw-currency-by-payment-rule,.eccw-currency-payment-table-list').slideDown();
                 } else {
-                    $('.eccw-currency-payment-table-list').slideUp();
+                    $('.eccw-payment-rule-bycurrency-table-list,.eccw-currency-by-payment-rule,.eccw-currency-payment-table-list').slideUp();
                 }
             });
       });
@@ -1086,6 +1080,20 @@
         "disabled",
         true
       );
+
+      $('.easy-currency-pro-feature').each(function(){
+        
+        $(this).find('input, select, textarea').prop('disabled', true);
+        
+      
+        $(this).find('select').each(function(){
+            if($(this).hasClass('select2-hidden-accessible')){
+                $(this).select2('destroy'); 
+                $(this).prop('disabled', true); 
+            }
+        });
+    });
+
     }
 
     if ($(".eccw-ccpro-missing").length > 0) {
@@ -1097,7 +1105,7 @@
   });
 
   $(document).ready(function($){
-      $('.eccw-payment-method-select').select2({
+      $('.eccw-payment-method-select,.eccw-payment-wise-currency-set').select2({
           width: '60%',
           placeholder: function(){
               return $(this).data('placeholder');
@@ -1105,7 +1113,6 @@
           allowClear: true
       });
   });
-
 
 
 })(jQuery);
