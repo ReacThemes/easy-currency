@@ -5,11 +5,16 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
 
     protected $ecccw_get_plugin_settings;
     protected $plugin_settings;
+    public $welcome_currency;
 
     public function __construct()
     {
         $this->ecccw_get_plugin_settings = new ECCW_Plugin_Settings();
         $this->plugin_settings = $this->ecccw_get_plugin_settings->ecccw_get_plugin_settings();
+
+        $this->welcome_currency = eccw_get_first_visit_currency();
+
+        error_log( "welcome currency" . print_r( $this->welcome_currency, true ) );
     }
 
     public function eccw_get_currency_rate_live_aggregators()
@@ -78,6 +83,10 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
             }
         }
 
+        if( isset( $this->welcome_currency ) && !empty($this->welcome_currency)) {
+            return $this->welcome_currency;
+        }
+
         return $default_currency;
     }
 
@@ -85,13 +94,6 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
     {
         $plugin_settings = $this->plugin_settings;
         $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : [];
-
-        // $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
-        //     ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
-        //     : (isset($plugin_settings['default_currency']) ? $plugin_settings['default_currency'] : 'USD');
-
-
-        
 
         $saved_settings = get_option('eccw_currency_settings');
 
@@ -137,6 +139,10 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
                     }
                 }
             }
+        }
+
+        if( isset( $this->welcome_currency ) && !empty($this->welcome_currency)) {
+            $default_currency = $this->welcome_currency;
         }
 
         $result = array_filter($eccw_currency_table, function ($item) use ($default_currency) {

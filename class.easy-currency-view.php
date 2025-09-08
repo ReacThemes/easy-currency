@@ -31,6 +31,7 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         add_action( 'init', [$this, 'ecccw_update_currency'] );
         add_shortcode( 'easy_currency_switcher', [$this, 'eccw_get_currency_switcher'] );
 
+
     }
 
  

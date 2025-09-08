@@ -145,3 +145,19 @@ if (!function_exists('eccw_is_checkout_ajax_request')) {
         return false;
     }
 }
+
+
+function eccw_get_first_visit_currency() {
+   
+    if ( ! class_exists('WooCommerce') || ! WC()->session ) {
+        return '';
+    }
+
+    $first_visit_currency = WC()->session->get('eccw_firstvisit_client_currency');
+
+    if ( !empty($first_visit_currency) ) {
+        return $first_visit_currency;
+    }
+    
+    return '';
+}

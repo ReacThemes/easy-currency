@@ -35,6 +35,8 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
             add_filter('wc_price_args', array($this, 'eccw_wc_price_format'));
 
             add_filter('woocommerce_price_format', array($this,'eccw_dynamic_currency_position'), 9999999, 2 );
+
+            add_action('wp_loaded', array($this,'eccw_set_first_visit_currency_session') );
         }
 
     }
@@ -260,6 +262,24 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
         }
 
         return false;
+    }
+
+    function eccw_set_first_visit_currency_session() {
+
+        if ( ! class_exists('WooCommerce') || ! WC()->session ) {
+            return;
+        }
+
+        $saved_settings = get_option('eccw_currency_settings', []);
+        $options = isset($saved_settings['options']) ? $saved_settings['options'] : [];
+        $welcome_currency = isset($options['eccw_welcome_currency']) ? $options['eccw_welcome_currency'] : 'USD';
+
+        $is_first_visit = ! isset($_COOKIE['eccw_first_visit']);
+
+        if ( $is_first_visit ) {
+            setcookie('eccw_first_visit', '1', time() + 365*24*60*60, COOKIEPATH, COOKIE_DOMAIN);
+            WC()->session->set('eccw_firstvisit_client_currency', $welcome_currency);
+        }
     }
 
 }

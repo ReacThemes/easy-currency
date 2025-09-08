@@ -37,12 +37,48 @@ class ECCW_admin_settings
         $ECCW_CURRENCY_SERVER = new ECCW_CURRENCY_SERVER();
         $aggregators = $ECCW_CURRENCY_SERVER->eccw_get_currency_rate_live_aggregators();
 
+        $code_currency_arr = [];
+        if (!empty($saved_settings) && isset($saved_settings['eccw_currency_table']) && count($saved_settings['eccw_currency_table']) > 0) {
+            $eccw_currency_table = $saved_settings['eccw_currency_table'];
+
+            foreach ($eccw_currency_table as $currency_data) {
+                if (!empty($currency_data['code'])) {
+                    $code_currency_arr[$currency_data['code']] = $currency_data['code'];
+                }
+            }
+        }
+
+        $default_country = get_option('woocommerce_default_country', '');
+        $country_code    = explode(':', $default_country)[0];
+
+        $currency_countries2 = $ECCW_CURRENCY_SERVER->eccw_get_currency_countries();
+
+        $currency_countries = json_decode(json_encode($currency_countries2), true);
+
+        $matched_currency = '';
+
+        foreach ( $currency_countries as $currency_code => $data ) {
+            if ( in_array( $country_code, $data['countries'], true ) ) {
+                $matched_currency = $currency_code;
+                break;
+            }
+        }
+
         $eccw_global_options_settings = array(
             'section_title' => array(
                 'name' => __('Change currency options from here.', 'easy-currency'),
                 'type' => 'title',
                 'desc' => '',
                 'id' => 'eccw_settings_tab_section_title'
+            ),
+            'easy_welcome_currency' => array(
+                'name' => __('Welcome Currency', 'easy-currency'),
+                'type' => 'select',
+                'desc' => __('The first-time visitor will see the selected "Welcome Currency" regardless of your store’s default currency.', 'easy-currency'),
+                'id' => 'options[eccw_welcome_currency]',
+                'options' => $code_currency_arr,
+                'default' => isset($options['eccw_welcome_currency']) ? $options['eccw_welcome_currency'] : $matched_currency,
+                'class' => 'eccw-welcome-currency-input', 
             ),
             'currency_aggregator' => array(
                 'name' => __('Currency aggregator', 'easy-currency'),
@@ -832,7 +868,7 @@ class ECCW_admin_settings
                 'title' => __('Show / Hide', 'easy-currency'),
                 'id'    => 'design[eccw_show_hide_side_currency]',
                 'type'  => 'switcher',
-                'default' => isset($design['eccw_show_hide_side_currency']) ? $design['eccw_show_hide_side_currency'] : 'yes',
+                'default' => isset($design['eccw_show_hide_side_currency']) ? $design['eccw_show_hide_side_currency'] : 'no',
                 'class' => 'eccw-switcher-ui-control-show-hide',
             ),
             'switcher_sticky_template' => array(
@@ -1336,8 +1372,6 @@ class ECCW_admin_settings
     }
 
     function eccw_payment_gateway_rule_currency() {
-
-        $settings = get_option('eccw_currency_settings', []);
 
         $eccw_currency_settings = get_option('eccw_currency_settings', []);
         $pro_class = 'easy-currency-pro-feature';
