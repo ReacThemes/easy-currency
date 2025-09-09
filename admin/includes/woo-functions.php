@@ -29,7 +29,6 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
             add_filter('woocommerce_product_variation_get_price', array($this, 'eccw_convert_variation_price'), 10, 2);
             add_filter('woocommerce_product_variation_get_regular_price', array($this, 'eccw_convert_variation_price'), 10, 2);
 
-           
             add_filter('woocommerce_currency_symbol', array($this, 'change_currency_symbol'), 10, 2);
             
             add_filter('wc_price_args', array($this, 'eccw_wc_price_format'));
@@ -50,7 +49,6 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
             return $format;
         }
 
-       
         $eccw_get_user_preferred_currency_data = $this->currency_server->eccw_get_user_preferred_currency_data();
         if (!empty($eccw_get_user_preferred_currency_data['symbol_position'])) {
             $symbol_position = $eccw_get_user_preferred_currency_data['symbol_position'];
@@ -106,6 +104,17 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
 
         $geo_prices = apply_filters('eccw_pricing_geo_rules', [], $product);
 
+        $fixed_rule_prices = apply_filters('eccw_pricing_fixed_rules', [], $product);
+
+        $eccw_fixed_regular_price = isset($fixed_rule_prices['easy_fixed_rule_regular_price']) 
+            ? (float) $fixed_rule_prices['easy_fixed_rule_regular_price'] 
+            : (float) get_post_meta($product->get_id(), '_regular_price', true);
+
+        $eccw_fixed_sale_price = isset($fixed_rule_prices['easy_fixed_rule_sale_price']) 
+            ? (float) $fixed_rule_prices['easy_fixed_rule_sale_price'] 
+            : (float) get_post_meta($product->get_id(), '_sale_price', true);
+
+
         $geo_regular_price = isset($geo_prices['easy_geo_regular_price']) 
             ? (float) $geo_prices['easy_geo_regular_price'] 
             : (float) get_post_meta($product->get_id(), '_regular_price', true);
@@ -118,23 +127,42 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
         $current_filter = current_filter();
 
         if ($current_filter === 'woocommerce_product_get_regular_price') {
-            $final_price = $geo_regular_price;
+            if ( !empty( $fixed_rule_prices['easy_fixed_rule_regular_price'] ) ) {
+                $final_price = $eccw_fixed_regular_price;
+            } else {
+                $final_price = $geo_regular_price;
+            }
+            
         } elseif ($current_filter === 'woocommerce_product_get_sale_price') {
-          
-            $final_price = !empty($geo_sale_price) && $geo_sale_price > 0 
+            
+            if ( !empty( $fixed_rule_prices['easy_fixed_rule_regular_price'] ) && !empty($fixed_rule_prices['easy_fixed_rule_sale_price'])) {
+                $final_price = !empty($eccw_fixed_sale_price) && $eccw_fixed_sale_price > 0 
+                ? $eccw_fixed_sale_price 
+                : $eccw_fixed_regular_price;
+            } else {
+                $final_price = !empty($geo_sale_price) && $geo_sale_price > 0 
                 ? $geo_sale_price 
                 : $geo_regular_price;
+            }
         } elseif ($current_filter === 'woocommerce_product_get_price') {
            
-            $final_price = !empty($geo_sale_price) && $geo_sale_price > 0
-                ? $geo_sale_price
+            if (  !empty( $fixed_rule_prices['easy_fixed_rule_regular_price'] ) && !empty($fixed_rule_prices['easy_fixed_rule_sale_price'])) {
+                $final_price = !empty($eccw_fixed_sale_price) && $eccw_fixed_sale_price > 0 
+                ? $eccw_fixed_sale_price 
+                : $eccw_fixed_regular_price;
+            } else {
+                $final_price = !empty($geo_sale_price) && $geo_sale_price > 0 
+                ? $geo_sale_price 
                 : $geo_regular_price;
+            }
         } else {
             $final_price = $price;
         }
 
-        if (!$this->eccw_should_skip_currency_conversion()) {
-            $final_price = (float) $final_price * $currency_rate;
+        if (  empty( $fixed_rule_prices['easy_fixed_rule_regular_price'] ) ) {
+            if (!$this->eccw_should_skip_currency_conversion()) {
+                $final_price = (float) $final_price * $currency_rate;
+            }
         }
 
         return $final_price;

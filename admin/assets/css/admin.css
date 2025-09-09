@@ -1066,4 +1066,26 @@
 .eccw-currecny-wise-payment-desc {
   color: #d5a720;
   font-weight: 600;
+}
+
+.eccw_fixed_price_options_group {
+  padding: 15px;
+}
+.eccw_fixed_price_options_group .fixed_price_rule_item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.eccw_fixed_price_options_group .fixed_price_rule_item input {
+  width: 30%;
+}
+.eccw_fixed_price_options_group .fixed_price_rule_item .button {
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.eccw-autu-update-settings .description {
+  margin-top: 15px;
 }/*# sourceMappingURL=admin.css.map */

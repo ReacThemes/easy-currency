@@ -19,6 +19,8 @@
       this.easyAutoUpdateExchangeRate();
       this.eccwGeobyCountry();
       this.currencyPaymentMethodTable();
+      this.EccwaddNewfixedPriceRules();
+      this.eccwFixedPriceValidation();
 
       $(document)
         .on(
@@ -1020,7 +1022,55 @@
             });
       });
 
-    }
+    },
+
+    EccwaddNewfixedPriceRules: function () {
+      let countries = eccw_vars.countries;
+      console.log(countries);
+
+      $(".eccw_fixed_price_options_group .add_fixed_price_rule").on("click", function () {
+        let index = $("#eccw_pricing_fixed_rules_container .fixed_price_rule_item").length;
+        let countryOptions = '<option value="">Select Country</option>';
+
+        $.each(countries, function (code, name) {
+          countryOptions +=
+            '<option value="' + code + '">' + name + "</option>";
+        });
+
+        let newRow = `<div class="fixed_price_rule_item">
+                    <input type="text" name="eccw_pricing_fixed_rules[${index}][regular_price]" placeholder="Regular Price" class="eccw_fixed_regular_price_input">
+                    <input type="text" name="eccw_pricing_fixed_rules[${index}][sale_price]" placeholder="Sale Price" class="eccw_fixed_sale_price_input">
+                    <select name="eccw_pricing_fixed_rules[${index}][country]" class="eccw_fixed_price_country_select">
+                        ${countryOptions}
+                    </select>
+                    <button type="button" class="remove_fixed_price_rule button">Remove</button>
+                </div>`;
+
+        $("#eccw_pricing_fixed_rules_container").append(newRow);
+      });
+
+      $(document).on("click", ".remove_fixed_price_rule", function () {
+        $(this).closest(".fixed_price_rule_item").remove();
+      });
+    },
+
+    eccwFixedPriceValidation: function() {
+        $(document).on('input blur', '.eccw_fixed_regular_price_input, .eccw_fixed_sale_price_input', function() {
+          let $item    = $(this).closest('.fixed_price_rule_item');
+          let regular  = parseFloat($item.find('.eccw_fixed_regular_price_input').val());
+          let sale     = parseFloat($item.find('.eccw_fixed_sale_price_input').val());
+
+          if ((isNaN(regular) || regular === '') && !isNaN(sale)) {
+              alert("⚠️ Sale Price requires Regular Price!");
+              $item.find('.eccw_fixed_sale_price_input').val(''); 
+          }
+
+          if (!isNaN(regular) && !isNaN(sale) && sale >= regular) {
+              alert("⚠️ Sale Price must be smaller than Regular Price!");
+              $item.find('.eccw_fixed_sale_price_input').val(''); 
+          }
+      });
+    },
   };
 
   ECCWAdmin.init();

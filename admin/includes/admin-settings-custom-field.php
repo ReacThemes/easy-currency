@@ -5,6 +5,7 @@ class ECCW_admin_settings_Customfields
 {
 
     private static $instance = null;
+    protected $fixed_price_eachproduct = false;
 
     public static function get_instance()
     {
@@ -16,6 +17,7 @@ class ECCW_admin_settings_Customfields
 
     public function __construct()
     {
+
         add_action('woocommerce_admin_field_template_preview', array($this, 'eccw_template_preview_field'));
         add_action('woocommerce_admin_field_switcher', array($this, 'eccw_admin_field_switcher_show_hide'));
         add_action('woocommerce_admin_field_eccw_slider', array($this, 'eccw_admin_field_custom_slider'));
@@ -27,9 +29,20 @@ class ECCW_admin_settings_Customfields
         add_action('woocommerce_admin_field_eccw_searchable_country', array($this, 'eccw_searchable_country_select_field') );
 
         add_action('woocommerce_admin_field_eccw_currency_on_billing',array( $this, 'eccw_admin_field_eccw_currency_on_billing' ) );
+
+        add_action('woocommerce_product_options_pricing', [$this, 'eccw_eccw_add_fixed_pricing_options']);
+        
+        add_filter('eccw_pricing_fixed_rules', [$this, 'eccw_add_fixed_pricing'], 10, 3);
+        add_action('woocommerce_process_product_meta', [$this, 'eccw_update_fixed_pricing_options']);
+
+        $this->fixed_price_eachproduct =  $this->eccw_fixed_price_rule();
+
+        
+
     }
 
     public function eccw_admin_field_eccw_currency_on_billing($field) {
+        
         $value = $field['value'] ?? $field['default'] ?? '';
         $option_id = $field['field_name'] ?? $field['id'];
         ?>
@@ -72,16 +85,6 @@ class ECCW_admin_settings_Customfields
         
         <?php
     }
-
-    // 2.b) Saver: saves the chosen value on "Save changes"
-    // add_action('woocommerce_update_option_eccw_currency_on_billing', function ($field) {
-    //     $option_id = $field['id'] ?? 'eccw_currency_on_billing';
-    //     $val = isset($_POST[$option_id]) ? sanitize_text_field($_POST[$option_id]) : 'none';
-    //     update_option($option_id, in_array($val, ['none','billing','shipping'], true) ? $val : 'none');
-    // });
-
-
-
 
     public function eccw_searchable_select_field( $value ) {
 
@@ -466,6 +469,7 @@ class ECCW_admin_settings_Customfields
 
     public function eccw_admin_field_switcher_show_hide($field)
     {
+        
         $value     = get_option($field['id'], $field['default'] ?? '');
         $desc      = ! empty($field['desc']) ? $field['desc'] : '';
         $desc_tip  = ! empty($field['desc_tip']) ? $field['desc_tip'] : false;
@@ -498,18 +502,154 @@ class ECCW_admin_settings_Customfields
                         <input type="checkbox" name="<?php echo esc_attr($field['id']); ?>" value="yes" <?php echo ($value === 'yes' || $value === '1') ? 'checked="checked"' : ''; ?> />
                         <span class="eccw-slider"></span>
                     </label>
-                    <?php if (!empty($field['desc'])) : ?>
+                    
+                <?php endif; ?>
+                <?php if (!empty($field['desc'])) : ?>
                         <p class="description"><?php echo esc_html($field['desc']); ?></p>
                     <?php endif; ?>
-                <?php endif; ?>
-
-                <?php if ( $desc && ! $desc_tip ) : ?>
-                    <p class="description"><?php echo esc_html($desc); ?></p>
-                <?php endif; ?>
+                
+               
             </td>
         </tr>
         <?php
     }
+
+
+    public function eccw_eccw_add_fixed_pricing_options() {
+
+        global $post;
+    
+        if (!function_exists('WC')) {
+            return;
+        }
+
+        if ( $this->fixed_price_eachproduct != 'yes' && $this->fixed_price_eachproduct != 1 ) {
+            return; 
+        }
+
+        $countries = eccw_get_available_countries(); 
+        $eccw_pricing_fixed_rules = get_post_meta($post->ID, '_eccw_pricing_fixed_rules', true);
+        $eccw_pricing_fixed_rules = is_array($eccw_pricing_fixed_rules) ? $eccw_pricing_fixed_rules : [];
+    
+        echo '<div class="options_group eccw_fixed_price_options_group">';
+        echo '<h4 style="margin-top: 20px;">Easy fixed Price rule</h4>';
+        
+        echo '<div id="eccw_pricing_fixed_rules_container">';
+        
+        foreach ($eccw_pricing_fixed_rules as $index => $rule) {
+            $regular_price = isset($rule['regular_price']) ? esc_attr($rule['regular_price']) : '';
+            $sale_price = isset($rule['sale_price']) ? esc_attr($rule['sale_price']) : '';
+            $selected_country = isset($rule['country']) ? esc_attr($rule['country']) : '';
+    
+            echo '<div class="fixed_price_rule_item">';
+            echo '<input type="text" name="eccw_pricing_fixed_rules[' . $index . '][regular_price]" value="' . $regular_price . '" placeholder="Regular Price" class="eccw_fixed_regular_price_input">';
+            echo '<input type="text" name="eccw_pricing_fixed_rules[' . $index . '][sale_price]" value="' . $sale_price . '" placeholder="Sale Price" class="eccw_fixed_sale_price_input">';
+            
+            echo '<select name="eccw_pricing_fixed_rules[' . $index . '][country]" class="eccw_fixed_price_country_select">';
+            echo '<option value="">Select Country</option>';
+            foreach ($countries as $code => $name) {
+                $selected = ($code === $selected_country) ? 'selected' : '';
+                echo '<option value="' . esc_attr($code) . '" ' . $selected . '>' . esc_html($name) . '</option>';
+            }
+            echo '</select>';
+    
+            echo '<button type="button" class="remove_fixed_price_rule button">Remove</button>';
+            echo '</div>';
+        }
+    
+        echo '</div>';
+        
+        echo '<button type="button" class="button add_fixed_price_rule">Add Rule</button>';
+        echo '</div>';
+
+    }
+
+    public function eccw_update_fixed_pricing_options($post_id){
+
+        if ( $this->fixed_price_eachproduct != 'yes' && $this->fixed_price_eachproduct != 1 ) {
+            return; 
+        }
+        
+        if (isset($_POST['eccw_pricing_fixed_rules']) && is_array($_POST['eccw_pricing_fixed_rules'])) {
+            update_post_meta($post_id, '_eccw_pricing_fixed_rules', array_values($_POST['eccw_pricing_fixed_rules']));
+        } else {
+            delete_post_meta($post_id, '_eccw_pricing_fixed_rules');
+        }
+        
+    }
+
+    public function eccw_add_fixed_pricing($price, $product) {
+
+        if ( $this->fixed_price_eachproduct != 'yes' && $this->fixed_price_eachproduct != 1 ) {
+            return; 
+        }
+
+        $request_currency = isset($_REQUEST['easy_currency']) 
+        ? sanitize_text_field( wp_unslash( $_REQUEST['easy_currency'] ) ) 
+        : '';
+
+        $eccw_pricing_fixed_rules = get_post_meta($product->get_id(), '_eccw_pricing_fixed_rules', true);
+       
+        $default_currency = isset($_COOKIE['user_preferred_currency']) && !empty($_COOKIE['user_preferred_currency'])
+            ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
+            :  '';
+        
+        $welcome_currency = eccw_get_first_visit_currency();
+
+        if ( !empty($welcome_currency) && empty( $request_currency ) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
+            $default_currency = $welcome_currency;
+        }
+
+        $currency_countries = json_decode(json_encode($currency_countries), true);
+
+        $easy_indivisual_fixed_price = [];
+
+        if ( is_array($eccw_pricing_fixed_rules) && !empty($eccw_pricing_fixed_rules) ) {
+
+            foreach ( $eccw_pricing_fixed_rules as $index => $rule ) {
+
+                $ccode     = isset( $rule['country'] ) ? $rule['country'] : '';
+
+                if ( $ccode == $default_currency ) {
+
+                    $regular_price = !empty($rule['regular_price']) ? (float) $rule['regular_price'] : '';
+                    $sale_price    = !empty($rule['sale_price']) ? (float) $rule['sale_price'] : '';
+
+                    if ( $regular_price === '' ) {
+                        $sale_price = '';
+                    }
+
+                    if ( $sale_price !== '' && $regular_price !== '' && $sale_price >= $regular_price ) {
+                        $sale_price = '';
+                    }
+
+                    $easy_indivisual_fixed_price = [
+                        'easy_fixed_rule_regular_price' => $regular_price,
+                        'easy_fixed_rule_sale_price'    => $sale_price,
+                    ];
+                }
+            }
+        }
+
+        return $easy_indivisual_fixed_price;
+    }
+
+    public function eccw_fixed_price_rule() {
+        
+        $currency_settings = get_option('eccw_currency_settings', []);
+        
+        $advanced_settings = isset($currency_settings['advanced_settings']) ? $currency_settings['advanced_settings'] : [];
+
+        if (
+            !isset($advanced_settings['eccw_enable_fixed_price_rule']) ||
+            !in_array($advanced_settings['eccw_enable_fixed_price_rule'], ['yes', '1'], true)
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
 
 ECCW_admin_settings_Customfields::get_instance();

@@ -21,6 +21,8 @@ function eccw_admin_enqueue_scripts (){
     wp_enqueue_script( 'eccw-rangeslider' );
     wp_enqueue_script( 'eccw-select2-min' );
     wp_enqueue_script( 'eccw-admin' );
+
+    $countries = eccw_get_available_countries(); 
     
     wp_localize_script(
         'eccw-admin', 
@@ -31,8 +33,11 @@ function eccw_admin_enqueue_scripts (){
                 'nonce'            => wp_create_nonce('eccw_nonce'),
                 'version'          => ECCW_VERSION,
                 'pluginURL'        => ECCW_DIR_URL,
+                'countries'        => $countries,
             ]
     );
+
+    
 
     wp_enqueue_style( 'woocommerce_admin_styles' );
     wp_enqueue_script( 'wc-admin' );

@@ -1480,6 +1480,16 @@ class ECCW_admin_settings
                 'desc' => '',
                 'id' => 'eccw_advancedupdate_settings_title'
             ),
+            'eccw_enable_fixed_price_rule' => array(
+                'title' => __('Enable fixed price rule', 'easy-currency'),
+                'id'    => 'advanced_settings[eccw_enable_fixed_price_rule]',
+                'type'  => 'switcher',
+                'default' => isset($advanced_settings['eccw_enable_fixed_price_rule']) ? $advanced_settings['eccw_enable_fixed_price_rule'] : '',
+                'class' => 'eccw-switcher-ui-control-show-hide',
+                'eccw_pro' => '',
+                'description' => __('Enable this option Fixed price rule', 'easy-currency'),
+                'desc' => __('If enabled, the Fixed Price Rule will override automatic currency conversion for products where a fixed price is set.', 'easy-currency'),
+            ),
             'eccw_enable_auto_update_exchange_rate' => array(
                 'title' => __('Enable Auto Update', 'easy-currency'),
                 'id'    => 'advanced_settings[eccw_enable_auto_update]',

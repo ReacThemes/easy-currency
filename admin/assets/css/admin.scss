@@ -1130,4 +1130,25 @@ $white-color: #ffffff;
   color: #d5a720;
   font-weight: 600;
 }
-    
+  
+.eccw_fixed_price_options_group {
+    padding: 15px;
+    .fixed_price_rule_item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        input {
+            width: 30%;
+        }
+        .button {
+            background: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    }
+}
+
+.eccw-autu-update-settings .description {
+    margin-top: 15px;
+}

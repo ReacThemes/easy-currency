@@ -169,3 +169,28 @@ function eccw_get_first_visit_currency() {
     
     return '';
 }
+
+function eccw_get_available_countries() {
+
+    $eccw_currency_settings = get_option('eccw_currency_settings', []);
+
+    $currencies = [];
+
+    if (!empty($eccw_currency_settings) && isset($eccw_currency_settings['eccw_currency_table']) && count($eccw_currency_settings['eccw_currency_table']) > 0) {
+        $eccw_currency_table = $eccw_currency_settings['eccw_currency_table'];
+
+        foreach ($eccw_currency_table as $currency_data) {
+            if (!empty($currency_data['code'])) {
+                $currencies[$currency_data['code']] = $currency_data['code'];
+            }
+        }
+    }
+
+    $default_currency = isset($eccw_currency_settings['default_currency']) && !empty($eccw_currency_settings['default_currency']) ? $eccw_currency_settings['default_currency'] : 'USD';
+
+    if ( isset($currencies[$default_currency]) ) {
+        unset($currencies[$default_currency]);
+    }
+
+    return $currencies;
+}
