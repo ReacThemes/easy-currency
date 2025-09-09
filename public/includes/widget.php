@@ -23,15 +23,9 @@ class Easy_Currency_Switcher_Widget extends \Elementor\Widget_Base {
      *
      * @return string Widget name.
      */
-
-    
-
-
     public function get_name() {
         return 'rt_currecny_switcher';
     }   
-
-
     /**
      * Get widget title.
      *

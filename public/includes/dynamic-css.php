@@ -22,7 +22,6 @@ function eccw_enqueue_all_dynamic_css()
                
             }
 
-           
             $dropdown_icon_color = !empty($style['switcher_button']['color']) ? $style['switcher_button']['color'] : '';
             $switcher_border = !empty($style['switcher_button']['border_control']) ? $style['switcher_button']['border_control'] : '';
             $dropdown_border_style = !empty($style['switcher_dropdown_border_style_option_control']) ? $style['switcher_dropdown_border_style_option_control'] : '';
