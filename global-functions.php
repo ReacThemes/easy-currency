@@ -70,6 +70,14 @@ function eccw_get_currency_common_settings()
         ? sanitize_text_field(wp_unslash($_COOKIE['user_preferred_currency']))
         : (isset($currency_settings['default_currency']) ? $currency_settings['default_currency'] : 'USD');
 
+    $welcome_currency = eccw_get_first_visit_currency();
+    $request_currency = isset($_REQUEST['easy_currency']) 
+    ? sanitize_text_field( wp_unslash( $_REQUEST['easy_currency'] ) ) 
+    : '';
+    if ( !empty($welcome_currency) && empty( $request_currency ) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
+        $default_currency = $welcome_currency;
+    }
+
     $options = isset($currency_settings['options']) ? $currency_settings['options'] : [];
     $flag_visibility = isset($options['flag_visibility']) && !empty($options['flag_visibility']) ? $options['flag_visibility'] : 'no';
 

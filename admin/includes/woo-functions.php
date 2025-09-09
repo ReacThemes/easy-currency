@@ -272,15 +272,15 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
 
         $saved_settings = get_option('eccw_currency_settings', []);
         $options = isset($saved_settings['options']) ? $saved_settings['options'] : [];
-        $welcome_currency = isset($options['eccw_welcome_currency']) ? $options['eccw_welcome_currency'] : 'USD';
+        $welcome_currency = isset($options['eccw_welcome_currency']) ? $options['eccw_welcome_currency'] : '';
 
-        $is_first_visit = ! isset($_COOKIE['eccw_first_visit']);
+        $already_set = WC()->session->get('eccw_firstvisit_client_currency');
 
-        if ( $is_first_visit ) {
-            setcookie('eccw_first_visit', '1', time() + 365*24*60*60, COOKIEPATH, COOKIE_DOMAIN);
+        if ( empty($already_set) ) {
             WC()->session->set('eccw_firstvisit_client_currency', $welcome_currency);
         }
     }
+
 
 }
 

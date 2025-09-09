@@ -44,6 +44,7 @@ if (! defined('ABSPATH')) exit; // Exit if accessed directly.
             }
 
             if (!empty($eccw_currency_table) && is_array($eccw_currency_table)) {
+                
                 foreach ($eccw_currency_table as $currency) {
                     $currency_code = $currency['code'] ?? '';
                     $country       = $currency_countries_json[$currency_code]['countries'][0] ?? '';
