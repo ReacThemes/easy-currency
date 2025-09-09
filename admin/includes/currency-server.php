@@ -150,6 +150,8 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
         }
 
         $welcome_currency = eccw_get_first_visit_currency();
+
+        error_log( "welcome currency:". print_r( $welcome_currency, true ) );
         if ( !empty($welcome_currency) && empty( $request_currency ) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
             $default_currency = $welcome_currency;
         }

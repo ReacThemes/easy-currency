@@ -280,10 +280,7 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
             WC()->session->set('eccw_firstvisit_client_currency', $welcome_currency);
         }
     }
-
-
 }
-
 
 new ECCW_WOO_FUNCTIONS();
 
