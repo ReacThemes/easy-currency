@@ -12,9 +12,6 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             add_action('wp_ajax_eccw_load_modal_content', array ( $this,'eccw_load_modal_content_callback'));
             add_action('wp_ajax_eccw_search_shortcode', array ( $this, 'eccw_search_shortcode_callback') );
 
-            add_action( 'wp_ajax_eccw_update_user_country', [$this, 'eccw_update_user_country'] );
-            add_action( 'wp_ajax_nopriv_eccw_update_user_country', [$this, 'eccw_update_user_country'] );
-
         }
 
         public function eccw_update_currency_rates(){
@@ -272,19 +269,6 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
             $html = ob_get_clean();
             wp_send_json_success(['html' => $html]);
         }
-
-        public function eccw_update_user_country(){
-            if (!isset($_POST['country']) || empty($_POST['country'])) {
-                wp_send_json_error(['message' => 'Country not provided!']);
-            }
-        
-            $country = sanitize_text_field($_POST['country']);
-        
-            update_option('eccw_user_country', strtoupper($country));
-        
-            wp_send_json_success(['message' => 'User country updated!', 'country' => $country]);
-        }
-
     }
 
     
