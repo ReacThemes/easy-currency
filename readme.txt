@@ -14,7 +14,7 @@ Let shoppers view and switch WooCommerce product prices in multiple currencies, 
 
 Easy Currency Switcher is a **free WooCommerce multi-currency plugin**. Create multiple currencies, set custom rates or auto rates, format symbols/positions, and let shoppers view and pay in their preferred currency.
 
-<a href="https://easy-currency.themewant.com/" target="_blank">Live Demo</a> | <a href="https://easy-currency.themewant.com/product/family-suite/" target="_blank">Single Demo</a> | <a href="https://documentation.themewant.com/docs/easy-currency-switcher/installation/" target="_blank">Documentation</a> | <a href="https://codecanyon.net/item/easy-currency-switcher-woocommerce-multicurrency-plugin/59845282?s_rank=1" target="_blank">Pro Version</a>
+<a href="https://easy-currency.themewant.com/" target="_blank">Live Demo</a> | <a href="https://easy-currency.themewant.com/product/family-suite/" target="_blank">Single Demo</a> | <a href="https://documentation.themewant.com/docs/easy-currency-switcher/installation/" target="_blank">Documentation</a> | <a href="https://codecanyon.net/item/easy-currency-switcher-woocommerce-multicurrency-plugin/59845282?s_rank=1" target="_blank">Pro Version</a> | <a href="https://app.instawp.io/launch?d=v2&t=easy-currency-switcher" target="_blank">Try Demo Admin</a>
 
 Easy Currency comes with one of the most powerful currency switcher customizers available on the market, allowing you to design modern and unlimited switchers for your site.
 
@@ -65,6 +65,20 @@ Supports more than 7 currency aggregators for automatic exchange rate updates, w
 
 Enable this option to allow customers to pay in their chosen currency.
 
+== Easy Currency Premium Features ==
+
+* **Unlimited Currencies** – Add as many currencies as you want.
+* **Auto Update Exchange Rate** – Keep exchange rates updated automatically.
+* **Update Interval** – Choose how often rates update (e.g., every 5 minutes).
+* **Geo IP Rule for Each Product** – Set custom prices for individual products based on the user’s country. (Fixed Price products are excluded.)  
+* **Auto Select Currency by Geo IP** – Automatically convert currency based on the visitor’s country. WooCommerce and Auto Select Currency must be enabled.
+* **Currency Checkout & Payment Rules** – Enable “Currency Checkout” to display currency-specific payment methods. To allow currency changes based on the selected payment method, also enable “Payment with Selected Currency” in the Options tab.
+* **Payment Gateway Rules** – Change currency based on selected payment method.
+* **Currency Change Mode** –
+  * Instant Change: Updates immediately when payment method is selected.
+  * On Place Order: Updates only after the order is placed.
+* **Shipping & Billing Currency Settings** – Determine how currency updates based on customer address.
+* **Currency on Billing** – Change currency by billing country or shipping country on checkout.
 
 == Installation ==
 
