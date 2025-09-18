@@ -22,6 +22,9 @@
       this.EccwaddNewfixedPriceRules();
       this.eccwFixedPriceValidation();
 
+      this.unbindEvents();
+      this.bindEvents();
+
       $(document)
         .on(
           "click.ECCWAdmin",
@@ -369,7 +372,7 @@
             '][decimal]">' +
             '<option value="0">0</option>' +
             '<option value="1">1</option>' +
-            '<option value="2">2</option>' +
+            '<option value="2" selected>2</option>' +
             '<option value="3">3</option>' +
             '<option value="4">4</option>' +
             '<option value="5">5</option>' +
@@ -1071,6 +1074,36 @@
           }
       });
     },
+
+    bindEvents: function () {
+      $(document).on(
+        "click.ecswBaseCurrency",
+        'input[type="radio"][name="eccw_currency_table[default]"]',
+        this.handleBaseCurrencySelect
+      );
+    },
+
+    unbindEvents: function () {
+      $(document).off("click.ecswBaseCurrency");
+    },
+
+    handleBaseCurrencySelect: function () {
+      let $row = $(this).closest("tr");
+      let $rateInput = $row.find("input.currency-rate");
+      let $currencySelect = $row.find("select.easy-currency-dropdownecsw");
+      let selectedCode = $currencySelect.val();
+
+      $("tr.easy-base-currency").removeClass("easy-base-currency");
+
+      let $hiddenInputs = $('input[type="hidden"][name*="[base_currency]"]');
+      $hiddenInputs.val(selectedCode);
+
+      if ($rateInput.val().trim() === "") {
+        $rateInput.val("1");
+      }
+    },
+
+
   };
 
   ECCWAdmin.init();

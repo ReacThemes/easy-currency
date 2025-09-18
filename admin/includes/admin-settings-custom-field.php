@@ -474,6 +474,7 @@ class ECCW_admin_settings_Customfields
         $desc      = ! empty($field['desc']) ? $field['desc'] : '';
         $desc_tip  = ! empty($field['desc_tip']) ? $field['desc_tip'] : false;
         $eccw_pro  = ! empty($field['eccw_pro']) ? $field['eccw_pro'] : false;
+
         ?>
         <tr valign="top" class="<?php echo esc_attr($field['class']); ?>">
             <th scope="row" class="titledesc">
@@ -499,7 +500,7 @@ class ECCW_admin_settings_Customfields
                    
                     <label class="eccw-switch">
                         <input type="hidden" name="<?php echo esc_attr($field['id']); ?>" value="no" />
-                        <input type="checkbox" name="<?php echo esc_attr($field['id']); ?>" value="yes" <?php echo ($value === 'yes' || $value === '1') ? 'checked="checked"' : ''; ?> />
+                        <input type="checkbox" name="<?php echo esc_attr($field['id']); ?>" value="yes" <?php echo ($value === 'yes' || $value == 1 ) ? 'checked="checked"' : ''; ?> />
                         <span class="eccw-slider"></span>
                     </label>
                     

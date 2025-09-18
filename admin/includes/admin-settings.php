@@ -184,6 +184,7 @@ class ECCW_admin_settings
 
         $design = isset($saved_settings[$current_shortcodeId]) ? $saved_settings[$current_shortcodeId] : [];
 
+
         global $wpdb;
 
         $template = isset( $design['switcher_dropdown_option_edit']['template'] ) ? $design['switcher_dropdown_option_edit']['template'] : 'eccw_template_1';
@@ -788,7 +789,7 @@ class ECCW_admin_settings
                 'title' => __('Enable Currency Symbol', 'easy-currency'),
                 'id'    => 'design[eccw_switcher_currency_symbol_show_hide]',
                 'type'  => 'switcher',
-                'default' => isset($design['eccw_switcher_currency_symbol_show_hide']) ? $design['eccw_switcher_currency_symbol_show_hide'] : 'yes',
+                'default' => isset($design['eccw_switcher_currency_symbol_show_hide']) ? $design['eccw_switcher_currency_symbol_show_hide'] : '',
                 'class' => 'eccw-switcher-ui-control',
             ),
             'eccw_switcher_ele_currency_code' => array(
@@ -944,7 +945,7 @@ class ECCW_admin_settings
             ),
             'eccw_sticky_ele_currency_symbol' => array(
                 'title' => __('Enable Currency Symbol', 'easy-currency'),
-                'id'    => 'design[eccw_switcher_currency_symbol_show_hide]',
+                'id'    => 'design[eccw_sticky_ele_currency_symbol]',
                 'type'  => 'switcher',
                 'default' => isset($design['eccw_sticky_ele_currency_symbol']) ? $design['eccw_sticky_ele_currency_symbol'] : 'yes',
                 'class' => 'eccw-switcher-ui-control',
@@ -2117,7 +2118,6 @@ class ECCW_admin_settings
                                 <div class="eccw-tabs-wrapper">
                                     <button class="eccw-tab-btn active" data-tab="eccw_general_tab">General</button>
                                     <button class="eccw-tab-btn" data-tab="eccw_display_option_tab">Display Option</button>
-                                    <button class="eccw-tab-btn" data-tab="eccw_display_custom_css">Custom Css</button>
                                 </div>
 
                                 <div class="eccw-style-modal-switcher-form" data-eccwtab="">

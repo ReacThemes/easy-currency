@@ -1,5 +1,6 @@
 <?php
 function eccw_save_plugin_default_settings() {
+
     $option_name = 'eccw_currency_settings';
     
     $default_settings = array(

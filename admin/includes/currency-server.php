@@ -97,6 +97,8 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
     public function eccw_get_user_preferred_currency_data()
     {
         $plugin_settings = $this->plugin_settings;
+
+        $default_currency = '';
         $request_currency = isset($_REQUEST['easy_currency']) 
         ? sanitize_text_field( wp_unslash( $_REQUEST['easy_currency'] ) ) 
         : '';
