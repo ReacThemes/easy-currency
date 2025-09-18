@@ -14,7 +14,7 @@ Let shoppers view and switch WooCommerce product prices in multiple currencies, 
 
 Easy Currency Switcher is a **free WooCommerce multi-currency plugin**. Create multiple currencies, set custom rates or auto rates, format symbols/positions, and let shoppers view and pay in their preferred currency.
 
-<a href="https://easy-currency.themewant.com/" target="_blank">Live Demo</a> | <a href="https://easy-currency.themewant.com/product/family-suite/" target="_blank">Single Demo</a> | <a href="https://documentation.themewant.com/docs/easy-currency-switcher/installation/" target="_blank">Documentation</a>
+<a href="https://easy-currency.themewant.com/" target="_blank">Live Demo</a> | <a href="https://easy-currency.themewant.com/product/family-suite/" target="_blank">Single Demo</a> | <a href="https://documentation.themewant.com/docs/easy-currency-switcher/installation/" target="_blank">Documentation</a> | <a href="https://codecanyon.net/item/easy-currency-switcher-woocommerce-multicurrency-plugin/59845282?s_rank=1" target="_blank">Pro Version</a>
 
 Easy Currency comes with one of the most powerful currency switcher customizers available on the market, allowing you to design modern and unlimited switchers for your site.
 
