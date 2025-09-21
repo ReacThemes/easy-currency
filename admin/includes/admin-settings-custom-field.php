@@ -601,8 +601,6 @@ class ECCW_admin_settings_Customfields
             $default_currency = $welcome_currency;
         }
 
-        $currency_countries = json_decode(json_encode($currency_countries), true);
-
         $easy_indivisual_fixed_price = [];
 
         if ( is_array($eccw_pricing_fixed_rules) && !empty($eccw_pricing_fixed_rules) ) {

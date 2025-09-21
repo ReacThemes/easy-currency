@@ -51,6 +51,9 @@ class ECCW_Auto_Switcher
             'sticky_ccode_option_hover_bg'       => $switcher_settings['design']['sticky_option_ccode_hover']['background'] ?? '',
             'sticky_ccode_option_hover_color'    => $switcher_settings['design']['sticky_option_ccode_hover']['color'] ?? '',
             'sticky_option_flag_size'            => $switcher_settings['design']['switcher_sticky_option_flag']['width'] ?? '',
+
+            'sticky_option_active_bg'             => $switcher_settings['design']['sticky_option_active']['background'] ?? '',
+            'sticky_option_active_color'          => $switcher_settings['design']['sticky_option_active']['color'] ?? '',
         );
 
         $this->settings = apply_filters('eccw_sticky_switcher_data', $this->settings);
@@ -227,14 +230,21 @@ class ECCW_Auto_Switcher
             'color'      => $this->settings['sticky_option_color'] ?? '',
         ];
 
-        $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li:hover,
-                .{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li.selected"] = [
+        $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li:hover"] = [
             'background' => $this->settings['sticky_option_hover_bg'] ?? '',
+        ];
+
+        $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li.selected"] = [
+            'background' => $this->settings['sticky_option_active_bg'] ?? '',
         ];
 
         $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li:hover span,
                 .easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li.selected span"] = [
             'color'      => $this->settings['sticky_option_hover_color'] ?? '',
+        ];
+
+        $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li.selected span"] = [
+            'color'      => $this->settings['sticky_option_active_color'] ?? '',
         ];
 
        if( $template == 'eccw-sticky-template-2') {

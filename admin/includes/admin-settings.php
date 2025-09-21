@@ -1096,10 +1096,24 @@ class ECCW_admin_settings
                 'class' => 'eccw-color-input ', 
             ),
             'eccw_sticky_hover_color' => array(
-                'name' => __('Color', 'easy-currency'),
+                'name' => __('Hover Color', 'easy-currency'),
                 'type' => 'text',
                 'id' => 'design[sticky_option_hover][color]',
                 'default' => isset($design['sticky_option_hover']['color']) ? $design['sticky_option_hover']['color'] : '#fff',
+                'class' => 'eccw-color-input ', 
+            ),
+            'eccw_sticky_color_active_bg' => array(
+                'name' => __('Active Background Color', 'easy-currency'),
+                'type' => 'text',
+                'id' => 'design[sticky_option_active][background]',
+                'default' => isset($design['sticky_option_active']['background']) ? $design['sticky_option_active']['background'] : '#000',
+                'class' => 'eccw-color-input ', 
+            ),
+            'eccw_sticky_active_color' => array(
+                'name' => __('Active Color', 'easy-currency'),
+                'type' => 'text',
+                'id' => 'design[sticky_option_active][color]',
+                'default' => isset($design['sticky_option_active']['color']) ? $design['sticky_option_active']['color'] : '#fff',
                 'class' => 'eccw-color-input ', 
             ),
             'switcher_sticky_option_flag_size' => array(
