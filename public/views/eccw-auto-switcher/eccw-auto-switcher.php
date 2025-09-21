@@ -238,8 +238,7 @@ class ECCW_Auto_Switcher
             'background' => $this->settings['sticky_option_active_bg'] ?? '',
         ];
 
-        $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li:hover span,
-                .easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li.selected span"] = [
+        $styles[".{$template}.easy-currency-switcher-auto-select.eccw-position-{$pos} .easy-currency-switcher-select.list li:hover span"] = [
             'color'      => $this->settings['sticky_option_hover_color'] ?? '',
         ];
 
