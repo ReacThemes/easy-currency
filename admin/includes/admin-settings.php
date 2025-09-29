@@ -1255,7 +1255,7 @@ class ECCW_admin_settings
                                 <?php echo esc_html($currency_name); ?>
                             </td>
                             <td>
-                                <select name="eccw_currency_table_geo[<?php echo $index; ?>][countries][<?php echo $currency_code; ?>][]"
+                                <select name="eccw_currency_table_geo[<?php echo esc_attr( $index ); ?>][countries][<?php echo esc_attr( $currency_code ); ?>][]"
                                         class="eccw-searchable-country-select <?php echo !$pro_enabled ? 'pro-disabled' : ''; ?>"
                                         multiple="multiple"
                                         data-placeholder="<?php esc_attr_e('Please Select countries...', 'easy-currency'); ?>"
@@ -1349,7 +1349,7 @@ class ECCW_admin_settings
                                 <?php echo esc_html($currency_name); ?>
                             </td>
                             <td>
-                                <select name="eccw_currency_payment_select[<?php echo $index; ?>][payment][<?php echo $currency_code; ?>][]"
+                                <select name="eccw_currency_payment_select[<?php echo esc_attr( $index ); ?>][payment][<?php echo esc_attr( $currency_code ); ?>][]"
                                         class="eccw-payment-method-select <?php echo !$pro_enabled ? 'pro-disabled' : ''; ?>"
                                         multiple="multiple"
                                         data-placeholder="<?php esc_attr_e('Please select payment methods...', 'easy-currency'); ?>"
@@ -1370,7 +1370,7 @@ class ECCW_admin_settings
                             <td>
                                 <label class="eccw-toggle-switch">
                                     <input type="checkbox" 
-                                        name="eccw_currency_payment_status[<?php echo $index; ?>][<?php echo $currency_code; ?>]" 
+                                        name="eccw_currency_payment_status[<?php echo esc_attr( $index ); ?>][<?php echo esc_attr( $currency_code ); ?>]" 
                                         value="1" <?php checked($checked_status); ?> />
                                     <span class="eccw-payment-toggle"></span>
                                 </label>
@@ -1436,7 +1436,7 @@ class ECCW_admin_settings
                             </td>
                            
                             <td>
-                                <select name="eccw_gateway_currency_set[<?php echo $gateway_id; ?>][]"
+                                <select name="eccw_gateway_currency_set[<?php echo esc_attr( $gateway_id ); ?>][]"
                                         class="eccw-payment-wise-currency-set-currency <?php echo !$pro_enabled ? 'pro-disabled' : ''; ?>"
                                         data-placeholder="<?php esc_attr_e('Please select currency...', 'easy-currency'); ?>">
                                         <?php 
@@ -1490,7 +1490,7 @@ class ECCW_admin_settings
 
         $update_settings_fields = array(
             'eccw_update_section_title' => array(
-                'name' => __('', 'easy-currency'),
+                'name' => '',
                 'type' => 'title',
                 'desc' => '',
                 'id' => 'eccw_advancedupdate_settings_title'
@@ -1556,7 +1556,7 @@ class ECCW_admin_settings
 
         $advanced_settings_fields = array(
             'eccw_advanced_section_title' => array(
-                'name' => __('', 'easy-currency'),
+                'name' => '',
                 'type' => 'title',
                 'desc' => '',
                 'id' => 'eccw_advanced_settings_title'
@@ -1649,7 +1649,7 @@ class ECCW_admin_settings
         );
         $checkout_enable_settings_fields = array(
             'eccw_custom_advanced_en_section_title' => array(
-                'name' => __('', 'easy-currency'),
+                'name' => '',
                 'type' => 'title',
                 'desc' => '',
                 'id' => 'eccw_advanced_en_settings_title_country'
@@ -1686,7 +1686,7 @@ class ECCW_admin_settings
 
         $checkout_settings_fields = array(
             'eccw_custom_advanced_section_title' => array(
-                'name' => __('', 'easy-currency'),
+                'name' => '',
                 'type' => 'title',
                 'desc' => '',
                 'id' => 'eccw_advanced_settings_title_country'
@@ -1722,7 +1722,11 @@ class ECCW_admin_settings
                 'id' => 'eccw_advanced_payment_gateway_title_country'
             ),
            'eccw_currency_change_mode_payment_gateway' => array(
-                'name'    => __("Currency Change Mode ({$protext})", 'easy-currency'),
+                'name'    => sprintf(
+                    // translators: %s: Pro text (label for currency change mode).
+                    __('Currency Change Mode (%s)', 'easy-currency'),
+                    esc_html($protext)
+                ),
                 'type'    => 'select',
                 'options' => [
                     'place_order'          => 'On Place Order',       
@@ -1757,13 +1761,17 @@ class ECCW_admin_settings
 
         $shipping_billing_settings_fields = array(
             'eccw_shipping_billing_section_title' => array(
-                'name' => __("Shipping & Billing Currency Settings ({$protext})", 'easy-currency'),
+                'name'    => sprintf(
+                    // translators: %s: Pro text (Shipping & Billing Currency Settings).
+                    __('Shipping & Billing Currency Settings (%s)', 'easy-currency'),
+                    esc_html($protext)
+                ),
                 'type' => 'title',
                 'desc' => __('Select how the currency changes based on customer billing or shipping address.', 'easy-currency'),
                 'id'   => 'eccw_shipping_billing_title'
             ),
             'eccw_shipping_billing_select_option' => array(
-                'title'   => __('Currency on Billing', 'eccw'),
+                'title'   => __('Currency on Billing', 'easy-currency'),
                 'type'    => 'eccw_currency_on_billing',
                 'id'      => 'checkout_settings[eccw_currency_on_billing]',
                 'desc'    => '',
@@ -2233,11 +2241,12 @@ class ECCW_admin_settings
             $eccw_currency_settings = get_option('eccw_currency_settings', []);
             $eccw_currency_table = $eccw_currency_settings['eccw_currency_table'] ?? [];
 
-            $checkout_settings = map_deep($_POST['checkout_settings'] ?? [], 'sanitize_text_field');
+            $checkout_settings = map_deep(wp_unslash($_POST['checkout_settings'] ?? []), 'sanitize_text_field');
             $val = $checkout_settings['eccw_currency_on_billing'] ?? 'none';
             $val = in_array($val, ['none','billing','shipping'], true) ? $val : 'none';
             $currency_settings['checkout_settings']['eccw_currency_on_billing'] = $val;
             update_option('eccw_currency_on_billing', $val);
+
 
 
            

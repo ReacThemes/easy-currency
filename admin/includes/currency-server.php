@@ -57,9 +57,6 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
     public function eccw_get_user_preferred_currency()
     {
 
-        $request_currency = isset($_REQUEST['easy_currency']) 
-        ? sanitize_text_field( wp_unslash( $_REQUEST['easy_currency'] ) ) 
-        : '';
         $plugin_settings = $this->plugin_settings;
         $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : [];
 
@@ -85,7 +82,7 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
         }
 
         $welcome_currency = eccw_get_first_visit_currency();
-        if ( !empty($welcome_currency) && empty( $request_currency ) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
+        if ( !empty($welcome_currency)  && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
             $default_currency = $welcome_currency;
         }
 
@@ -99,19 +96,24 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
         $plugin_settings = $this->plugin_settings;
 
         $default_currency = '';
-        $request_currency = isset($_REQUEST['easy_currency']) 
-        ? sanitize_text_field( wp_unslash( $_REQUEST['easy_currency'] ) ) 
-        : '';
 
         $eccw_currency_table = isset($plugin_settings['eccw_currency_table']) ? $plugin_settings['eccw_currency_table'] : [];
 
         $saved_settings = get_option('eccw_currency_settings');
 
-        $is_checkout_context = (
-            is_checkout() 
-            || is_order_received_page() 
-            || (defined('DOING_AJAX') && DOING_AJAX && isset($_REQUEST['wc-ajax']))
-        );
+       $is_checkout_context = is_checkout() || is_order_received_page();
+
+        // Ignore nonce verification warning because this is read-only GET param used safely
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if (defined('DOING_AJAX') && DOING_AJAX && isset($_GET['wc-ajax'])) {
+            // Ignore nonce verification warning because this is read-only GET param used safely
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $wc_ajax = sanitize_text_field(wp_unslash($_GET['wc-ajax']));
+            if ($wc_ajax) {
+                $is_checkout_context = true;
+            }
+        }
+
 
         $checkout_currency_payenable = isset($saved_settings['checkout_settings']['eccw_checkout_currency']) 
         ? $saved_settings['checkout_settings']['eccw_checkout_currency'] 
@@ -153,7 +155,7 @@ class ECCW_CURRENCY_SERVER extends ECCW_Plugin_Settings
 
         $welcome_currency = eccw_get_first_visit_currency();
 
-        if ( !empty($welcome_currency) && empty( $request_currency ) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
+        if ( !empty($welcome_currency) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
             $default_currency = $welcome_currency;
         }
 

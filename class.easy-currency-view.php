@@ -49,8 +49,10 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
         }
 
     }
-    
 
+    /**
+     * Update user preferred currency and handle redirect
+     */
     public function ecccw_update_currency(){
 
         // Verify the nonce
@@ -59,7 +61,9 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
            return;
         }
 
-        $curr_req = $_REQUEST['easy_currency'];
+         $curr_req = isset( $_REQUEST['easy_currency'] )
+            ? sanitize_text_field( wp_unslash( $_REQUEST['easy_currency'] ) )
+            : '';
         
         if(isset( $curr_req ) && !empty( $curr_req )){
 
@@ -97,10 +101,8 @@ class ECCW_CURRENCY_VIEW  extends ECCW_CURRENCY_SWITCHER {
     : ( isset($currency_settings['default_currency']) ? $currency_settings['default_currency'] : 'USD' ); 
 
         $welcome_currency = eccw_get_first_visit_currency();
-        $request_currency = isset($_REQUEST['easy_currency']) 
-        ? sanitize_text_field( wp_unslash( $_REQUEST['easy_currency'] ) ) 
-        : '';
-        if ( !empty($welcome_currency) && empty( $request_currency ) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
+       
+        if ( !empty($welcome_currency) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
             $default_currency = $welcome_currency;
         }
 

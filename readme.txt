@@ -1,10 +1,10 @@
-=== Easy Currency - Currency Switcher for WooCommerce ===
+=== Easy Currency ===
 Contributors: themewant
 Tags: currency switcher, woocommerce currency, multi-currency, currency converter, woocommerce
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,6 +96,9 @@ This plugin utilizes a third-party service, APILayer (https://apilayer.com/), to
 
 Privacy Policy link: https://www.ideracorp.com/legal/APILayer
 Terms of Use link: https://www.ideracorp.com/Legal/Terms-of-Use
+
+= 1.0.6 =
+* Fixed: Code updated
 
 = 1.0.5 =
 * Added: Settings Color opiton added

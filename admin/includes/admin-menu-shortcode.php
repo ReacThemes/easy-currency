@@ -50,7 +50,7 @@ trait Easy_Currency_Menu_Shortcode_Frontend {
         if ( ! is_object( $item ) ) return $item;
 
         if ( 'easy_eccw_menu_type' === $item->object ) {
-            $item->type_label = __( 'Shortcode', 'easy-currency-menu-shortcode' );
+            $item->type_label = __( 'Shortcode', 'easy-currency' );
             if ( ! empty( $item->post_content ) ) {
                 $item->description = $item->post_content;
             } else {
@@ -73,7 +73,7 @@ trait Easy_Currency_Menu_Shortcode_Admin {
     public function eccw_meta_box_func() {
         add_meta_box(
             'eccw-currency-menu-shortcode',
-            __( 'Easy Currency Shortcode', 'easy-currency-menu-shortcode' ),
+            __( 'Easy Currency Shortcode', 'easy-currency' ),
             [ $this, 'eccw_meta_render_func' ],
             'nav-menus',
             'side',
@@ -218,7 +218,7 @@ trait Easy_Currency_Menu_Shortcode_Admin {
             <input type="hidden" class="menu-item-type" name="menu-item[<?php echo esc_attr( $nav_menu_placeholder ); ?>][menu-item-type]" value="easy_eccw_menu_type" />
             <input type="hidden" id="eccw-menu-item-nonce" value="<?php echo esc_attr( wp_create_nonce( 'eccw-menu-item-nonce' ) ); ?>" />
             <p id="menu-item-title-wrap">
-                <label for="eccw-menu-shortcode-title"><?php esc_html_e( 'Title', 'easy-currency-menu-shortcode' ); ?></label>
+                <label for="eccw-menu-shortcode-title"><?php esc_html_e( 'Title', 'easy-currency' ); ?></label>
                 <input id="eccw-menu-shortcode-title" name="menu-item[<?php echo esc_attr( $nav_menu_placeholder ); ?>][menu-item-title]" type="text" class="regular-text menu-item-textbox" style="width:100%" />
             </p>
             <p id="menu-item-html-wrap">
@@ -226,7 +226,7 @@ trait Easy_Currency_Menu_Shortcode_Admin {
             </p>
             <p class="button-controls">
                 <span class="add-to-menu">
-                    <input type="submit" <?php wp_nav_menu_disabled_check( $nav_menu_selected_id ); ?> class="button-secondary eccw-submit-menu-add-button right" value="<?php esc_attr_e( 'Add to Menu', 'easy-currency-menu-shortcode' ); ?>" name="eccw-add-shortcode-menu-item" id="eccw-add-shortcode-menu-button" />
+                    <input type="submit" <?php wp_nav_menu_disabled_check( $nav_menu_selected_id ); ?> class="button-secondary eccw-submit-menu-add-button right" value="<?php esc_attr_e( 'Add to Menu', 'easy-currency' ); ?>" name="eccw-add-shortcode-menu-item" id="eccw-add-shortcode-menu-button" />
                     <span class="spinner"></span>
                 </span>
             </p>

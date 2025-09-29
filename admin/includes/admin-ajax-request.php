@@ -207,19 +207,17 @@ if ( !class_exists('ECCW_Admin_Ajax')) {
 
             $styles = get_option('eccw_switcher_styles', []);
 
-            if (isset($_POST['design']) && is_array($_POST['design'])) {
-              
-                $style_data = array();
-                foreach ($_POST['design'] as $key => $value) {
-                    if (is_array($value)) {
-                       
-                        $style_data[$key] = array_map('sanitize_text_field', $value);
+            if ( isset( $_POST['design'] ) && is_array( $_POST['design'] ) ) {
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+                $design = wp_unslash( $_POST['design'] );
+
+                foreach ( $design as $key => $value ) {
+                    if ( is_array( $value ) ) {
+                        $style_data[ $key ] = array_map( 'sanitize_text_field', $value );
                     } else {
-                        $style_data[$key] = sanitize_textarea_field($value);
+                        $style_data[ $key ] = sanitize_textarea_field( $value );
                     }
                 }
-            } else {
-                $style_data = [];
             }
 
             if (!isset($styles[$sd_id])) {

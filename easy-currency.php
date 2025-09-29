@@ -5,9 +5,9 @@
  * Plugin URI:  https://easy-currency.themewant.com/
  * Author:      Themewant
  * Author URI:  http://themewant.com/
- * Requires at least: 6.0
+ * Requires at least: 5.8
  * Requires PHP:7.4
- * Version:     1.0.5
+ * Version:     1.0.6
  * License:     GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: easy-currency

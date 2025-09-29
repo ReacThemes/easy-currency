@@ -264,8 +264,10 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
             return true;
         }
 
-        if (defined('DOING_AJAX') && DOING_AJAX && isset($_REQUEST['wc-ajax'])) {
-            $ajax_action = sanitize_text_field($_REQUEST['wc-ajax']);
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( defined( 'DOING_AJAX' ) && DOING_AJAX && isset( $_REQUEST['wc-ajax'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $ajax_action = sanitize_text_field( wp_unslash( $_REQUEST['wc-ajax'] ));
             $checkout_ajax_actions = array(
                 'update_order_review',
                 'checkout',
@@ -280,6 +282,7 @@ class ECCW_WOO_FUNCTIONS extends ECCW_Plugin_Settings {
                 return true;
             }
             
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing
             if ($ajax_action === 'checkout' && isset($_POST['woocommerce-process-checkout-nonce'])) {
                 return true;
             }

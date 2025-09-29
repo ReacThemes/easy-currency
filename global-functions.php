@@ -71,10 +71,8 @@ function eccw_get_currency_common_settings()
         : (isset($currency_settings['default_currency']) ? $currency_settings['default_currency'] : 'USD');
 
     $welcome_currency = eccw_get_first_visit_currency();
-    $request_currency = isset($_REQUEST['easy_currency']) 
-    ? sanitize_text_field( wp_unslash( $_REQUEST['easy_currency'] ) ) 
-    : '';
-    if ( !empty($welcome_currency) && empty( $request_currency ) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
+
+    if ( !empty($welcome_currency) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
         $default_currency = $welcome_currency;
     }
 
@@ -143,17 +141,28 @@ function eccw_do_shortcode($shortcode, $atts = []) {
     return do_shortcode("[$shortcode $atts_string]");
 }
 
+if ( ! function_exists( 'eccw_is_checkout_ajax_request' ) ) {
 
-if (!function_exists('eccw_is_checkout_ajax_request')) {
-    function eccw_is_checkout_ajax_request() {
-        if (defined('DOING_AJAX')) {
-            $ajax_request = $_REQUEST['wc-ajax'] ?? null;
-            return in_array($ajax_request, array('update_order_review', 'checkout', 'get_refreshed_fragments'));
-        }
-        return false;
-    }
+	/**
+	 * Check if the current request is a WooCommerce checkout AJAX request.
+	 *
+	 * @return bool True if checkout-related AJAX request, false otherwise.
+	 */
+	function eccw_is_checkout_ajax_request() {
+		if ( defined( 'DOING_AJAX' ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$ajax_request = isset( $_REQUEST['wc-ajax'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['wc-ajax'] ) ) : null;
+
+			return in_array(
+				$ajax_request,
+				array( 'update_order_review', 'checkout', 'get_refreshed_fragments' ),
+				true
+			);
+		}
+
+		return false;
+	}
 }
-
 
 function eccw_get_first_visit_currency() {
    
@@ -193,4 +202,21 @@ function eccw_get_available_countries() {
     }
 
     return $currencies;
+}
+
+/**
+ * Recursively sanitize input values.
+ *
+ * This function applies sanitize_text_field() to a single value
+ * or recursively to all elements if an array is provided.
+ *
+ * @param mixed $value Value or array of values to sanitize.
+ * @return mixed Sanitized value or array of sanitized values.
+ */
+function eccw_recursive_sanitize( $value ) {
+    if ( is_array( $value ) ) {
+        return array_map( 'eccw_recursive_sanitize', $value );
+    }
+
+    return sanitize_text_field( $value );
 }

@@ -49,7 +49,7 @@ class ECCW_admin_settings_Customfields
         <tr valign="top">
             <th scope="row" class="titledesc">
                 <label for="<?php echo esc_attr($option_id); ?>">
-                    <?php echo esc_html($field['title'] ?? __('Currency on Billing', 'eccw')); ?>
+                    <?php echo esc_html($field['title'] ?? __('Currency on Billing', 'easy-currency')); ?>
                 </label>
             </th>
             <td class="forminp forminp-radio">
@@ -61,19 +61,19 @@ class ECCW_admin_settings_Customfields
                     <label>
                         <input type="radio" name="<?php echo esc_attr($option_id); ?>" value="none"
                             <?php checked($value, 'none'); ?> />
-                        <?php esc_html_e('None', 'eccw'); ?>
+                        <?php esc_html_e('None', 'easy-currency'); ?>
                     </label><br/>
 
                     <label>
                         <input type="radio" name="<?php echo esc_attr($option_id); ?>" value="billing"
                             <?php checked($value, 'billing'); ?> />
-                        <?php esc_html_e('Change currency by billing country on checkout', 'eccw'); ?>
+                        <?php esc_html_e('Change currency by billing country on checkout', 'easy-currency'); ?>
                     </label><br/>
 
                     <label>
                         <input type="radio" name="<?php echo esc_attr($option_id); ?>" value="shipping"
                             <?php checked($value, 'shipping'); ?> />
-                        <?php esc_html_e('Change currency by shipping country on checkout', 'eccw'); ?>
+                        <?php esc_html_e('Change currency by shipping country on checkout', 'easy-currency'); ?>
                     </label>
 
                     <?php if (!empty($field['desc'])): ?>
@@ -543,15 +543,20 @@ class ECCW_admin_settings_Customfields
             $selected_country = isset($rule['country']) ? esc_attr($rule['country']) : '';
     
             echo '<div class="fixed_price_rule_item">';
-            echo '<input type="text" name="eccw_pricing_fixed_rules[' . $index . '][regular_price]" value="' . $regular_price . '" placeholder="Regular Price" class="eccw_fixed_regular_price_input">';
-            echo '<input type="text" name="eccw_pricing_fixed_rules[' . $index . '][sale_price]" value="' . $sale_price . '" placeholder="Sale Price" class="eccw_fixed_sale_price_input">';
+            echo '<input type="text" name="eccw_pricing_fixed_rules[' . esc_attr( $index ) . '][regular_price]" value="' . esc_attr( $regular_price ) . '" placeholder="Regular Price" class="eccw_fixed_regular_price_input">';
+            echo '<input type="text" name="eccw_pricing_fixed_rules[' . esc_attr( $index ). '][sale_price]" value="' . esc_attr( $sale_price ) . '" placeholder="Sale Price" class="eccw_fixed_sale_price_input">';
             
-            echo '<select name="eccw_pricing_fixed_rules[' . $index . '][country]" class="eccw_fixed_price_country_select">';
+            echo '<select name="eccw_pricing_fixed_rules[' . esc_attr( $index ) . '][country]" class="eccw_fixed_price_country_select">';
             echo '<option value="">Select Country</option>';
             foreach ($countries as $code => $name) {
-                $selected = ($code === $selected_country) ? 'selected' : '';
-                echo '<option value="' . esc_attr($code) . '" ' . $selected . '>' . esc_html($name) . '</option>';
-            }
+            $selected = ($code === $selected_country) ? 'selected' : '';
+            printf(
+                '<option value="%s" %s>%s</option>',
+                esc_attr($code),
+                esc_attr($selected),
+                esc_html($name)
+            );
+        }
             echo '</select>';
     
             echo '<button type="button" class="remove_fixed_price_rule button">Remove</button>';
@@ -571,23 +576,26 @@ class ECCW_admin_settings_Customfields
             return; 
         }
         
-        if (isset($_POST['eccw_pricing_fixed_rules']) && is_array($_POST['eccw_pricing_fixed_rules'])) {
-            update_post_meta($post_id, '_eccw_pricing_fixed_rules', array_values($_POST['eccw_pricing_fixed_rules']));
+         // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        if ( isset( $_POST['eccw_pricing_fixed_rules'] ) && is_array( $_POST['eccw_pricing_fixed_rules'] ) ) {
+
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+            $rules = eccw_recursive_sanitize( wp_unslash( $_POST['eccw_pricing_fixed_rules'] ) );
+
+            update_post_meta( $post_id, '_eccw_pricing_fixed_rules', array_values( $rules ) );
+
         } else {
-            delete_post_meta($post_id, '_eccw_pricing_fixed_rules');
+            delete_post_meta( $post_id, '_eccw_pricing_fixed_rules' );
         }
-        
     }
+
+
 
     public function eccw_add_fixed_pricing($price, $product) {
 
         if ( $this->fixed_price_eachproduct != 'yes' && $this->fixed_price_eachproduct != 1 ) {
             return; 
         }
-
-        $request_currency = isset($_REQUEST['easy_currency']) 
-        ? sanitize_text_field( wp_unslash( $_REQUEST['easy_currency'] ) ) 
-        : '';
 
         $eccw_pricing_fixed_rules = get_post_meta($product->get_id(), '_eccw_pricing_fixed_rules', true);
        
@@ -597,7 +605,7 @@ class ECCW_admin_settings_Customfields
         
         $welcome_currency = eccw_get_first_visit_currency();
 
-        if ( !empty($welcome_currency) && empty( $request_currency ) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
+        if ( !empty($welcome_currency) && !isset($_COOKIE['user_preferred_currency']) && empty($_COOKIE['user_preferred_currency']) ) {
             $default_currency = $welcome_currency;
         }
 
