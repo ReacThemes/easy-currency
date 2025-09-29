@@ -1799,85 +1799,6 @@ class ECCW_admin_settings
        return $all_settings;
     }
 
-    public function eccw_get_settings_converter_widgets_tab_fields() {
-        // Retrieve saved settings
-        $saved_settings = get_option('eccw_currency_settings');
-        $options = isset($saved_settings['options']) ? $saved_settings['options'] : [];
-        $design = isset($saved_settings['design']) ? $saved_settings['design'] : [];
-        $pro_active = class_exists('ECCW_CURRENCY_SWITCHER_PRO');
-        $settings = array(
-            'section_title' => array(
-                'name' => __('Basic Settings', 'easy-currency') ,
-                'type' => 'title',
-                'desc' => '',
-                'id' => 'eccw_settings_tab_section_titles',
-                'classes' => 'section-title'
-            ),
-                    'converter_widget_style' => array(
-                'name' => $pro_active 
-                    ? __('Layout Style', 'easy-currency') 
-                    : __('Layout Style (PRO)', 'easy-currency'),
-
-                'type'      => 'select',
-                'options'   => ['one' => 'Style One'],
-                'desc_tip'  => $pro_active ? '' : __('Available in PRO', 'easy-currency'), // show only if PRO missing
-                'desc'      => __('Widget position where you want to show this.', 'easy-currency'),
-                'id'        => 'options[converter_widget_style]',
-                'default'   => isset($options['converter_widget_style']) ? $options['converter_widget_style'] : 'one',
-                'class'     => 'easy-converter-pro'
-            ),
-            'converter_currency_button_border_color' => array(
-                'name'      => $pro_active 
-                    ? __('Border Color', 'easy-currency') 
-                    : __('Border Color (PRO)', 'easy-currency'),
-                'type'      => 'text',
-                'id'        => 'design[converter_currency_button][border-color]',
-                'default'   => isset($design['converter_currency_button']['border-color']) ? $design['converter_currency_button']['border-color'] : '',
-                'class'     => 'eccw-color-input',
-                'desc_tip'  => $pro_active ? '' : __('Available in PRO', 'easy-currency')
-            ),
-            'converter_currency_button_border' => array(
-                'name'      => $pro_active 
-                    ? __('Border width', 'easy-currency') 
-                    : __('Border width (PRO)', 'easy-currency'),
-                'type'      => 'text',
-                'desc'      => 'enter number with px. ex: 2px 2px 2px 2px',
-                'default'   => isset($design['converter_currency_button']['null']) ? $design['converter_currency_button']['null'] : '',
-                'class'     => 'eccw-currency-side-widget-bg eccw-dimension-input',
-                'custom_attributes' => array(
-                    'unit'   => 'px',
-                    'fields' => wp_json_encode(array(
-                        array('type'=>'text','name'=>'design[converter_currency_button][border-top-width]','value'=>isset($design['converter_currency_button']['border-top-width']) ? $design['converter_currency_button']['border-top-width'] : '', 'placeholder'=>'top'),
-                        array('type'=>'text','name'=>'design[converter_currency_button][border-left-width]','value'=>isset($design['converter_currency_button']['border-left-width']) ? $design['converter_currency_button']['border-left-width'] : '', 'placeholder'=>'left'),
-                        array('type'=>'text','name'=>'design[converter_currency_button][border-bottom-width]','value'=>isset($design['converter_currency_button']['border-bottom-width']) ? $design['converter_currency_button']['border-bottom-width'] : '', 'placeholder'=>'bottom'),
-                        array('type'=>'text','name'=>'design[converter_currency_button][border-right-width]','value'=>isset($design['converter_currency_button']['border-right-width']) ? $design['converter_currency_button']['border-right-width'] : '', 'placeholder'=>'right'),
-                    ))
-                ),
-                'desc_tip' => $pro_active ? '' : __('Available in PRO', 'easy-currency')
-            ),
-            'converter_currency_button_flag_size' => array(
-                'name'        =>  $pro_active 
-                    ? __('Flag Size (Width)', 'easy-currency') 
-                    : __('Flag Size (Width) (PRO)', 'easy-currency'), 
-                'type'        => 'text',
-                'desc'        => 'enter number with px. ex: 15px',
-                'id'          => 'design[converter_currency_button_flag][width]',
-                'default'     => isset($design['converter_currency_button_flag']['width']) ? $design['converter_currency_button_flag']['width'] : '',
-                'placeholder' => '15px',
-                'class'       => 'eccw-input',
-                'desc_tip'    => $pro_active ? '' : __('Available in PRO', 'easy-currency')
-            ),
-            'section_end' => array(
-                'type' => 'sectionend',
-                'id' => 'eccw_settings_tab_section_end'
-            )
-        );
-
-        $all_settings = array_merge($settings);
-    
-        return $all_settings;
-    }
-
     public function eccw_settings_tab_settings()
     {
 
@@ -1903,7 +1824,6 @@ class ECCW_admin_settings
                     <li><a href="#tab_currency_switcher_sticky">Side</a></li>
                     <li><a href="#tab_currency_advanced_settings">Advanced</a></li>
                     <li><a href="#tab_currency_checkout_settings">Checkout</a></li>
-                    <li><a href="#tab_converter_widgets">Converter</a></li>
                     <li><a href="#tab_currency_usage">Usage</a></li>
                     
 
@@ -2163,10 +2083,6 @@ class ECCW_admin_settings
 
                     <div id="tab_currency_checkout_settings" class="tab-content">
                         <?php woocommerce_admin_fields($this->eccw_checkout_settings_field()); ?>
-                    </div>
-
-                    <div id="tab_converter_widgets" class="tab-content easy-tab-converter-widget <?php echo class_exists('ECCW_CURRENCY_SWITCHER_PRO') ? '' : 'eccw-ccpro-missing'; ?>">
-                        <?php woocommerce_admin_fields($this->eccw_get_settings_converter_widgets_tab_fields()); ?>
                     </div>
                 </div>
             </div>
