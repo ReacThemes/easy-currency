@@ -1013,18 +1013,26 @@
     },
 
     currencyPaymentMethodTable: function() {
-        $(document).ready(function($){
-         
-            // Checkbox toggle
-            $('input[name="checkout_settings[eccw_checkout_currency]"]').on('change', function(){
-                if( $(this).is(':checked') ) {
-                    $('.eccw-payment-rule-bycurrency-table-list,.eccw-currency-by-payment-rule,.eccw-currency-payment-table-list').slideDown();
-                } else {
-                    $('.eccw-payment-rule-bycurrency-table-list,.eccw-currency-by-payment-rule,.eccw-currency-payment-table-list').slideUp();
-                }
-            });
-      });
+      $(document).ready(function($){
+          var $checkbox = $('input[name="checkout_settings[eccw_checkout_currency]"]');
+          var $tableElements = $('.eccw-payment-rule-bycurrency-table-list, .eccw-currency-by-payment-rule, .eccw-currency-payment-table-list');
 
+          // Initial check on page load
+          if( !$checkbox.is(':checked') ) {
+              $tableElements.hide();
+          } else {
+              $tableElements.show();
+          }
+
+          // Checkbox toggle
+          $checkbox.on('change', function(){
+              if( $(this).is(':checked') ) {
+                  $tableElements.slideDown();
+              } else {
+                  $tableElements.slideUp();
+              }
+          });
+      });
     },
 
     EccwaddNewfixedPriceRules: function () {
@@ -1196,6 +1204,25 @@
           allowClear: true
       });
   });
+
+   $(document).ready(function($){
+        var $checkbox = $('input[name="advanced_settings[eccw_auto_select_currency_by_country]"]');
+        var $table = $('.eccw-geo-country-table-list.easy-currency-pro-feature');
+
+        function easyCurrencytoggleTable() {
+            if( $checkbox.is(':disabled') || !$checkbox.is(':checked') ) {
+                $table.hide();
+            } else {
+                $table.show();
+            }
+        }
+
+        easyCurrencytoggleTable();
+
+        $checkbox.on('change', function(){
+            easyCurrencytoggleTable();
+        });
+    });
 
 
 })(jQuery);
