@@ -527,18 +527,18 @@
 
           $(".eccw-copy-btn").each(function () {
             $(this).html(
-              '<img draggable="false" role="img" class="emoji" alt="📋" src="https://s.w.org/images/core/emoji/16.0.1/svg/1f4cb.svg">'
+              `<img draggable="false" role="img" class="emoji" alt="📋" src="${eccw_vars.pluginURL}/admin/assets/img/svg/copy.svg">`
             );
           });
 
           const button = $(this);
           button.html(
-            '<img draggable="false" role="img" class="emoji" alt="✅" src="https://s.w.org/images/core/emoji/16.0.1/svg/2705.svg">'
+            `<img draggable="false" role="img" class="emoji" alt="✅" src="${eccw_vars.pluginURL}/admin/assets/img/svg/mark.svg">`
           );
 
           setTimeout(() => {
             button.html(
-              '<img draggable="false" role="img" class="emoji" alt="📋" src="https://s.w.org/images/core/emoji/16.0.1/svg/1f4cb.svg">'
+               `<img draggable="false" role="img" class="emoji" alt="📋" src="${eccw_vars.pluginURL}/admin/assets/img/svg/copy.svg">`
             );
           }, 5000);
         } catch (err) {

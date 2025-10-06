@@ -153,55 +153,37 @@ class ECCW_admin_settings_Customfields
         $desc_tip      = ! empty( $field['desc_tip'] ) ? true : false;
         $description   = ! empty( $field['description'] ) ? $field['description'] : '';
         $eccw_pro      = ! empty($field['eccw_pro']) ? $field['eccw_pro'] : false;
+        $pro_active    = $eccw_pro && ! class_exists('ECCW_CURRENCY_SWITCHER_PRO');
 
         if ( ! is_array( $current_value ) ) {
             $current_value = ! empty( $current_value ) ? [$current_value] : [];
         }
 
+        $countries = WC()->countries->get_countries();
         ?>
         <tr valign="top" class="<?php echo esc_attr( $class ); ?>">
             <th scope="row" class="titledesc">
                 <?php echo esc_html( $field['name'] ); ?>
-                <?php if ( $eccw_pro && ! class_exists('ECCW_CURRENCY_SWITCHER_PRO') ) : ?>
-                (<span class="eccw-pro-lock">PRO</span>)
+                <?php if ( $pro_active ) : ?>
+                    (<span class="eccw-pro-lock">PRO</span>)
                 <?php endif; ?>
                 <?php if ( $desc_tip && $description ) : ?>
                     <span class="woocommerce-help-tip" data-tip="<?php echo esc_attr( $description ); ?>"></span>
                 <?php endif; ?>
             </th>
             <td class="forminp forminp-select">
-
-                <?php if ( $eccw_pro && ! class_exists('ECCW_CURRENCY_SWITCHER_PRO') ) : ?>
-                   
-                    <label class=" eccw-pro-lock-tooltip" data-tooltip="<?php echo esc_attr__('This feature is available in Pro version', 'easy-currency'); ?>">
-                    <select class="eccw-searchable-country-select eccw-pro-lock-tooltip"
-                            multiple="multiple"
-                            disabled
-                            style="width: 100%;">
-                        <?php 
-                        $countries = WC()->countries->get_countries();
-                        foreach ( $current_value as $val ) :
-                            if ( isset( $countries[ $val ] ) ) : ?>
-                                <option value="<?php echo esc_attr( $val ); ?>" selected>
-                                    <?php echo esc_html( $countries[ $val ] ); ?>
-                                </option>
-                            <?php endif;
-                        endforeach; ?>
-                    </select>
-                    </label>
-
-                <?php else : ?>
-                  
+                <label <?php echo $pro_active ? 'class="eccw-pro-lock-tooltip" data-tooltip="' . esc_attr__('This feature is available in Pro version', 'easy-currency') . '"' : ''; ?>>
                     <select id="<?php echo esc_attr( $field['id'] ); ?>"
                             name="<?php echo esc_attr( $field['id'] ); ?>[]"
                             class="eccw-searchable-country-select"
                             multiple="multiple"
+                            style="width:100%;"
+                            <?php echo $pro_active ? 'disabled' : ''; ?>
+                            <?php if ( ! $pro_active ) : ?>
                             data-placeholder="<?php esc_attr_e( 'Search for a country...', 'easy-currency' ); ?>"
-                            style="width: 100%;">
-
-                        <?php 
-                        $countries = WC()->countries->get_countries();
-                        foreach ( $current_value as $val ) :
+                            <?php endif; ?>
+                    >
+                        <?php foreach ( $current_value as $val ) : 
                             if ( isset( $countries[ $val ] ) ) : ?>
                                 <option value="<?php echo esc_attr( $val ); ?>" selected>
                                     <?php echo esc_html( $countries[ $val ] ); ?>
@@ -209,17 +191,15 @@ class ECCW_admin_settings_Customfields
                             <?php endif;
                         endforeach; ?>
                     </select>
-                <?php endif; ?>
+                </label>
 
                 <?php if ( ! $desc_tip && $description ) : ?>
                     <p class="description"><?php echo esc_html( $description ); ?></p>
                 <?php endif; ?>
-
             </td>
         </tr>
         <?php
     }
-
 
     public function eccw_admin_field_eccw_select2($field)
     {
@@ -475,11 +455,13 @@ class ECCW_admin_settings_Customfields
         $desc_tip  = ! empty($field['desc_tip']) ? $field['desc_tip'] : false;
         $eccw_pro  = ! empty($field['eccw_pro']) ? $field['eccw_pro'] : false;
 
+        $pro_enable =  $eccw_pro && !class_exists('ECCW_CURRENCY_SWITCHER_PRO');
+
         ?>
         <tr valign="top" class="<?php echo esc_attr($field['class']); ?>">
             <th scope="row" class="titledesc">
                 <?php echo esc_html($field['title']); ?>
-                <?php if ( $eccw_pro && !class_exists('ECCW_CURRENCY_SWITCHER_PRO')) : ?>
+                <?php if ( $pro_enable ) : ?>
                 (<span class="eccw-pro-lock">PRO</span>)
                 <?php endif; ?>
                 <?php if ( $desc_tip ) : ?>
@@ -488,23 +470,18 @@ class ECCW_admin_settings_Customfields
             </th>
             <td class="forminp forminp-checkbox">
 
-                <?php if ( $eccw_pro && !class_exists('ECCW_CURRENCY_SWITCHER_PRO')) : ?>
-                    <label class="eccw-switch eccw-pro-lock-tooltip" 
-                        data-tooltip="<?php echo esc_attr__('This feature is available in Pro version', 'easy-currency'); ?>">
-                        <input type="hidden" name="<?php echo esc_attr($field['id']); ?>" value="no" />
-                        <input type="checkbox" disabled />
-                        <span class="eccw-slider"></span>
-                    </label>
-                
-                <?php else : ?>
-                   
-                    <label class="eccw-switch">
-                        <input type="hidden" name="<?php echo esc_attr($field['id']); ?>" value="no" />
-                        <input type="checkbox" name="<?php echo esc_attr($field['id']); ?>" value="yes" <?php echo ($value === 'yes' || $value == 1 ) ? 'checked="checked"' : ''; ?> />
-                        <span class="eccw-slider"></span>
-                    </label>
-                    
-                <?php endif; ?>
+                <label class="eccw-switch<?php echo $pro_enable ? ' eccw-pro-lock-tooltip' : ''; ?> "
+                    <?php if ( $pro_enable ) : ?>
+                        data-tooltip="<?php echo esc_attr__('This feature is available in Pro version', 'easy-currency'); ?>"
+                    <?php endif; ?>>
+                    <input type="hidden" name="<?php echo esc_attr($field['id']); ?>" value="no" />
+                   <input type="checkbox" 
+                    name="<?php echo esc_attr($field['id']); ?>" 
+                    value="yes" 
+                    <?php echo ($value === 'yes' || $value == 1 ) ? 'checked="checked"' : ''; ?>
+                    <?php echo $pro_enable ? '' : 'disabled="disabled"'; ?> />
+                    <span class="eccw-slider"></span>
+                </label>
                 <?php if (!empty($field['desc'])) : ?>
                         <p class="description"><?php echo esc_html($field['desc']); ?></p>
                     <?php endif; ?>

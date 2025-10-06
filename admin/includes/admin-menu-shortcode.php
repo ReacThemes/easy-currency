@@ -105,17 +105,30 @@ trait Easy_Currency_Menu_Shortcode_Admin {
 			wp_die();
 		}
 
-        $item = filter_input( INPUT_POST, 'menu-item', FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY );
-        set_transient( 'eccw_get_description_transient_' . $item['menu-item-object-id'], $item['menu-item-description'] );
+        $items = isset($_POST['menu-item']) && is_array($_POST['menu-item'])
+        ? map_deep(wp_unslash($_POST['menu-item']), 'sanitize_text_field')
+        : [];
 
-        $object_id = $this->eccw_menu_object_id( $item['menu-item-object-id'] );
+        $object_id = isset($item['menu-item-object-id']) ? intval($item['menu-item-object-id']) : 0;
+        $description = isset($item['menu-item-description']) ? sanitize_text_field($item['menu-item-description']) : '';
+
+        if ($object_id && $description) {
+            set_transient('eccw_get_description_transient_' . $object_id, $description);
+        }
+
+        $object_id = $this->eccw_menu_object_id( $object_id );
         echo esc_js( $object_id );
         wp_die();
     }
 
     public function eccw_security_check() {
         if ( current_user_can( 'activate_plugins' ) ) {
-            add_filter( 'clean_url', [ $this, 'eccw_shortcode_save' ], 99, 3 );
+
+            add_action( 'current_screen', function( $screen ) {
+                if ( $screen && 'nav-menus' === $screen->id ) {
+                    add_filter( 'clean_url', [ $this, 'eccw_shortcode_save' ], 99, 3 );
+                }
+            });
         }
     }
 
@@ -129,7 +142,10 @@ trait Easy_Currency_Menu_Shortcode_Admin {
         require_once ABSPATH . 'wp-admin/includes/nav-menu.php';
 
         $menu_items_data = [];
-        $menu_item = filter_input( INPUT_POST, 'menu-item', FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY );
+        $menu_item = isset($_POST['menu-item']) && is_array($_POST['menu-item'])
+        ? map_deep(wp_unslash($_POST['menu-item']), 'sanitize_text_field')
+        : [];
+
 
         foreach ( $menu_item as $menu_item_data ) {
             if (
@@ -138,22 +154,42 @@ trait Easy_Currency_Menu_Shortcode_Admin {
                 'easy_eccw_menu_type' !== $menu_item_data['menu-item-type'] &&
                 ! empty( $menu_item_data['menu-item-object-id'] )
             ) {
+
+                $object_id = isset($menu_item_data['menu-item-object-id']) ? intval($menu_item_data['menu-item-object-id']) : 0;
+                $menu_item_object = isset($menu_item_data['menu-item-object']) ? sanitize_key($menu_item_data['menu-item-object']) : '';
+
                 switch ( $menu_item_data['menu-item-type'] ) {
                     case 'post_type':
-                        $_object = get_post( $menu_item_data['menu-item-object-id'] );
+                        if (!post_type_exists($menu_item_object)) {
+                            $menu_item_object = '';
+                        }
+                        $_object = get_post( $object_id );
                         break;
                     case 'taxonomy':
-                        $_object = get_term( $menu_item_data['menu-item-object-id'], $menu_item_data['menu-item-object'] );
+                        if (!taxonomy_exists($menu_item_object)) {
+                            $menu_item_object = '';
+                        }
+                        $_object = get_term( $object_id, $menu_item_object );
+                        break;
+                    default:
+                        $_object = null;
                         break;
                 }
 
-                $_menu_items = array_map( 'wp_setup_nav_menu_item', [ $_object ] );
-                $_menu_item  = reset( $_menu_items );
-                $menu_item_data['menu-item-description'] = $_menu_item->description;
+                if ( $_object ) {
+                    $_menu_items = array_map( 'wp_setup_nav_menu_item', [ $_object ] );
+                    $_menu_item  = reset( $_menu_items );
+
+                    $menu_item_data['menu-item-description'] = isset($_menu_item->description)
+                        ? sanitize_text_field($_menu_item->description)
+                        : '';
+                }
             }
+
             $menu_items_data[] = $menu_item_data;
         }
 
+        // Save all sanitized menu items
         $item_ids = wp_save_nav_menu_items( 0, $menu_items_data );
         if ( is_wp_error( $item_ids ) ) {
             wp_die( 0 );
@@ -267,7 +303,13 @@ if ( ! class_exists( 'Easy_Currency_Menu_Shortcode' ) ) {
             // frontend
             add_filter( 'walker_nav_menu_start_el', [ $this, 'start_el' ], 20, 2 );
             add_filter( 'megamenu_walker_nav_menu_start_el', [ $this, 'start_el' ], 20, 2 );
-            add_filter( 'clean_url', [ $this, 'display_shortcode' ], 1, 3 );
+
+            add_action( 'current_screen', function( $screen ) {
+                if ( $screen && 'nav-menus' === $screen->id ) {
+                    add_filter( 'clean_url', [ $this, 'display_shortcode' ], 1, 3 );
+                }
+            });
+
             add_filter( 'wp_setup_nav_menu_item', [ $this, 'setup_item' ], 10, 1 );
 
             // admin

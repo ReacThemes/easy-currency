@@ -4,7 +4,7 @@ Tags: currency switcher, woocommerce currency, multi-currency, currency converte
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,7 +23,6 @@ We provide 2 ready-made templates for shortcode switchers and 3 different ready-
 You can also display estimated product prices on the shop, single product, cart, and checkout pages. The plugin automatically updates exchange rates and lets customers pay directly in their selected currency.
 
 Easy Currency is available both as a shortcode and as a sticky sidebar switcher.
-
 
 == Why Choose Easy Currency? ==
 
@@ -90,12 +89,83 @@ Enable this option to allow customers to pay in their chosen currency.
 
 == External services ==
 
-APILayer
+This plugin connects to multiple external services to fetch live currency exchange rates. 
+These services are required to provide accurate and up-to-date currency information in the plugin. 
 
-This plugin utilizes a third-party service, APILayer (https://apilayer.com/), to get updated currency rates. When the plugin needs to calculate currency wise price, it retrieves updated currency rates. For example, we need convert currency from usd to ero, then it will retrieve currency rate and help to convert the price to ero.
+No user personal data is sent. The plugin only requests currency symbols or API key data when fetching exchange rates.
 
-Privacy Policy link: https://www.ideracorp.com/legal/APILayer
-Terms of Use link: https://www.ideracorp.com/Legal/Terms-of-Use
+---
+
+**1. Yahoo Finance API**  
+This service is used to fetch live forex rates.  
+No user personal data is sent. The plugin only requests currency symbols from the Yahoo Finance API whenever rates need to be updated.  
+
+Service provider: Yahoo Finance  
+- Terms of Use: https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html  
+- Privacy Policy: https://policies.yahoo.com/us/en/yahoo/privacy/index.htm  
+
+---
+
+**2. CryptoCompare API**  
+This service is used to fetch cryptocurrency exchange rates.  
+No user personal data is sent. The plugin only requests the selected cryptocurrency symbols when rates are fetched.  
+
+Service provider: CryptoCompare  
+- Terms of Use: https://www.cryptocompare.com/terms-conditions/ 
+- Privacy Policy:  https://www.cryptocompare.com/privacy-policy/
+
+---
+
+**3. European Central Bank (ECB)**  
+This service provides Euro-based currency exchange rates.  
+No user personal data is sent. The plugin only requests currency rates from the ECB API whenever rates need to be updated.  
+
+Service provider: European Central Bank  
+- Terms of Use: https://www.ecb.europa.eu/services/data-protection/privacy-statements/html/ecb.terms_identity_portal.en.html
+- Privacy Policy: https://www.ecb.europa.eu/services/data-protection/privacy-statements/html/index.en.html
+
+---
+
+**4. apilayer / Exchangerates API**  
+This service is used to fetch live currency exchange rates via API key.  
+No user personal data is sent. The plugin only requests the selected currency symbols along with the API key.  
+
+Service provider: apilayer  
+- Privacy Policy link: https://www.ideracorp.com/legal/APILayer
+- Terms of Use link: https://www.ideracorp.com/Legal/Terms-of-Use 
+
+---
+
+**5. PrivatBank API**  
+This service is used to fetch UAH-based currency exchange rates.  
+No user personal data is sent. The plugin only requests currency symbols when rates need to be updated.  
+
+Service provider: PrivatBank  
+- Terms of Use: https://static.privatbank.ua/files/0000003515410882.pdf
+- Privacy Policy: https://privatbank.ua/en/personal-information 
+
+---
+
+**6. Hungarian National Bank (MNB) API**  
+This service is used to fetch HUF-based currency exchange rates via SOAP.  
+No user personal data is sent. The plugin only requests currency rates from the MNB API whenever currency data needs to be updated.  
+
+Service provider: Hungarian National Bank (MNB)  
+- Terms of Use: https://www.mnb.hu/en/the-central-bank/about-the-mnb/terms-of-use
+- Privacy Policy: https://www.mnb.hu/en/privacy-notice
+
+---
+
+**7. Open Exchange Rates API**  
+This service is used to fetch live currency exchange rates via API key.  
+No user personal data is sent. The plugin only requests the selected currency symbols along with the API key.  
+
+Service provider: Open Exchange Rates  
+- Terms of Use: https://openexchangerates.org/terms
+- Privacy Policy: https://openexchangerates.org/privacy
+
+= 1.0.7 =
+* Fixed: Plugin Review fix
 
 = 1.0.6 =
 * Fixed: Code updated
