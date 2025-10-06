@@ -457,6 +457,8 @@ class ECCW_admin_settings_Customfields
 
         $pro_enable =  $eccw_pro && !class_exists('ECCW_CURRENCY_SWITCHER_PRO');
 
+        error_log( print_r( $pro_enable, true ) );
+
         ?>
         <tr valign="top" class="<?php echo esc_attr($field['class']); ?>">
             <th scope="row" class="titledesc">
@@ -479,7 +481,7 @@ class ECCW_admin_settings_Customfields
                     name="<?php echo esc_attr($field['id']); ?>" 
                     value="yes" 
                     <?php echo ($value === 'yes' || $value == 1 ) ? 'checked="checked"' : ''; ?>
-                    <?php echo $pro_enable ? '' : 'disabled="disabled"'; ?> />
+                    <?php echo $pro_enable ? 'disabled="disabled"' : ''; ?> />
                     <span class="eccw-slider"></span>
                 </label>
                 <?php if (!empty($field['desc'])) : ?>
