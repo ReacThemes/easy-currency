@@ -457,8 +457,6 @@ class ECCW_admin_settings_Customfields
 
         $pro_enable =  $eccw_pro && !class_exists('ECCW_CURRENCY_SWITCHER_PRO');
 
-        error_log( print_r( $pro_enable, true ) );
-
         ?>
         <tr valign="top" class="<?php echo esc_attr($field['class']); ?>">
             <th scope="row" class="titledesc">
