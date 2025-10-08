@@ -4,7 +4,7 @@ Tags: currency switcher, woocommerce currency, multi-currency, currency converte
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -163,6 +163,10 @@ No user personal data is sent. The plugin only requests the selected currency sy
 Service provider: Open Exchange Rates  
 - Terms of Use: https://openexchangerates.org/terms
 - Privacy Policy: https://openexchangerates.org/privacy
+
+
+= 1.0.8 =
+* Fixed: Shortcode Menu Issue fix
 
 = 1.0.7 =
 * Fixed: Plugin Review fix

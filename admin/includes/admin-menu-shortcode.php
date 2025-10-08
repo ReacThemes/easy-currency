@@ -40,12 +40,6 @@ trait Easy_Currency_Menu_Shortcode_Frontend {
         return $item_output;
     }
 
-    public function display_shortcode( $url, $orig_url, $context ) {
-        return ( 'display' === $context && $this->has_shortcode( $orig_url ) )
-            ? do_shortcode( $orig_url )
-            : $url;
-    }
-
     public function setup_item( $item ) {
         if ( ! is_object( $item ) ) return $item;
 
@@ -119,17 +113,6 @@ trait Easy_Currency_Menu_Shortcode_Admin {
         $object_id = $this->eccw_menu_object_id( $object_id );
         echo esc_js( $object_id );
         wp_die();
-    }
-
-    public function eccw_security_check() {
-        if ( current_user_can( 'activate_plugins' ) ) {
-
-            add_action( 'current_screen', function( $screen ) {
-                if ( $screen && 'nav-menus' === $screen->id ) {
-                    add_filter( 'clean_url', [ $this, 'eccw_shortcode_save' ], 99, 3 );
-                }
-            });
-        }
     }
 
     public function eccw_ajax_menu_add_item() {
@@ -225,12 +208,6 @@ trait Easy_Currency_Menu_Shortcode_Admin {
         wp_die();
     }
 
-    public function eccw_shortcode_save( $url, $orig_url, $context ) {
-        return ( 'db' === $context && $this->has_shortcode( $orig_url ) )
-            ? $orig_url
-            : $url;
-    }
-
     public function eccw_menu_object_id( $last_object_id ) {
         $object_id = (int) $last_object_id;
         $object_id ++;
@@ -304,12 +281,6 @@ if ( ! class_exists( 'Easy_Currency_Menu_Shortcode' ) ) {
             add_filter( 'walker_nav_menu_start_el', [ $this, 'start_el' ], 20, 2 );
             add_filter( 'megamenu_walker_nav_menu_start_el', [ $this, 'start_el' ], 20, 2 );
 
-            add_action( 'current_screen', function( $screen ) {
-                if ( $screen && 'nav-menus' === $screen->id ) {
-                    add_filter( 'clean_url', [ $this, 'display_shortcode' ], 1, 3 );
-                }
-            });
-
             add_filter( 'wp_setup_nav_menu_item', [ $this, 'setup_item' ], 10, 1 );
 
             // admin
@@ -317,7 +288,6 @@ if ( ! class_exists( 'Easy_Currency_Menu_Shortcode' ) ) {
                 add_action( 'admin_init', [ $this, 'eccw_meta_box_func' ] );
                 add_action( 'admin_enqueue_scripts', [ $this, 'enqueue' ] );
                 add_action( 'wp_ajax_eccw_get_description_transient', [ $this, 'description_hack' ] );
-                add_action( 'wp_loaded', [ $this, 'eccw_security_check' ] );
                 add_action( 'wp_ajax_add-menu-item', [ $this, 'eccw_ajax_menu_add_item' ], 0 );
             }
         }
